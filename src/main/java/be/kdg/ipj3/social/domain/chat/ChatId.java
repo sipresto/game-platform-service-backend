@@ -1,12 +1,22 @@
 package be.kdg.ipj3.social.domain.chat;
 
-import jakarta.validation.constraints.NotNull;
+import be.kdg.ipj3.shared.domain.NotFoundException;
+import org.jmolecules.ddd.annotation.ValueObject;
 
 import java.util.Objects;
 import java.util.UUID;
 
-public record ChatId(@NotNull UUID id) {
+@ValueObject
+public record ChatId(UUID id) {
     public ChatId {
-        Objects.requireNonNull(id, "ChatId cannot be null");
+        Objects.requireNonNull(id, "Chat id cannot be null");
+    }
+
+    public NotFoundException notFound() {
+        return new NotFoundException("Chat [" + id + "] not found");
+    }
+
+    public static ChatId create() {
+        return new ChatId(UUID.randomUUID());
     }
 }

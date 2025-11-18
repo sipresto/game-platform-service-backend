@@ -1,37 +1,42 @@
 package be.kdg.ipj3.social.domain.chat;
 
-import be.kdg.ipj3.shared.domain.user.UserId;
+import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.social.domain.message.Message;
 import org.jmolecules.ddd.annotation.Entity;
 import org.jmolecules.ddd.annotation.Identity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
+import java.util.Set;
 
 @Entity
 public class Chat {
     @Identity
-    private final ChatId chatId;
-    private final UserId[] userIds = new UserId[2];
+    private final ChatId id;
+    private final Set<UserId> participants = new HashSet<>();
     private final List<Message> messages = new ArrayList<>();
 
-    public Chat(UserId user1, UserId user2) {
-        userIds[0] = user1;
-        userIds[1] = user2;
-        chatId = new ChatId(UUID.randomUUID());
+    public Chat(ChatId id, Set<UserId> participants, List<Message> messages) {
+        this.id = id;
+        this.participants.addAll(participants);
+        this.messages.addAll(messages);
     }
 
-    public ChatId chatId() {
-        return chatId;
+    public Chat(Set<UserId> participants) {
+        this(ChatId.create(), participants, List.of());
     }
 
-    public UserId[] userIds() {
-        return userIds;
+    public ChatId getId() {
+        return id;
     }
 
-    public List<Message> messages() {
-        return messages;
+    public Set<UserId> getParticipants() {
+        return Set.copyOf(participants);
+    }
+
+    public List<Message> getMessages() {
+        return List.copyOf(messages);
     }
 
     public void addMessage(Message message) {
