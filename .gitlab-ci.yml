@@ -1,0 +1,99 @@
+stages:
+  - test
+  - package
+  - security-scan
+
+variables:
+  MAVEN_IMAGE: eclipse-temurin:25-jdk-alpine
+  DOCKER_IMAGE: docker:27
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-fast --show-version"
+
+cache:
+  key: "${CI_COMMIT_REF_SLUG}"
+  paths:
+    - .m2/repository/
+    - target/
+
+.test-rules: &test-rules
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+test-job:
+  stage: test
+  image: $MAVEN_IMAGE
+  script:
+    - ./mvnw test $MAVEN_CLI_OPTS
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+    paths:
+      - target/
+    expire_in: 1 week
+  rules: *test-rules
+
+integration-test-job:
+  stage: test
+  image: $MAVEN_IMAGE
+  script:
+    - ./mvnw verify $MAVEN_CLI_OPTS -DskipUnitTests
+  artifacts:
+    reports:
+      junit:
+        - target/failsafe-reports/TEST-*.xml
+    paths:
+      - target/
+  rules: *test-rules
+  allow_failure: false
+
+build-job:
+  stage: package
+  image: $MAVEN_IMAGE
+  script:
+    - ./mvnw clean package $MAVEN_CLI_OPTS -DskipTests
+    - echo "JAR built: $(ls target/*.jar)"
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 week
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
+
+docker-build-job:
+  stage: package
+  image:
+    name: $DOCKER_IMAGE
+    entrypoint: [""]
+  services:
+    - name: docker:27-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
+    - echo "Docker image pushed: $IMAGE_TAG"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
+  needs: ["build-job"]
+
+dependency-scan:
+  stage: security-scan
+  image: $MAVEN_IMAGE
+  script:
+    - ./mvnw dependency:check $MAVEN_CLI_OPTS
+  artifacts:
+    reports:
+      dependency_scanning:
+        - gl-dependency-scanning-report.json
+  rules: *test-rules
+  allow_failure: true
+
+include:
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
