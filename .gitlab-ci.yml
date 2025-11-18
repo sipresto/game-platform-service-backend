@@ -1,16 +1,27 @@
 stages:
   - compile
   - test
+  - static-analysis
   - package
 
 variables:
   DEFAULT_IMAGE_NAME: eclipse-temurin:25-jdk-alpine
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+  GIT_DEPTH: "0"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-fast --show-version"
+
+cache:
+  paths:
+    - .m2/repository/
+    - .sonar/cache
+    - build/reports/detekt/
 
 compile-job:
   stage: compile
   image: $DEFAULT_IMAGE_NAME
   script:
-    - ./mvnw compile
+    - ./mvnw compile $MAVEN_CLI_OPTS
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
@@ -22,21 +33,54 @@ test-job:
     reports:
       junit:
         - target/surefire-reports/TEST-*.xml
+    paths:
+      - target/
   services:
     - name: docker:27-dind
   variables:
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ""
   script:
-    - ./mvnw test
+    - ./mvnw test $MAVEN_CLI_OPTS
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
 
+sonarqube-check:
+  stage: static-analysis
+  image: $DEFAULT_IMAGE_NAME
+  variables:
+    SONAR_TOKEN: $SONAR_TOKEN 
+    SONAR_HOST_URL: $SONAR_HOST_URL 
+  script:
+    - ./mvnw sonar:sonar $MAVEN_CLI_OPTS
+      -Dsonar.projectKey=$SONAR_PROJECT_KEY
+      -Dsonar.projectName="$CI_PROJECT_TITLE"
+      -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+      -Dsonar.java.coveragePlugin=jacoco
+  dependencies:
+    - test-job
+  artifacts:
+    reports:
+      codequality: gl-sast-report.json
+    paths:
+      - .sonar/cache
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      variables:
+        SONAR_GATE: "true"
+    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+  allow_failure: false
+
 package-job:
   stage: package
+  image: $DEFAULT_IMAGE_NAME
   script:
-    - echo 'packaging the application'
+    - ./mvnw package $MAVEN_CLI_OPTS -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 week
   rules:
     - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
 
