@@ -13,9 +13,9 @@ compile-job:
     - chmod +x ./mvnw
   script:
     - ./mvnw compile
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
 
 test-job:
   stage: test
@@ -39,9 +39,9 @@ test-job:
     reports:
       junit:
         - target/surefire-reports/TEST-*.xml
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
 
 package-job:
   stage: package
