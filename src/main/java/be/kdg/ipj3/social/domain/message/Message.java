@@ -1,40 +1,43 @@
 package be.kdg.ipj3.social.domain.message;
 
-import be.kdg.ipj3.shared.domain.user.UserId;
+import be.kdg.ipj3.shared.domain.UserId;
 import org.jmolecules.ddd.annotation.Entity;
 import org.jmolecules.ddd.annotation.Identity;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 public class Message {
     @Identity
-    private final MessageId messageId;
+    private final MessageId id;
     private final String message;
-    private final Instant sendAt;
-    private final UserId sentById;
+    private final Instant sentAt;
+    private final UserId sender;
 
-    public Message(String message, UserId sentById) {
+    public Message(MessageId id, String message, UserId sender, Instant sentAt) {
+        this.id = id;
         this.message = message;
-        this.sentById = sentById;
-        sendAt = Instant.now();
-        messageId = new MessageId(UUID.randomUUID());
+        this.sender = sender;
+        this.sentAt = sentAt;
     }
 
-    public MessageId messageId() {
-        return messageId;
+    public Message(String message, UserId sender) {
+        this(MessageId.create(), message, sender, Instant.now());
     }
 
-    public String message() {
+    public MessageId getId() {
+        return id;
+    }
+
+    public String getMessage() {
         return message;
     }
 
-    public Instant sendAt() {
-        return sendAt;
+    public Instant getSentAt() {
+        return sentAt;
     }
 
-    public UserId sentById() {
-        return sentById;
+    public UserId getSender() {
+        return sender;
     }
 }
