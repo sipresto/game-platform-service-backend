@@ -19,8 +19,6 @@ compile-job:
   image: $DEFAULT_IMAGE_NAME
   before_script:
     - chmod +x ./mvnw
-    - apk add --no-cache docker-cli
-    - timeout 30s sh -c 'until docker info; do echo "Waiting for Docker..."; sleep 2; done'
 
   script:
     - ./mvnw compile
@@ -33,6 +31,8 @@ test-job:
   image: $DEFAULT_IMAGE_NAME
   before_script:
     - chmod +x ./mvnw
+    - chmod +x ./mvnw
+    - apk add --no-cache docker-cli
     - timeout 30s sh -c 'until docker info; do echo "Waiting for Docker..."; sleep 2; done'
   artifacts:
     reports:
