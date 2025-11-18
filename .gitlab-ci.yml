@@ -33,7 +33,6 @@ test-job:
     - chmod +x ./mvnw
     - chmod +x ./mvnw
     - apk add --no-cache docker-cli
-    - timeout 30s sh -c 'until docker info; do echo "Waiting for Docker..."; sleep 2; done'
   artifacts:
     reports:
       junit:
