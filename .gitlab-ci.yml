@@ -15,11 +15,6 @@ cache:
     - .m2/repository/
     - target/
 
-.test-rules: &test-rules
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
 test-job:
   stage: test
   image: $MAVEN_IMAGE
@@ -31,8 +26,9 @@ test-job:
         - target/surefire-reports/TEST-*.xml
     paths:
       - target/
-    expire_in: 1 week
-  rules: *test-rules
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
 
 integration-test-job:
   stage: test
@@ -45,7 +41,9 @@ integration-test-job:
         - target/failsafe-reports/TEST-*.xml
     paths:
       - target/
-  rules: *test-rules
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
   allow_failure: false
 
 build-job:
@@ -53,7 +51,6 @@ build-job:
   image: $MAVEN_IMAGE
   script:
     - ./mvnw clean package $MAVEN_CLI_OPTS -DskipTests
-    - echo "JAR built: $(ls target/*.jar)"
   artifacts:
     paths:
       - target/*.jar
@@ -63,9 +60,7 @@ build-job:
 
 docker-build-job:
   stage: package
-  image:
-    name: $DOCKER_IMAGE
-    entrypoint: [""]
+  image: $DOCKER_IMAGE
   services:
     - name: docker:27-dind
       alias: docker
@@ -78,7 +73,6 @@ docker-build-job:
   script:
     - docker build -t $IMAGE_TAG .
     - docker push $IMAGE_TAG
-    - echo "Docker image pushed: $IMAGE_TAG"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
   needs: ["build-job"]
@@ -92,7 +86,9 @@ dependency-scan:
     reports:
       dependency_scanning:
         - gl-dependency-scanning-report.json
-  rules: *test-rules
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
   allow_failure: true
 
 include:
