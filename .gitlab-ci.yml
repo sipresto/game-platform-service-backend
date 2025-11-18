@@ -21,9 +21,9 @@ compile-job:
     - chmod +x ./mvnw
   script:
     - ./mvnw compile
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
 
 test-job:
   stage: test
@@ -44,10 +44,10 @@ test-job:
     TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: "/var/run/docker.sock"
   script:
     - ./mvnw test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
-
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+#
 package-job:
   stage: package
   image: $DEFAULT_IMAGE_NAME
@@ -56,8 +56,8 @@ package-job:
   script:
     - ./mvnw package -DskipTests
     - echo 'packaging the application'
-  rules:
-    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
+#  rules:
+#    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
 
 include:
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
