@@ -4,7 +4,7 @@ stages:
   - package
 
 variables:
-  DEFAULT_IMAGE_NAME: eclipse-temurin:25-jdk-alpine
+  DEFAULT_IMAGE_NAME: eclipse-temurin:21-jdk-alpine
 
 compile-job:
   stage: compile
