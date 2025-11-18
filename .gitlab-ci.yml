@@ -77,7 +77,6 @@ package-job:
     - chmod +x ./mvnw  # Fix permission issue
   script:
     - ./mvnw package $MAVEN_CLI_OPTS -DskipTests
-    - echo "Package created: $(ls target/*.jar)"
   artifacts:
     paths:
       - target/*.jar
