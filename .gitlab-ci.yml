@@ -25,6 +25,7 @@ compile-job:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "ci-test"  # Add this line
 
 test-job:
   stage: test
@@ -45,7 +46,7 @@ test-job:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
-
+    - if: $CI_COMMIT_BRANCH == "ci-test"  # Add this line
 sonarqube-check:
   stage: static-analysis
   image: $DEFAULT_IMAGE_NAME
@@ -70,6 +71,7 @@ sonarqube-check:
       variables:
         SONAR_GATE: "true"
     - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "ci-test"  # Add this line
   allow_failure: false
 
 package-job:
@@ -80,7 +82,7 @@ package-job:
   artifacts:
     paths:
       - target/*.jar
-    expire_in: 1 week
+    expire_in: 1 month
   rules:
     - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
 
