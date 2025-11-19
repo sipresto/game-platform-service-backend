@@ -30,7 +30,6 @@ lint-job:
       - target/site/
     expire_in: 1 day
 
-
 compile-job:
   stage: compile
   image: $DEFAULT_IMAGE_NAME
@@ -64,8 +63,6 @@ test-job:
         - target/surefire-reports/**/TEST-*.xml
   script:
     - ./mvnw test
-  rules:
-    - when: always
 
 quality-job:
   stage: quality
@@ -77,12 +74,10 @@ quality-job:
       artifacts: true
   script:
     - ./mvnw com.github.spotbugs:spotbugs-maven-plugin:spotbugs
-  allow_failure: false
   artifacts:
     paths:
       - target/spotbugs/
     expire_in: 1 day
-
 
 package-job:
   stage: package
@@ -96,10 +91,10 @@ package-job:
       artifacts: true
   script:
     - ./mvnw package -DskipTests
-  rules:
-    - if: '$CI_COMMIT_TAG'
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"'
-
+#  rules:
+#    - if: '$CI_COMMIT_TAG'
+#    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"'
 
 include:
+  - template: Code-Quality.gitlab-ci.yml
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
