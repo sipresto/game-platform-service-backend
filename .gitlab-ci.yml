@@ -17,22 +17,16 @@ cache:
 compile-job:
   stage: compile
   image: $DEFAULT_IMAGE_NAME
-  before_script:
-    - chmod +x ./mvnw
 
   script:
     - ./mvnw compile
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
 
 test-job:
   stage: test
   image: $DEFAULT_IMAGE_NAME
-  before_script:
-    - chmod +x ./mvnw
-    - chmod +x ./mvnw
-    - apk add --no-cache docker-cli
   artifacts:
     reports:
       junit:
@@ -46,20 +40,17 @@ test-job:
     TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: "/var/run/docker.sock"
   script:
     - ./mvnw test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
 
 package-job:
   stage: package
   image: $DEFAULT_IMAGE_NAME
-  before_script:
-    - chmod +x ./mvnw
   script:
     - ./mvnw package -DskipTests
-    - echo 'packaging the application'
-  rules:
-    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
+#  rules:
+#    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
 
 include:
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
