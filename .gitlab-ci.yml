@@ -24,6 +24,12 @@ lint-job:
   script:
     - ./mvnw checkstyle:check || true
   allow_failure: true
+  artifacts:
+    paths:
+      - target/checkstyle-result.xml
+      - target/site/
+    expire_in: 1 day
+
 
 compile-job:
   stage: compile
@@ -72,8 +78,11 @@ quality-job:
   script:
     - ./mvnw com.github.spotbugs:spotbugs-maven-plugin:spotbugs
   allow_failure: false
-  rules:
-    - when: always
+  artifacts:
+    paths:
+      - target/spotbugs/
+    expire_in: 1 day
+
 
 package-job:
   stage: package
@@ -83,12 +92,14 @@ package-job:
   needs:
     - job: compile-job
       artifacts: true
+    - job: test-job
+      artifacts: true
   script:
     - ./mvnw package -DskipTests
-#  rules:
-#    - if: '$CI_COMMIT_TAG'
-#    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"'
-#    - when: never
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"'
+
 
 include:
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
