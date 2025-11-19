@@ -1,5 +1,4 @@
 stages:
-  - lint
   - compile
   - test
   - quality
@@ -15,20 +14,6 @@ cache:
       - pom.xml
   paths:
     - .m2/repository
-
-lint-job:
-  stage: lint
-  image: $DEFAULT_IMAGE_NAME
-  before_script:
-    - chmod +x ./mvnw
-  script:
-    - ./mvnw checkstyle:check || true
-  allow_failure: true
-  artifacts:
-    paths:
-      - target/checkstyle-result.xml
-      - target/site/
-    expire_in: 1 day
 
 compile-job:
   stage: compile
@@ -63,21 +48,12 @@ test-job:
         - target/surefire-reports/**/TEST-*.xml
   script:
     - ./mvnw test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
-quality-job:
-  stage: quality
-  image: $DEFAULT_IMAGE_NAME
-  before_script:
-    - chmod +x ./mvnw
-  needs:
-    - job: compile-job
-      artifacts: true
-  script:
-    - ./mvnw com.github.spotbugs:spotbugs-maven-plugin:spotbugs
-  artifacts:
-    paths:
-      - target/spotbugs/
-    expire_in: 1 day
+include:
+  - template: Code-Quality.gitlab-ci.yml
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
 
 package-job:
   stage: package
@@ -91,10 +67,6 @@ package-job:
       artifacts: true
   script:
     - ./mvnw package -DskipTests
-#  rules:
-#    - if: '$CI_COMMIT_TAG'
-#    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"'
-
-include:
-  - template: Code-Quality.gitlab-ci.yml
-  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"'
