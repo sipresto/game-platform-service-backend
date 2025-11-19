@@ -63,6 +63,7 @@ package-job:
   needs:
     - job: compile-job
       artifacts: true
+      optional: true
     - job: test-job
       artifacts: true
   script:
