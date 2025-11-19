@@ -34,6 +34,7 @@ test-job:
   needs:
     - job: compile-job
       artifacts: true
+      optional: true
   services:
     - name: docker:27-dind
   variables:
