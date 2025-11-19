@@ -1,7 +1,6 @@
 stages:
   - compile
   - test
-  - quality
   - package
 
 variables:
@@ -21,7 +20,7 @@ compile-job:
   before_script:
     - chmod +x ./mvnw
   script:
-    - ./mvnw package -DskipTests
+    - ./mvnw compile
   artifacts:
     paths:
       - target/
@@ -40,8 +39,6 @@ test-job:
   variables:
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ""
-    TESTCONTAINERS_HOST_OVERRIDE: "docker"
-    TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: "/var/run/docker.sock"
   artifacts:
     reports:
       junit:
@@ -50,6 +47,8 @@ test-job:
     - ./mvnw test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+
 
 include:
   - template: Code-Quality.gitlab-ci.yml
@@ -66,7 +65,7 @@ package-job:
     - job: test-job
       artifacts: true
   script:
-    - ./mvnw package -DskipTests
+    - ./mvnw package
   rules:
     - if: '$CI_COMMIT_TAG'
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"'
