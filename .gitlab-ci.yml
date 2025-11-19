@@ -68,6 +68,6 @@ package-job:
       artifacts: true
   script:
     - ./mvnw package
-  rules:
-    - if: '$CI_COMMIT_TAG'
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"'
+#  rules:
+#    - if: '$CI_COMMIT_TAG'
+#    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"'
