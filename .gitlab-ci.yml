@@ -1,0 +1,72 @@
+stages:
+  - compile
+  - test
+  - package
+
+variables:
+  DEFAULT_IMAGE_NAME: eclipse-temurin:21-jdk-alpine
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+cache:
+  key:
+    files:
+      - pom.xml
+  paths:
+    - .m2/repository
+
+compile-job:
+  stage: compile
+  image: $DEFAULT_IMAGE_NAME
+  before_script:
+    - chmod +x ./mvnw
+  script:
+    - ./mvnw compile
+  artifacts:
+    paths:
+      - target/
+    expire_in: 1 day
+
+test-job:
+  stage: test
+  image: $DEFAULT_IMAGE_NAME
+  before_script:
+    - chmod +x ./mvnw
+  needs:
+    - job: compile-job
+      artifacts: true
+      optional: true
+  services:
+    - name: docker:27-dind
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
+  artifacts:
+    reports:
+      junit:
+        - target/surefire-reports/**/TEST-*.xml
+  script:
+    - ./mvnw test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+
+
+include:
+  - template: Code-Quality.gitlab-ci.yml
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+
+package-job:
+  stage: package
+  image: $DEFAULT_IMAGE_NAME
+  before_script:
+    - chmod +x ./mvnw
+  needs:
+    - job: compile-job
+      artifacts: true
+    - job: test-job
+      artifacts: true
+  script:
+    - ./mvnw package
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"'
