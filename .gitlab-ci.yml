@@ -47,7 +47,6 @@ test-job:
     - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
 
 include:
-  - template: Code-Quality.gitlab-ci.yml
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
 
 maven-package-job:
