@@ -52,6 +52,8 @@ include:
 maven-package-job:
   stage: package
   image: $DEFAULT_IMAGE_NAME
+  services:
+    - name: docker:27-dind
   variables:
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ""
