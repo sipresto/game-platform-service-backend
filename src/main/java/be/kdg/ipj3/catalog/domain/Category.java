@@ -13,6 +13,15 @@ public enum Category {
         this.description = description;
     }
 
+    public static Category find(String description) {
+        for (Category c : Category.values()) {
+            if (c.description.equalsIgnoreCase(description)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return description;

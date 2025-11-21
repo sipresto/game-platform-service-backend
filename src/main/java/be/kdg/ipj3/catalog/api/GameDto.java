@@ -6,11 +6,12 @@ import be.kdg.ipj3.shared.domain.GameId;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
-public record GameDto(GameId gameId, String name, String description, BigDecimal price, List<Category> categories) {
+public record GameDto(UUID gameId, String name, String description, BigDecimal price, List<Category> categories) {
     public static GameDto from(Game game) {
         return new GameDto(
-                game.getId(),
+                game.getId().id(),
                 game.getName(),
                 game.getDescription(),
                 game.getPrice().amount(),

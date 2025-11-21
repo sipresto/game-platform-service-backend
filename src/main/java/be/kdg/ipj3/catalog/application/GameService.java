@@ -4,6 +4,7 @@ import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.GameRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,8 +18,8 @@ public class GameService {
         this.gameRepository = gameRepository;
     }
 
-
-    public List<Game> getGames() {
+    @Transactional
+    public List<Game> getAllGames() {
         return gameRepository.getAllGames();
     }
 }
