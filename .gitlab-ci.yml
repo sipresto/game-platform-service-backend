@@ -55,6 +55,7 @@ maven-package-job:
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ""
   before_script:
+    - apk update && apk add --no-cache docker  # Install Docker client in the image
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - chmod +x ./mvnw
   script:
