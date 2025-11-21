@@ -21,19 +21,13 @@ compile-job:
     - chmod +x ./mvnw
   script:
     - ./mvnw compile
-  artifacts:
-    paths:
-      - target/
-    expire_in: 1 day
+
 
 test-job:
   stage: test
   image: $DEFAULT_IMAGE_NAME
-  before_script:
-    - chmod +x ./mvnw
   needs:
     - job: compile-job
-      artifacts: true
       optional: true
   services:
     - name: docker:27-dind
@@ -44,6 +38,8 @@ test-job:
     reports:
       junit:
         - target/surefire-reports/**/TEST-*.xml
+  before_script:
+    - chmod +x ./mvnw
   script:
     - ./mvnw test
   rules:
@@ -58,40 +54,13 @@ maven-package-job:
   stage: package
   image: $DEFAULT_IMAGE_NAME
   before_script:
-    - chmod +x ./mvnw
-  needs:
-    - job: compile-job
-      artifacts: true
-      optional: true
-    - job: test-job
-      artifacts: true
-  script:
-    - ./mvnw package -DskipTests
-  artifacts:
-    paths:
-      - target/*.jar
-    expire_in: 1 hour
-  rules:
-    - if: '$CI_COMMIT_TAG'
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"'
-
-
-docker-build-job:
-  stage: package
-  image: docker:27
-  services:
-    - docker:27-dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-  needs:
-    - job: maven-package-job
-      artifacts: true
-  before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - chmod +x ./mvnw
   script:
+    - ./mvnw spring-boot:build-image
     - docker build -t $CI_REGISTRY_IMAGE:latest .
     - docker push $CI_REGISTRY_IMAGE:latest
   rules:
     - if: '$CI_COMMIT_TAG'
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
