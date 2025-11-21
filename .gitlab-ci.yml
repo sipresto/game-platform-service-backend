@@ -21,9 +21,6 @@ compile-job:
     - chmod +x ./mvnw
   script:
     - ./mvnw compile
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
 
 test-job:
   stage: test
@@ -62,14 +59,12 @@ maven-package-job:
     - chmod +x ./mvnw
   script:
     - ./mvnw spring-boot:build-image -Dimage=$CI_REGISTRY_IMAGE/game-platform-service-backend:0.0.1-SNAPSHOT
-    - docker images
     - docker tag game-platform-service-backend:0.0.1-SNAPSHOT $CI_REGISTRY_IMAGE:latest
-    - docker images
     - docker push $CI_REGISTRY_IMAGE:latest
-#  rules:
-#    - if: '$CI_COMMIT_TAG'
-#    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-#    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 include:
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
