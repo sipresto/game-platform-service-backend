@@ -2,7 +2,6 @@ package be.kdg.ipj3.catalog.api;
 
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.shared.domain.GameId;
 
 import java.math.BigDecimal;
 import java.util.List;
