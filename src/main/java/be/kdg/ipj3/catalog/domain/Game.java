@@ -1,6 +1,5 @@
 package be.kdg.ipj3.catalog.domain;
 
-import be.kdg.ipj3.shared.domain.AchievementId;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import org.jmolecules.ddd.annotation.AggregateRoot;
@@ -16,17 +15,20 @@ public class Game {
     private final String name;
     private final String description;
     private final Money price;
-    private final List<AchievementId> achievements = new ArrayList<>();
+    private final List<Category> categories;
+    private final List<Achievement> achievements = new ArrayList<>();
 
-    public Game(GameId id, String name, String description, Money price, List<AchievementId> achievements) {
+    public Game(GameId id, String name, String description, Money price, List<Achievement> achievements, List<Category> categories) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
+        this.achievements.addAll(achievements);
+        this.categories = categories;
     }
 
-    public Game(String name, String description, Money price) {
-        this(GameId.create(), name, description, price, List.of());
+    public Game(String name, String description, Money price, List<Category> categories) {
+        this(GameId.create(), name, description, price, List.of(), categories);
     }
 
     public GameId getId() {
@@ -45,11 +47,15 @@ public class Game {
         return price;
     }
 
-    public List<AchievementId> getAchievements() {
+    public List<Achievement> getAchievements() {
         return achievements;
     }
 
-    public void addAchievement(AchievementId achievementId) {
-        achievements.add(achievementId);
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void addAchievement(Achievement achievement) {
+        achievements.add(achievement);
     }
 }
