@@ -4,8 +4,8 @@ public enum Category {
     STRATEGY("strategie"),
     BOARDGAME("boardgame"),
     CARDGAME("cardgame"),
-    STUDENT("student"),
-    TEACHER("leerkracht");
+    NATIVE("native"),
+    EXTERNAL("extern");
 
     private final String description;
 

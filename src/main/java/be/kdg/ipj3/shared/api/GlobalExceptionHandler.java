@@ -34,28 +34,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
-    /*
-    @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<ApiError> handleUnauthorized(MethodArgumentNotValidException ex) {
-        List<ApiError.FieldError> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
-                .map(fe -> new ApiError.FieldError(
-                        fe.getField(),
-                        String.valueOf(fe.getRejectedValue()),
-                        fe.getDefaultMessage()
-                ))
-                .toList();
-
-        ApiError body = new ApiError(
-                HttpStatus.UNAUTHORIZED.value(),
-                "Unauthorized",
-                "The user does not have the required authorizations",
-                fieldErrors,
-                Instant.now()
-        );
-        return ResponseEntity.badRequest().body(body);
-    }
-     */
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiError> handleParseError(HttpMessageNotReadableException ex) {
         ApiError body = new ApiError(

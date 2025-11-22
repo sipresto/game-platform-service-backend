@@ -28,27 +28,27 @@ class GameRestControllerIntegrationTest {
 
     @Test
     void testGetAllGamesIntegration() throws Exception {
-        // Arrange: Mock the service to return a non-empty list
-        Game game = new Game("Tic-Tac-Toe", "Description", Money.of(BigDecimal.valueOf(1.99)), List.of(Category.STUDENT, Category.BOARDGAME));
+        // Arrange
+        Game game = new Game("Tic-Tac-Toe", "Description", Money.of(BigDecimal.valueOf(1.99)), List.of(Category.NATIVE, Category.BOARDGAME));
         when(gameService.getAllGames()).thenReturn(List.of(game));
 
-        // Act & Assert: Perform the GET request and verify the response
+        // Act & Assert
         mockMvc.perform(MockMvcRequestBuilders.get("/api/games"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Tic-Tac-Toe"))
                 .andExpect(jsonPath("$[0].description").value("Description"))
                 .andExpect(jsonPath("$[0].price").value(1.99))
-                .andExpect(jsonPath("$[0].categories[0]").value("STUDENT"))
+                .andExpect(jsonPath("$[0].categories[0]").value("NATIVE"))
                 .andExpect(jsonPath("$[0].categories[1]").value("BOARDGAME"));
     }
 
     @Test
     void testGetAllGamesIntegration_NoGamesFound() throws Exception {
-        // Arrange: Mock the service to return an empty list
+        // Arrange
         when(gameService.getAllGames()).thenReturn(List.of());
 
-        // Act & Assert: Perform the GET request and expect a 404 response
+        // Act & Assert
         mockMvc.perform(MockMvcRequestBuilders.get("/api/games"))
-                .andExpect(status().isNotFound());  // Expecting 404
+                .andExpect(status().isNotFound());
     }
 }

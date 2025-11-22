@@ -15,14 +15,13 @@ class GameTest {
 
     @BeforeEach
     void setUp() {
-        // Prepare test data
         game = new Game("Game1", "Action Game", Money.of(BigDecimal.valueOf(4.99)), List.of(Category.BOARDGAME));
     }
 
     @Test
     void testGameConstructor_WithAllFields() {
         // Arrange
-        List<Category> categories = List.of(Category.BOARDGAME, Category.TEACHER);
+        List<Category> categories = List.of(Category.BOARDGAME, Category.EXTERNAL);
         Money price = Money.of(BigDecimal.valueOf(5.99));
 
         // Act

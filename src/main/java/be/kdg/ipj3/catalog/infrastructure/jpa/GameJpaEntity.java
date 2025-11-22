@@ -35,8 +35,10 @@ public class GameJpaEntity {
         this.description = description;
         this.price = price.amount();
         achievements.forEach(achievement -> this.achievements.add(AchievementJpaEntity.fromDomain(achievement)));
-        this.categories = "";
-        categories.forEach(category -> this.categories += category.toString() + ", ");
+        if (!categories.isEmpty()) {
+            this.categories = "";
+            categories.forEach(category -> this.categories += category.toString() + ", ");
+        }
     }
 
     public static GameJpaEntity fromDomain(Game game) {
@@ -70,5 +72,25 @@ public class GameJpaEntity {
                 achievements,
                 categories
         );
+    }
+
+    public UUID getGameId() {
+        return gameId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public String getCategories() {
+        return categories;
     }
 }

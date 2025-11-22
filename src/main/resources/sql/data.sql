@@ -1,2 +1,2 @@
 INSERT INTO games(price, game_id, categories, description, name)
-VALUES (1.99, 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc', 'student, boardgame', 'Tic Tac Toe is een puzzelspel voor twee spelers, "X" en "O", die om de beurt de velden in een 3×3 raster markeren. De speler die erin is geslaagd drie respectieve merktekens in een horizontale, verticale of diagonale rij te plaatsen, wint het spel.', 'Tic-Tac-Toe');
+VALUES (1.99, 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc', 'native, boardgame', 'Tic Tac Toe is een puzzelspel voor twee spelers, "X" en "O", die om de beurt de velden in een 3×3 raster markeren. De speler die erin is geslaagd drie respectieve merktekens in een horizontale, verticale of diagonale rij te plaatsen, wint het spel.', 'Tic-Tac-Toe');
