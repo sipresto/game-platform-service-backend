@@ -1,26 +1,29 @@
 package be.kdg.ipj3.catalog.domain;
 
 import be.kdg.ipj3.shared.domain.AchievementId;
-import org.jmolecules.ddd.annotation.AggregateRoot;
+import be.kdg.ipj3.shared.domain.GameId;
+import org.jmolecules.ddd.annotation.Entity;
 import org.jmolecules.ddd.annotation.Identity;
 
-@AggregateRoot
+@Entity
 public class Achievement {
     @Identity
     private final AchievementId id;
     private final String name;
     private final String description;
     private int points;
+    private final GameId game;
 
-    public Achievement(AchievementId id, String name, String description, int points) {
+    public Achievement(AchievementId id, String name, String description, int points, GameId game) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.points = points;
+        this.game = game;
     }
 
-    public Achievement(String name, String description, int points) {
-        this(AchievementId.create(), name, description, points);
+    public Achievement(String name, String description, int points, GameId game) {
+        this(AchievementId.create(), name, description, points, game);
     }
 
     public AchievementId getId() {
@@ -39,6 +42,10 @@ public class Achievement {
         return points;
     }
 
+    public GameId getGameId() {
+        return game;
+    }
+
     public void addPoints(int points) {
         this.points += points;
     }
@@ -46,4 +53,5 @@ public class Achievement {
     public void removePoints(int points) {
         this.points -= points;
     }
+
 }
