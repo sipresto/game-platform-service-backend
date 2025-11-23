@@ -1,5 +1,5 @@
 ### GET all games
-GET http://localhost:8095/api/games
+GET http://localhost/api/games
 Accept: application/json
 Content-Type: application/json
 

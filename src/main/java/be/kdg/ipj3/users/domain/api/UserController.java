@@ -1,4 +1,4 @@
-package be.kdg.ipj3.shared.api;
+package be.kdg.ipj3.users.domain.api;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
