@@ -2,21 +2,16 @@ name: kdg-ipj3-team20
 
 services:
   # ---------------------
-  # REVERSE PROXY
+  # REVERSE PROXY (DEV)
   # ---------------------
   reverse_proxy:
-    build:
-      context: ../../platform-reverse-proxy
-      dockerfile: Dockerfile
+    image: nginx:alpine
     ports:
       - "80:80"
-    depends_on:
-      - platform_backend
-      - platform_frontend
-      - idp_keycloak
+    volumes:
+      - ./nginx-dev.conf:/etc/nginx/nginx.conf:ro
     networks:
-      - backend
-      - kc
+      - dev
 
   # ---------------------
   # DATABASE (POSTGRES)
@@ -32,7 +27,7 @@ services:
     ports:
       - "5544:5432"
     networks:
-      - backend
+      - dev
     volumes:
       - ./postgresql/data:/var/lib/postgresql/data
       - ./init-scripts/sql:/docker-entrypoint-initdb.d/
@@ -49,7 +44,7 @@ services:
       - "5772:5672"
       - "15683:15672"
     networks:
-      - backend
+      - dev
     volumes:
       - ./rabbitmq/data:/var/lib/rabbitmq
       - ./rabbitmq/log:/var/log/rabbitmq
@@ -69,14 +64,14 @@ services:
     ports:
       - "3407:3306"
     networks:
-      - kc
+      - dev
 
   # ---------------------
   # KEYCLOAK (IDP / SSO)
   # ---------------------
   idp_keycloak:
     image: quay.io/keycloak/keycloak:26.3
-    command: start-dev
+    command: start-dev --http-relative-path=/auth
     environment:
       KEYCLOAK_ADMIN: "admin"
       KEYCLOAK_ADMIN_PASSWORD: "admin"
@@ -87,50 +82,14 @@ services:
       KC_DB_PASSWORD: "password"
       KC_PROXY: "edge"
       KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME: "localhost"
+      KC_HOSTNAME_PORT: "80"
     ports:
-      - "8280:8080"  # <-- ADD THIS LINE BACK
+      - "8280:8080"
     networks:
-      - kc
+      - dev
 
-  # ---------------------
-  # PLATFORM BACKEND
-  # ---------------------
-  platform_backend:
-    build:
-      context: ../..
-      dockerfile: Dockerfile
-    depends_on:
-      - app_postgres
-      - app_rabbitmq
-      - idp_keycloak
-    environment:
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://app_postgres:5432/platformdb"
-      SPRING_DATASOURCE_USERNAME: "platform"
-      SPRING_DATASOURCE_PASSWORD: "platformSecretPassword"
-      RABBITMQ_URL: "amqp://user:password@app_rabbitmq:5672"
-      KEYCLOAK_URL: "http://idp_keycloak:8080"
-    networks:
-      - backend
-      - kc
-
-  # ---------------------
-  # PLATFORM FRONTEND
-  # ---------------------
-  platform_frontend:
-    build:
-      context: C:/Users/ftlbv/WebstormProjects/game-platform-service-frontend
-    depends_on:
-      - platform_backend
-    networks:
-      - backend
-
-# ---------------------
-# NETWORKS
-# ---------------------
 networks:
-  kc:
-    name: kc-network
-    driver: bridge
-  backend:
-    name: back-network
+  dev:
+    name: dev-network
     driver: bridge
