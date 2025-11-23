@@ -1,27 +1,24 @@
-## Gedetailleerde omschrijving
+## Description
 
 Als een student het proces voor een inschrijving aan het doorlopen is 
 moet hij zich kunnen inschrijvingen voor opleidingsonderdelen binnen de richting 
 waarvoor hij nog geen credits heeft verworven.
 
-## Aanpassingen aan het domeinmodel
+## Changes to the domain model
 
 Het concept opleidingsonderdeelInschrijving moet toegevoegd worden. 
 Deze is gekoppeld aan een inschrijving van een student en aan een opleidingsonderdeel.
 
 
-## Taken
+## Checklist
 * [ ] Toon lijst waarvoor student nog geen credits verwierf
 * [ ] Laat de student opleidingsonderdelen selecteren en sla deze opleidingsonderdeel
 * [ ] Voeg update functionaliteit toe. 
 	* Preselecteer opleidingsonderdelen waarvoor de student ingeschreven is. 
 	* Verwijder inschrijvingen als deze gedeselecteerd werden.
 
-## Relevante wireframes
 
-Link naar de wireframes
-
-## Acceptatiecriteria
+## Acceptance criteria
 
 ```
   Background:
