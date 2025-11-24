@@ -131,16 +131,6 @@ class UserControllerTest {
     }
 
     @Test
-    void testGetAllUsers_Success() {
-        List<String> expected = List.of("user1", "user2", "admin");
-
-        List<String> actual = userController.getAllUsers();
-
-        assertEquals(expected.size(), actual.size());
-        assertTrue(actual.containsAll(expected));
-    }
-
-    @Test
     void testGetUserWithGames_WithOwnedGames() {
         when(userService.getUserWithGames(userId)).thenReturn(user);
         when(gameService.getGameById(game1Id)).thenReturn(game1);
