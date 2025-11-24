@@ -82,14 +82,12 @@ class GameRestControllerTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 Money.of(BigDecimal.valueOf(10.00)),
                 Money.of(BigDecimal.valueOf(30.00)),
-                List.of(Category.STRATEGY),
-                false
+                List.of(Category.STRATEGY)
         );
         when(gameService.filterGames(
                 filterRequest.minPrice(),
                 filterRequest.maxPrice(),
-                filterRequest.categories(),
-                filterRequest.hasAchievements()
+                filterRequest.categories()
         )).thenReturn(List.of(testGame));
 
         // Act
@@ -103,16 +101,15 @@ class GameRestControllerTest {
         verify(gameService).filterGames(
                 filterRequest.minPrice(),
                 filterRequest.maxPrice(),
-                filterRequest.categories(),
-                filterRequest.hasAchievements()
+                filterRequest.categories()
         );
     }
 
     @Test
     void testGetAllGamesByFilter_WithNullFilters_ReturnsAllGames() {
         // Arrange
-        GameFilterRequest filterRequest = new GameFilterRequest(null, null, null, false);
-        when(gameService.filterGames(null, null, null, false)).thenReturn(List.of(testGame));
+        GameFilterRequest filterRequest = new GameFilterRequest(null, null, null);
+        when(gameService.filterGames(null, null, null)).thenReturn(List.of(testGame));
 
         // Act
         ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
@@ -121,7 +118,7 @@ class GameRestControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        verify(gameService).filterGames(null, null, null, false);
+        verify(gameService).filterGames(null, null, null);
     }
 
     @Test
@@ -130,10 +127,9 @@ class GameRestControllerTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 Money.of(BigDecimal.valueOf(10.00)),
                 Money.of(BigDecimal.valueOf(30.00)),
-                null,
-                false
+                null
         );
-        when(gameService.filterGames(filterRequest.minPrice(), filterRequest.maxPrice(), null, false))
+        when(gameService.filterGames(filterRequest.minPrice(), filterRequest.maxPrice(), null))
                 .thenReturn(List.of(testGame));
 
         // Act
@@ -143,7 +139,7 @@ class GameRestControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        verify(gameService).filterGames(filterRequest.minPrice(), filterRequest.maxPrice(), null, false);
+        verify(gameService).filterGames(filterRequest.minPrice(), filterRequest.maxPrice(), null);
     }
 
     @Test
@@ -152,10 +148,9 @@ class GameRestControllerTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 null,
                 null,
-                List.of(Category.STRATEGY, Category.BOARDGAME),
-                false
+                List.of(Category.STRATEGY, Category.BOARDGAME)
         );
-        when(gameService.filterGames(null, null, filterRequest.categories(), false))
+        when(gameService.filterGames(null, null, filterRequest.categories()))
                 .thenReturn(List.of(testGame));
 
         // Act
@@ -165,50 +160,7 @@ class GameRestControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        verify(gameService).filterGames(null, null, filterRequest.categories(), false);
-    }
-
-    @Test
-    void testGetAllGamesByFilter_WithAchievementsFilterTrue_ReturnsGamesWithAchievements() {
-        // Arrange
-        GameFilterRequest filterRequest = new GameFilterRequest(
-                null,
-                null,
-                null,
-                true
-        );
-        when(gameService.filterGames(null, null, null, true))
-                .thenReturn(List.of(testGame));
-
-        // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
-
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1, response.getBody().size());
-        verify(gameService).filterGames(null, null, null, true);
-    }
-
-    @Test
-    void testGetAllGamesByFilter_WithAchievementsFilterFalse_ReturnsGamesWithoutAchievements() {
-        // Arrange
-        GameFilterRequest filterRequest = new GameFilterRequest(
-                null,
-                null,
-                null,
-                false
-        );
-        when(gameService.filterGames(null, null, null, false))
-                .thenReturn(List.of(testGame));
-
-        // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
-
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().size());
-        verify(gameService).filterGames(null, null, null, false);
+        verify(gameService).filterGames(null, null, filterRequest.categories());
     }
 
     @Test
@@ -217,14 +169,12 @@ class GameRestControllerTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 Money.of(BigDecimal.valueOf(100.00)),
                 null,
-                null,
-                false
+                null
         );
         when(gameService.filterGames(
                 filterRequest.minPrice(),
                 filterRequest.maxPrice(),
-                filterRequest.categories(),
-                filterRequest.hasAchievements()
+                filterRequest.categories()
         )).thenReturn(List.of());
 
         // Act & Assert
@@ -236,8 +186,7 @@ class GameRestControllerTest {
         verify(gameService).filterGames(
                 filterRequest.minPrice(),
                 filterRequest.maxPrice(),
-                filterRequest.categories(),
-                filterRequest.hasAchievements()
+                filterRequest.categories()
         );
     }
 
@@ -247,10 +196,9 @@ class GameRestControllerTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 null,
                 null,
-                List.of(),
-                false
+                List.of()
         );
-        when(gameService.filterGames(null, null, List.of(), false))
+        when(gameService.filterGames(null, null, List.of()))
                 .thenReturn(List.of(testGame));
 
         // Act
@@ -260,7 +208,7 @@ class GameRestControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        verify(gameService).filterGames(null, null, List.of(), false);
+        verify(gameService).filterGames(null, null, List.of());
     }
 
     @Test
@@ -279,10 +227,9 @@ class GameRestControllerTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 null,
                 null,
-                List.of(Category.STRATEGY, Category.BOARDGAME),
-                false
+                List.of(Category.STRATEGY, Category.BOARDGAME)
         );
-        when(gameService.filterGames(null, null, filterRequest.categories(), false))
+        when(gameService.filterGames(null, null, filterRequest.categories()))
                 .thenReturn(List.of(testGame, anotherGame));
 
         // Act
@@ -294,7 +241,7 @@ class GameRestControllerTest {
         assertEquals(2, response.getBody().size());
         assertTrue(response.getBody().contains(testGameDto));
         assertTrue(response.getBody().contains(anotherGameDto));
-        verify(gameService).filterGames(null, null, filterRequest.categories(), false);
+        verify(gameService).filterGames(null, null, filterRequest.categories());
     }
 
     @Test
@@ -303,10 +250,9 @@ class GameRestControllerTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 Money.of(BigDecimal.valueOf(0.00)),
                 Money.of(BigDecimal.valueOf(10.00)),
-                null,
-                false
+                null
         );
-        when(gameService.filterGames(filterRequest.minPrice(), filterRequest.maxPrice(), null, false))
+        when(gameService.filterGames(filterRequest.minPrice(), filterRequest.maxPrice(), null))
                 .thenReturn(List.of(testGame));
 
         // Act
@@ -316,7 +262,7 @@ class GameRestControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        verify(gameService).filterGames(filterRequest.minPrice(), filterRequest.maxPrice(), null, false);
+        verify(gameService).filterGames(filterRequest.minPrice(), filterRequest.maxPrice(), null);
     }
 
     @Test
@@ -325,10 +271,9 @@ class GameRestControllerTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 Money.of(BigDecimal.valueOf(15.00)),
                 null,
-                null,
-                false
+                null
         );
-        when(gameService.filterGames(filterRequest.minPrice(), null, null, false))
+        when(gameService.filterGames(filterRequest.minPrice(), null, null))
                 .thenReturn(List.of(testGame));
 
         // Act
@@ -338,7 +283,7 @@ class GameRestControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        verify(gameService).filterGames(filterRequest.minPrice(), null, null, false);
+        verify(gameService).filterGames(filterRequest.minPrice(), null, null);
     }
 
     @Test
@@ -347,10 +292,9 @@ class GameRestControllerTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 null,
                 Money.of(BigDecimal.valueOf(25.00)),
-                null,
-                false
+                null
         );
-        when(gameService.filterGames(null, filterRequest.maxPrice(), null, false))
+        when(gameService.filterGames(null, filterRequest.maxPrice(), null))
                 .thenReturn(List.of(testGame));
 
         // Act
@@ -360,7 +304,7 @@ class GameRestControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        verify(gameService).filterGames(null, filterRequest.maxPrice(), null, false);
+        verify(gameService).filterGames(null, filterRequest.maxPrice(), null);
     }
 
     @Test
@@ -369,10 +313,9 @@ class GameRestControllerTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 null,
                 null,
-                List.of(Category.STRATEGY),
-                false
+                List.of(Category.STRATEGY)
         );
-        when(gameService.filterGames(null, null, filterRequest.categories(), false))
+        when(gameService.filterGames(null, null, filterRequest.categories()))
                 .thenReturn(List.of(testGame));
 
         // Act
@@ -382,6 +325,55 @@ class GameRestControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
-        verify(gameService).filterGames(null, null, filterRequest.categories(), false);
+        verify(gameService).filterGames(null, null, filterRequest.categories());
+    }
+
+    @Test
+    void testGetAllGamesByFilter_WithCombinedPriceAndCategoryFilters_ReturnsGames() {
+        // Arrange
+        GameFilterRequest filterRequest = new GameFilterRequest(
+                Money.of(BigDecimal.valueOf(15.00)),
+                Money.of(BigDecimal.valueOf(25.00)),
+                List.of(Category.STRATEGY)
+        );
+        when(gameService.filterGames(
+                filterRequest.minPrice(),
+                filterRequest.maxPrice(),
+                filterRequest.categories()
+        )).thenReturn(List.of(testGame));
+
+        // Act
+        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+        verify(gameService).filterGames(
+                filterRequest.minPrice(),
+                filterRequest.maxPrice(),
+                filterRequest.categories()
+        );
+    }
+
+    @Test
+    void testGetAllGamesByFilter_WithNullCategoryList_ReturnsGames() {
+        // Arrange
+        GameFilterRequest filterRequest = new GameFilterRequest(
+                null,
+                null,
+                null
+        );
+        when(gameService.filterGames(null, null, null))
+                .thenReturn(List.of(testGame));
+
+        // Act
+        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+        verify(gameService).filterGames(null, null, null);
     }
 }

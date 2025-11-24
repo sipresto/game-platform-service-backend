@@ -27,7 +27,7 @@ public class GameRestController {
 
     @PostMapping("/filter")
     public ResponseEntity<List<GameDto>> getAllGamesByFilter(@RequestBody GameFilterRequest filter) {
-        var dtos = gameService.filterGames(filter.minPrice(), filter.maxPrice(), filter.categories(), filter.hasAchievements()).stream().map(GameDto::from).toList();
+        var dtos = gameService.filterGames(filter.minPrice(), filter.maxPrice(), filter.categories()).stream().map(GameDto::from).toList();
         if(dtos.isEmpty()) {
             throw new ResourceNotFoundException("No games found");
         }

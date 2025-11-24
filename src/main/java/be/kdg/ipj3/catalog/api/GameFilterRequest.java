@@ -5,5 +5,5 @@ import be.kdg.ipj3.shared.domain.Money;
 
 import java.util.List;
 
-public record GameFilterRequest(Money minPrice, Money maxPrice, List<Category> categories, boolean hasAchievements) {
+public record GameFilterRequest(Money minPrice, Money maxPrice, List<Category> categories) {
 }

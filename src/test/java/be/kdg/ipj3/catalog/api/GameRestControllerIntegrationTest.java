@@ -74,11 +74,10 @@ class GameRestControllerIntegrationTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 null,
                 null,
-                List.of(Category.CARDGAME),
-                false
+                List.of(Category.CARDGAME)
         );
 
-        when(gameService.filterGames(any(), any(), anyList(), anyBoolean()))
+        when(gameService.filterGames(any(), any(), anyList()))
                 .thenReturn(List.of(game));
 
         // Act & Assert
@@ -104,11 +103,10 @@ class GameRestControllerIntegrationTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 Money.of(BigDecimal.valueOf(40.00)),
                 Money.of(BigDecimal.valueOf(60.00)),
-                List.of(Category.BOARDGAME, Category.STRATEGY),
-                true
+                List.of(Category.BOARDGAME, Category.STRATEGY)
         );
 
-        when(gameService.filterGames(any(Money.class), any(Money.class), anyList(), anyBoolean()))
+        when(gameService.filterGames(any(Money.class), any(Money.class), anyList()))
                 .thenReturn(List.of(game));
 
         // Act & Assert
@@ -128,11 +126,10 @@ class GameRestControllerIntegrationTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 Money.of(BigDecimal.valueOf(100.00)),
                 null,
-                List.of(Category.EXTERNAL),
-                true
+                List.of(Category.EXTERNAL)
         );
 
-        when(gameService.filterGames(any(Money.class), any(), anyList(), anyBoolean()))
+        when(gameService.filterGames(any(Money.class), any(), anyList()))
                 .thenReturn(List.of());
 
         // Act & Assert
@@ -149,11 +146,10 @@ class GameRestControllerIntegrationTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 null,
                 null,
-                List.of(),
-                false
+                List.of()
         );
 
-        when(gameService.filterGames(any(), any(), anyList(), anyBoolean()))
+        when(gameService.filterGames(any(), any(), anyList()))
                 .thenReturn(List.of(game));
 
         // Act & Assert
@@ -173,11 +169,10 @@ class GameRestControllerIntegrationTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 null,
                 Money.of(BigDecimal.valueOf(20.00)),
-                List.of(Category.BOARDGAME),
-                false
+                List.of(Category.BOARDGAME)
         );
 
-        when(gameService.filterGames(any(), any(Money.class), anyList(), anyBoolean()))
+        when(gameService.filterGames(any(), any(Money.class), anyList()))
                 .thenReturn(List.of(game1, game2));
 
         // Act & Assert
@@ -197,11 +192,10 @@ class GameRestControllerIntegrationTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 null,
                 null,
-                List.of(Category.NATIVE),
-                false
+                List.of(Category.NATIVE)
         );
 
-        when(gameService.filterGames(any(), any(), anyList(), anyBoolean()))
+        when(gameService.filterGames(any(), any(), anyList()))
                 .thenReturn(List.of(nativeGame));
 
         // Act & Assert
@@ -221,11 +215,10 @@ class GameRestControllerIntegrationTest {
         GameFilterRequest filterRequest = new GameFilterRequest(
                 null,
                 null,
-                List.of(Category.BOARDGAME, Category.NATIVE),
-                false
+                List.of(Category.BOARDGAME, Category.NATIVE)
         );
 
-        when(gameService.filterGames(any(), any(), anyList(), anyBoolean()))
+        when(gameService.filterGames(any(), any(), anyList()))
                 .thenReturn(List.of(mixedGame));
 
         // Act & Assert
@@ -240,7 +233,7 @@ class GameRestControllerIntegrationTest {
     @Test
     void testFilterGames_EmptyRequestBody() throws Exception {
         // Arrange
-        when(gameService.filterGames(any(), any(), anyList(), anyBoolean()))
+        when(gameService.filterGames(any(), any(), anyList()))
                 .thenReturn(List.of());
 
         // Act & Assert
@@ -248,6 +241,69 @@ class GameRestControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testFilterGames_WithOnlyPriceFilters() throws Exception {
+        // Arrange
+        Game game = new Game("Price Filtered Game", "Description", Money.of(BigDecimal.valueOf(25.99)), List.of(Category.STRATEGY));
+        GameFilterRequest filterRequest = new GameFilterRequest(
+                Money.of(BigDecimal.valueOf(20.00)),
+                Money.of(BigDecimal.valueOf(30.00)),
+                null
+        );
+
+        when(gameService.filterGames(any(Money.class), any(Money.class), any()))
+                .thenReturn(List.of(game));
+
+        // Act & Assert
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/games/filter")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(filterRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Price Filtered Game"));
+    }
+
+    @Test
+    void testFilterGames_WithOnlyMinPrice() throws Exception {
+        // Arrange
+        Game game = new Game("Min Price Game", "Description", Money.of(BigDecimal.valueOf(35.99)), List.of(Category.EXTERNAL));
+        GameFilterRequest filterRequest = new GameFilterRequest(
+                Money.of(BigDecimal.valueOf(30.00)),
+                null,
+                null
+        );
+
+        when(gameService.filterGames(any(Money.class), any(), any()))
+                .thenReturn(List.of(game));
+
+        // Act & Assert
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/games/filter")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(filterRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Min Price Game"));
+    }
+
+    @Test
+    void testFilterGames_WithOnlyMaxPrice() throws Exception {
+        // Arrange
+        Game game = new Game("Max Price Game", "Description", Money.of(BigDecimal.valueOf(8.99)), List.of(Category.BOARDGAME));
+        GameFilterRequest filterRequest = new GameFilterRequest(
+                null,
+                Money.of(BigDecimal.valueOf(10.00)),
+                null
+        );
+
+        when(gameService.filterGames(any(), any(Money.class), any()))
+                .thenReturn(List.of(game));
+
+        // Act & Assert
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/games/filter")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(filterRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Max Price Game"));
     }
 
     @Test

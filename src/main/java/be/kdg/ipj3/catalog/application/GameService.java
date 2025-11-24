@@ -27,14 +27,7 @@ public class GameService {
 
     @Transactional(readOnly = true)
     public List<Game> filterGames(Money minPrice, Money maxPrice,
-                                  List<Category> categories, Boolean hasAchievements) {
-        return gameRepository.getAllGames().stream()
-                .filter(game -> hasAchievements == null ||
-                        (hasAchievements != game.getAchievements().isEmpty()))
-                .filter(game -> categories == null || categories.isEmpty() ||
-                        categories.stream().anyMatch(game.getCategories()::contains))
-                .filter(game -> minPrice == null || game.getPrice().amount().compareTo(minPrice.amount()) >= 0)
-                .filter(game -> maxPrice == null || game.getPrice().amount().compareTo(maxPrice.amount()) <= 0)
-                .toList();
+                                  List<Category> categories) {
+        return gameRepository.filterGames(minPrice, maxPrice, categories);
     }
 }
