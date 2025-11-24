@@ -45,10 +45,10 @@ Create the following realm roles:
 ## 5. User Management
 
 - **Create New User**
-    - Username: `johny`
+    - Username: `johnny`
     - Password: `Test123`
-    - Email: johny.test@test.com
-    - First name: Johny
+    - Email: johnny.test@test.com
+    - First name: Johnny
     - Last name: The tester
     - Roles Assigned: `player`, `admin`, `game-developer`
     - When you made this account, go to users, edit account and remove all required user actions. Put email verified on the on toggle.

@@ -6,6 +6,7 @@ import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.GameRepository;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.Money;
+import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -13,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
@@ -32,13 +34,14 @@ class GameServiceTest {
     private Game boardGame;
     private Game strategyGame;
     private Game multiCategoryGame;
+    private GameId gameWithAchievementsId;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         gameService = new GameService(gameRepository);
 
-        GameId gameWithAchievementsId = GameId.create();
+        gameWithAchievementsId = GameId.create();
         GameId boardGameId = GameId.create();
         GameId strategyGameId = GameId.create();
         GameId multiCategoryGameId = GameId.create();
@@ -334,4 +337,35 @@ class GameServiceTest {
         assertEquals(expectedGames, result);
         verify(gameRepository).filterGames(null, maxPrice, null);
     }
+    @Test
+    void testGetGameById_Found() {
+        // Arrange
+        GameId id = gameWithAchievements.getId(); // any game is fine
+        when(gameRepository.getGameById(id)).thenReturn(Optional.of(gameWithAchievements));
+
+        // Act
+        Game result = gameService.getGameById(id);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(id, result.getId());
+        verify(gameRepository).getGameById(id);
+    }
+
+    @Test
+    void testGetGameById_NotFound() {
+        // Arrange
+        GameId id = GameId.create();
+        when(gameRepository.getGameById(id)).thenReturn(Optional.empty());
+
+        // Act + Assert
+        ResourceNotFoundException ex = assertThrows(
+                ResourceNotFoundException.class,
+                () -> gameService.getGameById(id)
+        );
+
+        assertEquals("Game with id " + id + " not found", ex.getMessage());
+        verify(gameRepository).getGameById(id);
+    }
+
 }
