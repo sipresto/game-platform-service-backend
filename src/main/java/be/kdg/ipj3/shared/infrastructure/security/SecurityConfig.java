@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/games").permitAll()
                         .requestMatchers("/api/games/filter").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/user/**").hasRole("PLAYER")
                         .requestMatchers("/api/games/manage/**").hasRole("GAME_DEVELOPER")
                         .anyRequest().authenticated()
                 )
