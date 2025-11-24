@@ -20,7 +20,7 @@ public class GameRestController {
 
     @GetMapping
     public ResponseEntity<List<GameDto>> getAllGames() {
-        List<GameDto> dtos = gameService.getAllGames().stream().map(GameDto::from).toList();
+        List<GameDto> dtos = gameService.findAllGames().stream().map(GameDto::from).toList();
         if (dtos.isEmpty()) {
             throw new ResourceNotFoundException("No games found");
         }

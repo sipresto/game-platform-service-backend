@@ -31,8 +31,8 @@ class GameRestControllerIntegrationTest {
     @Test
     void testGetAllGamesIntegration() throws Exception {
         // Arrange
-        Game game = new Game("Tic-Tac-Toe", "Description", Money.of(BigDecimal.valueOf(1.99)), List.of(Category.NATIVE, Category.BOARDGAME));
-        when(gameService.getAllGames()).thenReturn(List.of(game));
+        Game game = new Game("Tic-Tac-Toe", "Description", Money.of(BigDecimal.valueOf(1.99)), List.of(Category.NATIVE, Category.BOARDGAME), "http://localhost/api/tictactoe");
+        when(gameService.findAllGames()).thenReturn(List.of(game));
 
         // Act & Assert
         mockMvc.perform(MockMvcRequestBuilders.get("/api/games"))
@@ -47,7 +47,7 @@ class GameRestControllerIntegrationTest {
     @Test
     void testGetAllGamesIntegration_NoGamesFound() throws Exception {
         // Arrange
-        when(gameService.getAllGames()).thenReturn(List.of());
+        when(gameService.findAllGames()).thenReturn(List.of());
 
         // Act & Assert
         mockMvc.perform(MockMvcRequestBuilders.get("/api/games"))

@@ -33,9 +33,9 @@ class GameRestControllerTest {
     @Test
     void testGetAllGames_ReturnsGames() {
         // Arrange
-        Game game = new Game("Game1", "Description",  Money.of(BigDecimal.valueOf(19.99)), List.of(Category.BOARDGAME));
+        Game game = new Game("Game1", "Description",  Money.of(BigDecimal.valueOf(19.99)), List.of(Category.BOARDGAME), "http://localhost/api/game1");
         GameDto gameDto = GameDto.from(game);
-        when(gameService.getAllGames()).thenReturn(List.of(game));
+        when(gameService.findAllGames()).thenReturn(List.of(game));
 
         // Act
         ResponseEntity<List<GameDto>> response = gameRestController.getAllGames();
@@ -50,7 +50,7 @@ class GameRestControllerTest {
     @Test
     void testGetAllGames_NoGamesFound() {
         // Arrange
-        when(gameService.getAllGames()).thenReturn(List.of());
+        when(gameService.findAllGames()).thenReturn(List.of());
 
         // Act & Assert
         assertThrows(ResourceNotFoundException.class, () -> gameRestController.getAllGames());

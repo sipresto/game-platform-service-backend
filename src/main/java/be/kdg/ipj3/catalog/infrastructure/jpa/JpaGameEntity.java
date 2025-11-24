@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "games")
-public class GameJpaEntity {
+public class JpaGameEntity {
     @Id
     @Column(name = "game_id")
     private UUID gameId;
@@ -22,33 +22,36 @@ public class GameJpaEntity {
     private String description;
     private BigDecimal price;
     private String categories;
+    private String serviceUrl;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
-    private List<AchievementJpaEntity> achievements;
+    private List<JpaAchievementEntity> achievements;
 
 
-    protected GameJpaEntity() {} // for JPA
+    protected JpaGameEntity() {} // for JPA
 
-    public GameJpaEntity(GameId id, String name, String description, Money price, List<Achievement> achievements, List<Category> categories) {
+    public JpaGameEntity(GameId id, String name, String description, Money price, List<Achievement> achievements, List<Category> categories, String serviceUrl) {
         this.gameId = id.id();
         this.name = name;
         this.description = description;
         this.price = price.amount();
-        achievements.forEach(achievement -> this.achievements.add(AchievementJpaEntity.fromDomain(achievement)));
+        achievements.forEach(achievement -> this.achievements.add(JpaAchievementEntity.fromDomain(achievement)));
         if (!categories.isEmpty()) {
             this.categories = "";
             categories.forEach(category -> this.categories += category.toString() + ", ");
         }
+        this.serviceUrl = serviceUrl;
     }
 
-    public static GameJpaEntity fromDomain(Game game) {
-        return new GameJpaEntity(
+    public static JpaGameEntity fromDomain(Game game) {
+        return new JpaGameEntity(
                 game.getId(),
                 game.getName(),
                 game.getDescription(),
                 game.getPrice(),
                 game.getAchievements(),
-                game.getCategories()
+                game.getCategories(),
+                game.getServiceUrl()
         );
     }
 
@@ -70,6 +73,7 @@ public class GameJpaEntity {
                 this.description,
                 Money.of(this.price),
                 achievements,
+                this.serviceUrl,
                 categories
         );
     }
@@ -92,5 +96,9 @@ public class GameJpaEntity {
 
     public String getCategories() {
         return categories;
+    }
+
+    public String getServiceUrl() {
+        return serviceUrl;
     }
 }
