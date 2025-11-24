@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "achievements")
-public class AchievementJpaEntity {
+public class JpaAchievementEntity {
     @Id
     @Column(name = "achievement_id")
     private UUID achievementId;
@@ -20,17 +20,17 @@ public class AchievementJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private JpaGameEntity game;
 
-    public AchievementJpaEntity(UUID achievementId, String achievementName, String achievementDescription, int points) {
+    public JpaAchievementEntity(UUID achievementId, String achievementName, String achievementDescription, int points) {
         this.achievementId = achievementId;
         this.achievementName = achievementName;
         this.achievementDescription = achievementDescription;
         this.points = points;
     }
 
-    protected AchievementJpaEntity() {} // for JPA
+    protected JpaAchievementEntity() {} // for JPA
 
-    public static AchievementJpaEntity fromDomain(Achievement achievement) {
-        return new AchievementJpaEntity(
+    public static JpaAchievementEntity fromDomain(Achievement achievement) {
+        return new JpaAchievementEntity(
                 achievement.getId().id(),
                 achievement.getName(),
                 achievement.getDescription(),

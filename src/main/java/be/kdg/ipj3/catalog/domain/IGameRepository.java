@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface GameRepository {
+public interface IGameRepository {
     void save(Game game);
 
     List<Game> getAllGames();

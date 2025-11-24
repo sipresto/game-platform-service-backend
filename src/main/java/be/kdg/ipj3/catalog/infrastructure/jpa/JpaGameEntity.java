@@ -24,7 +24,7 @@ public class JpaGameEntity {
     private String categories;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
-    private List<AchievementJpaEntity> achievements;
+    private List<JpaAchievementEntity> achievements;
 
 
     protected JpaGameEntity() {} // for JPA
@@ -34,7 +34,7 @@ public class JpaGameEntity {
         this.name = name;
         this.description = description;
         this.price = price.amount();
-        achievements.forEach(achievement -> this.achievements.add(AchievementJpaEntity.fromDomain(achievement)));
+        achievements.forEach(achievement -> this.achievements.add(JpaAchievementEntity.fromDomain(achievement)));
         if (!categories.isEmpty()) {
             this.categories = "";
             categories.forEach(category -> this.categories += category.toString() + ", ");

@@ -1,6 +1,7 @@
 package be.kdg.ipj3.users.infrastructure;
 
 import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.users.domain.IUserRepository;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.infrastructure.jpa.*;

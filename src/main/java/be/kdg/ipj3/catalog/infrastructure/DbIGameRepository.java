@@ -2,9 +2,9 @@ package be.kdg.ipj3.catalog.infrastructure;
 
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.catalog.domain.IGameRepository;
+import be.kdg.ipj3.catalog.infrastructure.jpa.IGameJpaRepository;
 import be.kdg.ipj3.catalog.infrastructure.jpa.JpaGameEntity;
-import be.kdg.ipj3.catalog.infrastructure.jpa.IGameRepository;
 import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.shared.domain.GameId;
 import org.springframework.stereotype.Repository;
@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class DbGameRepository implements GameRepository {
-    private final IGameRepository gameRepo;
+public class DbIGameRepository implements IGameRepository {
+    private final IGameJpaRepository gameRepo;
 
-    public DbGameRepository(IGameRepository gameRepo) {
+    public DbIGameRepository(IGameJpaRepository gameRepo) {
         this.gameRepo = gameRepo;
     }
 

@@ -69,15 +69,6 @@ public class UserController {
     }
 
     /**
-     * Admin-only endpoint
-     */
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/users")
-    public List<String> getAllUsers() {
-        return List.of("user1", "user2", "admin");
-    }
-
-    /**
      * Get user details along with their owned games.
      */
     @GetMapping("/users/{id}/games")

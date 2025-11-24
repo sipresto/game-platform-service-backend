@@ -3,7 +3,7 @@ package be.kdg.ipj3.catalog.application;
 import be.kdg.ipj3.catalog.domain.Achievement;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.catalog.domain.IGameRepository;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 class GameServiceTest {
 
     @Mock
-    private GameRepository gameRepository;
+    private IGameRepository IGameRepository;
 
     private GameService gameService;
 
@@ -39,7 +39,7 @@ class GameServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        gameService = new GameService(gameRepository);
+        gameService = new GameService(IGameRepository);
 
         gameWithAchievementsId = GameId.create();
         GameId boardGameId = GameId.create();
@@ -97,7 +97,7 @@ class GameServiceTest {
     void testGetAllGames() {
         // Arrange
         List<Game> expectedGames = List.of(gameWithAchievements, gameWithoutAchievements);
-        when(gameRepository.getAllGames()).thenReturn(expectedGames);
+        when(IGameRepository.getAllGames()).thenReturn(expectedGames);
 
         // Act
         List<Game> actualGames = gameService.getAllGames();
@@ -105,14 +105,14 @@ class GameServiceTest {
         // Assert
         assertEquals(2, actualGames.size());
         assertEquals(expectedGames, actualGames);
-        verify(gameRepository).getAllGames();
+        verify(IGameRepository).getAllGames();
     }
 
     @Test
     void testFilterGames_AllParametersNull_DelegatesToRepository() {
         // Arrange
         List<Game> expectedGames = List.of(gameWithAchievements, gameWithoutAchievements, cheapGame, expensiveGame);
-        when(gameRepository.filterGames(null, null, null)).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(null, null, null)).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(null, null, null);
@@ -120,14 +120,14 @@ class GameServiceTest {
         // Assert
         assertEquals(4, result.size());
         assertEquals(expectedGames, result);
-        verify(gameRepository).filterGames(null, null, null);
+        verify(IGameRepository).filterGames(null, null, null);
     }
 
     @Test
     void testFilterGames_BySingleCategory_DelegatesToRepository() {
         // Arrange
         List<Game> expectedGames = List.of(boardGame, multiCategoryGame);
-        when(gameRepository.filterGames(null, null, List.of(Category.BOARDGAME))).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(null, null, List.of(Category.BOARDGAME))).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(null, null, List.of(Category.BOARDGAME));
@@ -135,14 +135,14 @@ class GameServiceTest {
         // Assert
         assertEquals(2, result.size());
         assertEquals(expectedGames, result);
-        verify(gameRepository).filterGames(null, null, List.of(Category.BOARDGAME));
+        verify(IGameRepository).filterGames(null, null, List.of(Category.BOARDGAME));
     }
 
     @Test
     void testFilterGames_ByMultipleCategories_DelegatesToRepository() {
         // Arrange
         List<Game> expectedGames = List.of(boardGame, strategyGame, multiCategoryGame);
-        when(gameRepository.filterGames(null, null, List.of(Category.BOARDGAME, Category.STRATEGY))).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(null, null, List.of(Category.BOARDGAME, Category.STRATEGY))).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(null, null, List.of(Category.BOARDGAME, Category.STRATEGY));
@@ -150,14 +150,14 @@ class GameServiceTest {
         // Assert
         assertEquals(3, result.size());
         assertEquals(expectedGames, result);
-        verify(gameRepository).filterGames(null, null, List.of(Category.BOARDGAME, Category.STRATEGY));
+        verify(IGameRepository).filterGames(null, null, List.of(Category.BOARDGAME, Category.STRATEGY));
     }
 
     @Test
     void testFilterGames_ByEmptyCategories_DelegatesToRepository() {
         // Arrange
         List<Game> expectedGames = List.of(boardGame, strategyGame);
-        when(gameRepository.filterGames(null, null, List.of())).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(null, null, List.of())).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(null, null, List.of());
@@ -165,7 +165,7 @@ class GameServiceTest {
         // Assert
         assertEquals(2, result.size());
         assertEquals(expectedGames, result);
-        verify(gameRepository).filterGames(null, null, List.of());
+        verify(IGameRepository).filterGames(null, null, List.of());
     }
 
     @Test
@@ -173,7 +173,7 @@ class GameServiceTest {
         // Arrange
         List<Game> expectedGames = List.of(gameWithAchievements, expensiveGame);
         Money minPrice = Money.of(BigDecimal.valueOf(10.00));
-        when(gameRepository.filterGames(minPrice, null, null)).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(minPrice, null, null)).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(minPrice, null, null);
@@ -181,7 +181,7 @@ class GameServiceTest {
         // Assert
         assertEquals(2, result.size());
         assertEquals(expectedGames, result);
-        verify(gameRepository).filterGames(minPrice, null, null);
+        verify(IGameRepository).filterGames(minPrice, null, null);
     }
 
     @Test
@@ -189,7 +189,7 @@ class GameServiceTest {
         // Arrange
         List<Game> expectedGames = List.of(cheapGame, gameWithoutAchievements);
         Money maxPrice = Money.of(BigDecimal.valueOf(20.00));
-        when(gameRepository.filterGames(null, maxPrice, null)).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(null, maxPrice, null)).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(null, maxPrice, null);
@@ -197,7 +197,7 @@ class GameServiceTest {
         // Assert
         assertEquals(2, result.size());
         assertEquals(expectedGames, result);
-        verify(gameRepository).filterGames(null, maxPrice, null);
+        verify(IGameRepository).filterGames(null, maxPrice, null);
     }
 
     @Test
@@ -206,7 +206,7 @@ class GameServiceTest {
         List<Game> expectedGames = List.of(gameWithoutAchievements);
         Money minPrice = Money.of(BigDecimal.valueOf(5.00));
         Money maxPrice = Money.of(BigDecimal.valueOf(30.00));
-        when(gameRepository.filterGames(minPrice, maxPrice, null)).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(minPrice, maxPrice, null)).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(minPrice, maxPrice, null);
@@ -214,7 +214,7 @@ class GameServiceTest {
         // Assert
         assertEquals(1, result.size());
         assertEquals(expectedGames, result);
-        verify(gameRepository).filterGames(minPrice, maxPrice, null);
+        verify(IGameRepository).filterGames(minPrice, maxPrice, null);
     }
 
     @Test
@@ -224,7 +224,7 @@ class GameServiceTest {
         Money minPrice = Money.of(BigDecimal.valueOf(20.00));
         Money maxPrice = Money.of(BigDecimal.valueOf(40.00));
         List<Category> categories = List.of(Category.BOARDGAME, Category.STRATEGY);
-        when(gameRepository.filterGames(minPrice, maxPrice, categories)).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(minPrice, maxPrice, categories)).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(minPrice, maxPrice, categories);
@@ -232,7 +232,7 @@ class GameServiceTest {
         // Assert
         assertEquals(1, result.size());
         assertEquals(expectedGames, result);
-        verify(gameRepository).filterGames(minPrice, maxPrice, categories);
+        verify(IGameRepository).filterGames(minPrice, maxPrice, categories);
     }
 
     @Test
@@ -242,14 +242,14 @@ class GameServiceTest {
         Money minPrice = Money.of(BigDecimal.valueOf(50.00));
         Money maxPrice = Money.of(BigDecimal.valueOf(100.00));
         List<Category> categories = List.of(Category.BOARDGAME);
-        when(gameRepository.filterGames(minPrice, maxPrice, categories)).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(minPrice, maxPrice, categories)).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(minPrice, maxPrice, categories);
 
         // Assert
         assertTrue(result.isEmpty());
-        verify(gameRepository).filterGames(minPrice, maxPrice, categories);
+        verify(IGameRepository).filterGames(minPrice, maxPrice, categories);
     }
 
     @Test
@@ -263,7 +263,7 @@ class GameServiceTest {
 
         List<Game> expectedGames = List.of(exactPriceGame);
         Money exactPrice = Money.of(BigDecimal.valueOf(25.00));
-        when(gameRepository.filterGames(exactPrice, exactPrice, null)).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(exactPrice, exactPrice, null)).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(exactPrice, exactPrice, null);
@@ -271,7 +271,7 @@ class GameServiceTest {
         // Assert
         assertEquals(1, result.size());
         assertEquals(expectedGames, result);
-        verify(gameRepository).filterGames(exactPrice, exactPrice, null);
+        verify(IGameRepository).filterGames(exactPrice, exactPrice, null);
     }
 
     @Test
@@ -280,14 +280,14 @@ class GameServiceTest {
         List<Game> expectedGames = List.of();
         Money minPrice = Money.of(BigDecimal.valueOf(50.00));
         Money maxPrice = Money.of(BigDecimal.valueOf(10.00));
-        when(gameRepository.filterGames(minPrice, maxPrice, null)).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(minPrice, maxPrice, null)).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(minPrice, maxPrice, null);
 
         // Assert
         assertTrue(result.isEmpty());
-        verify(gameRepository).filterGames(minPrice, maxPrice, null);
+        verify(IGameRepository).filterGames(minPrice, maxPrice, null);
     }
 
     @Test
@@ -295,7 +295,7 @@ class GameServiceTest {
         // Arrange
         List<Game> expectedGames = List.of(boardGame, multiCategoryGame);
         List<Category> categories = List.of(Category.BOARDGAME);
-        when(gameRepository.filterGames(null, null, categories)).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(null, null, categories)).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(null, null, categories);
@@ -303,7 +303,7 @@ class GameServiceTest {
         // Assert
         assertEquals(2, result.size());
         assertEquals(expectedGames, result);
-        verify(gameRepository).filterGames(null, null, categories);
+        verify(IGameRepository).filterGames(null, null, categories);
     }
 
     @Test
@@ -311,7 +311,7 @@ class GameServiceTest {
         // Arrange
         List<Game> expectedGames = List.of(gameWithAchievements, expensiveGame);
         Money minPrice = Money.of(BigDecimal.valueOf(15.00));
-        when(gameRepository.filterGames(minPrice, null, null)).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(minPrice, null, null)).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(minPrice, null, null);
@@ -319,7 +319,7 @@ class GameServiceTest {
         // Assert
         assertEquals(2, result.size());
         assertEquals(expectedGames, result);
-        verify(gameRepository).filterGames(minPrice, null, null);
+        verify(IGameRepository).filterGames(minPrice, null, null);
     }
 
     @Test
@@ -327,7 +327,7 @@ class GameServiceTest {
         // Arrange
         List<Game> expectedGames = List.of(cheapGame, gameWithoutAchievements);
         Money maxPrice = Money.of(BigDecimal.valueOf(15.00));
-        when(gameRepository.filterGames(null, maxPrice, null)).thenReturn(expectedGames);
+        when(IGameRepository.filterGames(null, maxPrice, null)).thenReturn(expectedGames);
 
         // Act
         List<Game> result = gameService.filterGames(null, maxPrice, null);
@@ -335,13 +335,13 @@ class GameServiceTest {
         // Assert
         assertEquals(2, result.size());
         assertEquals(expectedGames, result);
-        verify(gameRepository).filterGames(null, maxPrice, null);
+        verify(IGameRepository).filterGames(null, maxPrice, null);
     }
     @Test
     void testGetGameById_Found() {
         // Arrange
         GameId id = gameWithAchievements.getId(); // any game is fine
-        when(gameRepository.getGameById(id)).thenReturn(Optional.of(gameWithAchievements));
+        when(IGameRepository.getGameById(id)).thenReturn(Optional.of(gameWithAchievements));
 
         // Act
         Game result = gameService.getGameById(id);
@@ -349,14 +349,14 @@ class GameServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(id, result.getId());
-        verify(gameRepository).getGameById(id);
+        verify(IGameRepository).getGameById(id);
     }
 
     @Test
     void testGetGameById_NotFound() {
         // Arrange
         GameId id = GameId.create();
-        when(gameRepository.getGameById(id)).thenReturn(Optional.empty());
+        when(IGameRepository.getGameById(id)).thenReturn(Optional.empty());
 
         // Act + Assert
         ResourceNotFoundException ex = assertThrows(
@@ -365,7 +365,7 @@ class GameServiceTest {
         );
 
         assertEquals("Game with id " + id + " not found", ex.getMessage());
-        verify(gameRepository).getGameById(id);
+        verify(IGameRepository).getGameById(id);
     }
 
 }

@@ -20,12 +20,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class GameRestControllerTest {
+class GameControllerTest {
 
     @Mock
     private GameService gameService;
 
-    private GameRestController gameRestController;
+    private GameController gameController;
 
     private Game testGame;
     private GameDto testGameDto;
@@ -33,7 +33,7 @@ class GameRestControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        gameRestController = new GameRestController(gameService);
+        gameController = new GameController(gameService);
 
         testGame = new Game(
                 GameId.create(),
@@ -52,7 +52,7 @@ class GameRestControllerTest {
         when(gameService.getAllGames()).thenReturn(List.of(testGame));
 
         // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGames();
+        ResponseEntity<List<GameDto>> response = gameController.getAllGames();
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -70,7 +70,7 @@ class GameRestControllerTest {
         // Act & Assert
         ResourceNotFoundException exception = assertThrows(
                 ResourceNotFoundException.class,
-                () -> gameRestController.getAllGames()
+                () -> gameController.getAllGames()
         );
         assertEquals("No games found", exception.getMessage());
         verify(gameService).getAllGames();
@@ -91,7 +91,7 @@ class GameRestControllerTest {
         )).thenReturn(List.of(testGame));
 
         // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+        ResponseEntity<List<GameDto>> response = gameController.getAllGamesByFilter(filterRequest);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -112,7 +112,7 @@ class GameRestControllerTest {
         when(gameService.filterGames(null, null, null)).thenReturn(List.of(testGame));
 
         // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+        ResponseEntity<List<GameDto>> response = gameController.getAllGamesByFilter(filterRequest);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -133,7 +133,7 @@ class GameRestControllerTest {
                 .thenReturn(List.of(testGame));
 
         // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+        ResponseEntity<List<GameDto>> response = gameController.getAllGamesByFilter(filterRequest);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -154,7 +154,7 @@ class GameRestControllerTest {
                 .thenReturn(List.of(testGame));
 
         // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+        ResponseEntity<List<GameDto>> response = gameController.getAllGamesByFilter(filterRequest);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -180,7 +180,7 @@ class GameRestControllerTest {
         // Act & Assert
         ResourceNotFoundException exception = assertThrows(
                 ResourceNotFoundException.class,
-                () -> gameRestController.getAllGamesByFilter(filterRequest)
+                () -> gameController.getAllGamesByFilter(filterRequest)
         );
         assertEquals("No games found", exception.getMessage());
         verify(gameService).filterGames(
@@ -202,7 +202,7 @@ class GameRestControllerTest {
                 .thenReturn(List.of(testGame));
 
         // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+        ResponseEntity<List<GameDto>> response = gameController.getAllGamesByFilter(filterRequest);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -233,7 +233,7 @@ class GameRestControllerTest {
                 .thenReturn(List.of(testGame, anotherGame));
 
         // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+        ResponseEntity<List<GameDto>> response = gameController.getAllGamesByFilter(filterRequest);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -256,7 +256,7 @@ class GameRestControllerTest {
                 .thenReturn(List.of(testGame));
 
         // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+        ResponseEntity<List<GameDto>> response = gameController.getAllGamesByFilter(filterRequest);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -277,7 +277,7 @@ class GameRestControllerTest {
                 .thenReturn(List.of(testGame));
 
         // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+        ResponseEntity<List<GameDto>> response = gameController.getAllGamesByFilter(filterRequest);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -298,7 +298,7 @@ class GameRestControllerTest {
                 .thenReturn(List.of(testGame));
 
         // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+        ResponseEntity<List<GameDto>> response = gameController.getAllGamesByFilter(filterRequest);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -319,7 +319,7 @@ class GameRestControllerTest {
                 .thenReturn(List.of(testGame));
 
         // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+        ResponseEntity<List<GameDto>> response = gameController.getAllGamesByFilter(filterRequest);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -343,7 +343,7 @@ class GameRestControllerTest {
         )).thenReturn(List.of(testGame));
 
         // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+        ResponseEntity<List<GameDto>> response = gameController.getAllGamesByFilter(filterRequest);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -368,7 +368,7 @@ class GameRestControllerTest {
                 .thenReturn(List.of(testGame));
 
         // Act
-        ResponseEntity<List<GameDto>> response = gameRestController.getAllGamesByFilter(filterRequest);
+        ResponseEntity<List<GameDto>> response = gameController.getAllGamesByFilter(filterRequest);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());

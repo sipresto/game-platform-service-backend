@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-public interface IGameRepository extends JpaRepository<JpaGameEntity, UUID> {
+public interface IGameJpaRepository extends JpaRepository<JpaGameEntity, UUID> {
 
     @Query("SELECT g FROM JpaGameEntity g WHERE " +
             "(:minPrice IS NULL OR g.price >= :minPrice) AND " +
