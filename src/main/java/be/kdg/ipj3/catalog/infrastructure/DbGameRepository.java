@@ -6,10 +6,12 @@ import be.kdg.ipj3.catalog.domain.GameRepository;
 import be.kdg.ipj3.catalog.infrastructure.jpa.JpaGameEntity;
 import be.kdg.ipj3.catalog.infrastructure.jpa.IGameRepository;
 import be.kdg.ipj3.shared.domain.Money;
+import be.kdg.ipj3.shared.domain.GameId;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class DbGameRepository implements GameRepository {
@@ -50,5 +52,10 @@ public class DbGameRepository implements GameRepository {
                 )
                 .distinct()
                 .toList();
+    }
+
+    @Override
+    public Optional<Game> getGameById(GameId gameId) {
+        return jpaGameRepository.findById(gameId.id()).map(GameJpaEntity::toDomain);
     }
 }
