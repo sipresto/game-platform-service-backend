@@ -1,5 +1,7 @@
 package be.kdg.ipj3.users.api;
 
+import be.kdg.ipj3.catalog.application.GameService;
+import be.kdg.ipj3.shared.api.SmallGameDto;
 import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.Profile;
@@ -10,24 +12,23 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
+    private final GameService gameService;
 
-    public UserController(UserService userService) {
+    public UserController(
+            UserService userService,
+            GameService gameService
+    ) {
         this.userService = userService;
-    }
-
-    /**
-     * Public endpoint - no authentication required
-     */
-    @GetMapping("/public/health")
-    public Map<String, String> publicEndpoint() {
-        return Map.of("status", "ok", "access", "public");
+        this.gameService = gameService;
     }
 
     /**
@@ -74,6 +75,24 @@ public class UserController {
     @GetMapping("/admin/users")
     public List<String> getAllUsers() {
         return List.of("user1", "user2", "admin");
+    }
+
+    /**
+     * Get user details along with their owned games.
+     */
+    @GetMapping("/users/{id}/games")
+    public ResponseEntity<UserDto> getUserWithGames(
+            @PathVariable UUID id
+    ) {
+        User user = userService.getUserWithGames(new UserId(id.toString()));
+        List<SmallGameDto> games = new ArrayList<>();
+
+        if (!user.getOwnedGames().isEmpty()) {
+            user.getOwnedGames().forEach(gameId -> games.add(SmallGameDto.from(gameService.getGameById(gameId))));
+        }
+
+        UserDto userDtos = UserDto.from(user, games);
+        return ResponseEntity.ok(userDtos);
     }
 
     /**

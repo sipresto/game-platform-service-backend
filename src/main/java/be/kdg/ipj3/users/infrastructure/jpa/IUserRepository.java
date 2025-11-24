@@ -11,5 +11,6 @@ public interface IUserRepository {
     User save(User user);
     boolean existsById(UserId userId);
     Optional<Profile> findProfileByUserId(UserId userId);
+    Optional<User> getUserByIdWithGames(UserId userId);
     Profile save(Profile profile);
 }

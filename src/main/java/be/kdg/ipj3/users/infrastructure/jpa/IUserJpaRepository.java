@@ -8,12 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface IUserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
+public interface IUserJpaRepository extends JpaRepository<JpaUserEntity, String> {
     @Query("""
     SELECT u
-    FROM UserJpaEntity u
+    FROM JpaUserEntity u
     JOIN FETCH u.ownedGames
     WHERE u.userId = :userId
 """)
-    Optional<UserJpaEntity> findByIdWithGames(String userId);
+    Optional<JpaUserEntity> findByIdWithGames(String userId);
 }

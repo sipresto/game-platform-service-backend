@@ -15,20 +15,20 @@ import java.util.Optional;
 
 @Repository
 public class DbGameRepository implements GameRepository {
-    private final IGameRepository iGameRepository;
+    private final IGameRepository gameRepo;
 
-    public DbGameRepository(IGameRepository iGameRepository) {
-        this.iGameRepository = iGameRepository;
+    public DbGameRepository(IGameRepository gameRepo) {
+        this.gameRepo = gameRepo;
     }
 
     @Override
     public void save(Game game) {
-        iGameRepository.save(JpaGameEntity.fromDomain(game));
+        gameRepo.save(JpaGameEntity.fromDomain(game));
     }
 
     @Override
     public List<Game> getAllGames() {
-        return iGameRepository.findAll()
+        return gameRepo.findAll()
                 .stream().map(JpaGameEntity::toDomain).toList();
     }
 
@@ -38,7 +38,7 @@ public class DbGameRepository implements GameRepository {
         BigDecimal maxPriceAmount = maxPrice != null ? maxPrice.amount() : null;
 
         if (categories == null || categories.isEmpty()) {
-            return iGameRepository.filterGames(minPriceAmount, maxPriceAmount, null)
+            return gameRepo.filterGames(minPriceAmount, maxPriceAmount, null)
                     .stream()
                     .map(JpaGameEntity::toDomain)
                     .toList();
@@ -46,7 +46,7 @@ public class DbGameRepository implements GameRepository {
 
         return categories.stream()
                 .flatMap(category ->
-                        iGameRepository.filterGames(minPriceAmount, maxPriceAmount, category.name())
+                        gameRepo.filterGames(minPriceAmount, maxPriceAmount, category.name())
                                 .stream()
                                 .map(JpaGameEntity::toDomain)
                 )
@@ -56,6 +56,6 @@ public class DbGameRepository implements GameRepository {
 
     @Override
     public Optional<Game> getGameById(GameId gameId) {
-        return jpaGameRepository.findById(gameId.id()).map(GameJpaEntity::toDomain);
+        return gameRepo.findById(gameId.id()).map(JpaGameEntity::toDomain);
     }
 }
