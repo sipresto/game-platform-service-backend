@@ -14,6 +14,7 @@ public record GameDto(UUID gameId, String name, String description, BigDecimal p
                 game.getName(),
                 game.getDescription(),
                 game.getPrice().amount(),
-                game.getCategories());
+                game.getCategories()
+        );
     }
 }
