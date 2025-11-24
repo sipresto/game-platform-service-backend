@@ -8,15 +8,15 @@ import org.jmolecules.ddd.annotation.Identity;
 public class User {
     @Identity
     private final UserId id;
-    private final String username;
+    private String username;
 
     public User(UserId id, String username) {
         this.id = id;
         this.username = username;
     }
 
-    public static User create(String username) {
-        return new User(UserId.create(), username);
+    public static User createFromKeycloak(String keycloakId, String keycloakUsername) {
+        return new User(UserId.fromKeycloak(keycloakId), keycloakUsername);
     }
 
     public UserId getId() {
@@ -25,5 +25,12 @@ public class User {
 
     public String getUsername() {
         return username;
+    }
+
+    public void updateUsername(String newUsername) {
+        if (newUsername == null || newUsername.isBlank()) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
+        this.username = newUsername;
     }
 }
