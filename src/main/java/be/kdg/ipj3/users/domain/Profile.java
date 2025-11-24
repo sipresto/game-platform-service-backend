@@ -6,8 +6,8 @@ import org.jmolecules.ddd.annotation.ValueObject;
 @ValueObject
 public class Profile {
     private final UserId owner;
-    private final String username;
-    private final String bio;
+    private String username;
+    private String bio;
 
     public Profile(UserId owner, String username, String bio) {
         this.owner = owner;
@@ -27,4 +27,11 @@ public class Profile {
         return bio;
     }
 
+    public void updateUsername(String username) {
+        this.username = username;
+    }
+
+    public static Profile createFromUser(User user) {
+        return new Profile(user.getId(), user.getUsername(), "");
+    }
 }

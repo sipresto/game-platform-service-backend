@@ -1,7 +1,5 @@
 package be.kdg.ipj3.shared.domain;
 
-import java.util.Objects;
-
 public record UserId(String value) {
 
     public static UserId fromKeycloak(String keycloakId) {
