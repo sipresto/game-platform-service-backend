@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -31,9 +32,9 @@ public class UserRestController {
 
     @GetMapping("/{id}/games")
     public ResponseEntity<UserDto> getUserWithGames(
-            @PathVariable UserId id
+            @PathVariable UUID id
     ) {
-        User user = userService.getUserWithGames(id);
+        User user = userService.getUserWithGames(new UserId(id.toString()));
         List<SmallGameDto> games = new ArrayList<>();
         if (!user.getOwnedGames().isEmpty()) {
             user.getOwnedGames().forEach(gameId -> games.add(SmallGameDto.from(gameService.getGameById(gameId))));

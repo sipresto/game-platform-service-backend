@@ -21,6 +21,6 @@ public class DbUserRepository implements IUserRepository {
 
     @Override
     public Optional<User> getUserByIdWithGames(UserId userId) {
-        return userJpaRepository.findByIdWithGames(userId).map(UserJpaEntity::toDomain);
+        return userJpaRepository.findByIdWithGames(userId.value()).map(UserJpaEntity::toDomain);
     }
 }

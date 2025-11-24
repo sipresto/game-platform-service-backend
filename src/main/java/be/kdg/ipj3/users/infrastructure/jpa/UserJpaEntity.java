@@ -14,7 +14,7 @@ import java.util.UUID;
 public class UserJpaEntity {
     @Id
     @Column(name = "user_id")
-    private UUID userId;
+    private String userId;
     private String username;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -27,7 +27,7 @@ public class UserJpaEntity {
 
     protected UserJpaEntity() {} // for JPA
 
-    public UserJpaEntity(UUID userId, String username, List<GameId> ownedGames) {
+    public UserJpaEntity(String userId, String username, List<GameId> ownedGames) {
         this.userId = userId;
         this.username = username;
         if (ownedGames != null) {
@@ -42,7 +42,7 @@ public class UserJpaEntity {
 
     public static UserJpaEntity fromDomain(User user) {
         return new UserJpaEntity(
-                user.getId().id(),
+                user.getId().value(),
                 user.getUsername(),
                 user.getOwnedGames()
         );
@@ -61,5 +61,17 @@ public class UserJpaEntity {
                 this.username,
                 ownedGames
         );
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public List<UUID> getOwnedGames() {
+        return ownedGames;
     }
 }

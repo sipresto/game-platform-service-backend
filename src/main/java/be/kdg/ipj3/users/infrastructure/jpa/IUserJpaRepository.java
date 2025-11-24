@@ -15,5 +15,5 @@ public interface IUserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
     JOIN FETCH u.ownedGames
     WHERE u.userId = :userId
 """)
-    Optional<UserJpaEntity> findByIdWithGames(UserId userId);
+    Optional<UserJpaEntity> findByIdWithGames(String userId);
 }

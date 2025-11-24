@@ -33,6 +33,7 @@ public class GameService {
         return gameRepository.filterGames(minPrice, maxPrice, categories);
     }
 
+    @Transactional(readOnly = true)
     public Game getGameById(GameId gameId) {
         return gameRepository.getGameById(gameId)
                 .orElseThrow(() -> new ResourceNotFoundException("Game with id " + gameId + " not found"));
