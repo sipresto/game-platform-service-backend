@@ -8,13 +8,16 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
-public class UserJpaEntity {
+public class JpaUserEntity {
+
     @Id
     @Column(name = "user_id")
     private String userId;
+
     private String username;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -25,23 +28,23 @@ public class UserJpaEntity {
     @Column(name = "game_id")
     private List<UUID> ownedGames = new ArrayList<>();
 
-    protected UserJpaEntity() {} // for JPA
+    protected JpaUserEntity() {}
 
-    public UserJpaEntity(String userId, String username, List<GameId> ownedGames) {
+    public JpaUserEntity(String userId, String username, List<GameId> ownedGames) {
         this.userId = userId;
         this.username = username;
+
         if (ownedGames != null) {
-            for (GameId gameId : ownedGames) {
-                this.ownedGames.add(gameId.id());
-            }
-        }
-        else {
+            this.ownedGames = ownedGames.stream()
+                    .map(GameId::id)
+                    .collect(Collectors.toList());
+        } else {
             this.ownedGames = new ArrayList<>();
         }
     }
 
-    public static UserJpaEntity fromDomain(User user) {
-        return new UserJpaEntity(
+    public static JpaUserEntity fromDomain(User user) {
+        return new JpaUserEntity(
                 user.getId().value(),
                 user.getUsername(),
                 user.getOwnedGames()
@@ -49,17 +52,17 @@ public class UserJpaEntity {
     }
 
     public User toDomain() {
-        List<GameId> ownedGames = new ArrayList<>();
+        List<GameId> domainOwnedGames = new ArrayList<>();
         if (this.ownedGames != null) {
-            for (UUID gameId : this.ownedGames) {
-                ownedGames.add(new GameId(gameId));
-            }
+            domainOwnedGames = this.ownedGames.stream()
+                    .map(GameId::new)
+                    .collect(Collectors.toList());
         }
 
         return new User(
                 new UserId(this.userId),
                 this.username,
-                ownedGames
+                domainOwnedGames
         );
     }
 
@@ -73,5 +76,9 @@ public class UserJpaEntity {
 
     public List<UUID> getOwnedGames() {
         return ownedGames;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

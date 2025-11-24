@@ -9,10 +9,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/games")
-public class GameRestController {
+public class GameController {
     private final GameService gameService;
 
-    public GameRestController(GameService gameService) {
+    public GameController(GameService gameService) {
         this.gameService = gameService;
     }
 

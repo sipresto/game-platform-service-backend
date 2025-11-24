@@ -2,9 +2,9 @@ package be.kdg.ipj3.catalog.infrastructure;
 
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.domain.GameRepository;
-import be.kdg.ipj3.catalog.infrastructure.jpa.GameJpaEntity;
-import be.kdg.ipj3.catalog.infrastructure.jpa.JpaGameRepository;
+import be.kdg.ipj3.catalog.domain.IGameRepository;
+import be.kdg.ipj3.catalog.infrastructure.jpa.IGameJpaRepository;
+import be.kdg.ipj3.catalog.infrastructure.jpa.JpaGameEntity;
 import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.shared.domain.GameId;
 import org.springframework.stereotype.Repository;
@@ -14,22 +14,22 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class DbGameRepository implements GameRepository {
-    private final JpaGameRepository jpaGameRepository;
+public class DbIGameRepository implements IGameRepository {
+    private final IGameJpaRepository gameRepo;
 
-    public DbGameRepository(JpaGameRepository jpaGameRepository) {
-        this.jpaGameRepository = jpaGameRepository;
+    public DbIGameRepository(IGameJpaRepository gameRepo) {
+        this.gameRepo = gameRepo;
     }
 
     @Override
     public void save(Game game) {
-        jpaGameRepository.save(GameJpaEntity.fromDomain(game));
+        gameRepo.save(JpaGameEntity.fromDomain(game));
     }
 
     @Override
     public List<Game> getAllGames() {
-        return jpaGameRepository.findAll()
-                .stream().map(GameJpaEntity::toDomain).toList();
+        return gameRepo.findAll()
+                .stream().map(JpaGameEntity::toDomain).toList();
     }
 
     @Override
@@ -38,17 +38,17 @@ public class DbGameRepository implements GameRepository {
         BigDecimal maxPriceAmount = maxPrice != null ? maxPrice.amount() : null;
 
         if (categories == null || categories.isEmpty()) {
-            return jpaGameRepository.filterGames(minPriceAmount, maxPriceAmount, null)
+            return gameRepo.filterGames(minPriceAmount, maxPriceAmount, null)
                     .stream()
-                    .map(GameJpaEntity::toDomain)
+                    .map(JpaGameEntity::toDomain)
                     .toList();
         }
 
         return categories.stream()
                 .flatMap(category ->
-                        jpaGameRepository.filterGames(minPriceAmount, maxPriceAmount, category.name())
+                        gameRepo.filterGames(minPriceAmount, maxPriceAmount, category.name())
                                 .stream()
-                                .map(GameJpaEntity::toDomain)
+                                .map(JpaGameEntity::toDomain)
                 )
                 .distinct()
                 .toList();
@@ -56,6 +56,6 @@ public class DbGameRepository implements GameRepository {
 
     @Override
     public Optional<Game> getGameById(GameId gameId) {
-        return jpaGameRepository.findById(gameId.id()).map(GameJpaEntity::toDomain);
+        return gameRepo.findById(gameId.id()).map(JpaGameEntity::toDomain);
     }
 }

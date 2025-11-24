@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "games")
-public class GameJpaEntity {
+public class JpaGameEntity {
     @Id
     @Column(name = "game_id")
     private UUID gameId;
@@ -24,25 +24,25 @@ public class GameJpaEntity {
     private String categories;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
-    private List<AchievementJpaEntity> achievements;
+    private List<JpaAchievementEntity> achievements;
 
 
-    protected GameJpaEntity() {} // for JPA
+    protected JpaGameEntity() {} // for JPA
 
-    public GameJpaEntity(GameId id, String name, String description, Money price, List<Achievement> achievements, List<Category> categories) {
+    public JpaGameEntity(GameId id, String name, String description, Money price, List<Achievement> achievements, List<Category> categories) {
         this.gameId = id.id();
         this.name = name;
         this.description = description;
         this.price = price.amount();
-        achievements.forEach(achievement -> this.achievements.add(AchievementJpaEntity.fromDomain(achievement)));
+        achievements.forEach(achievement -> this.achievements.add(JpaAchievementEntity.fromDomain(achievement)));
         if (!categories.isEmpty()) {
             this.categories = "";
             categories.forEach(category -> this.categories += category.toString() + ", ");
         }
     }
 
-    public static GameJpaEntity fromDomain(Game game) {
-        return new GameJpaEntity(
+    public static JpaGameEntity fromDomain(Game game) {
+        return new JpaGameEntity(
                 game.getId(),
                 game.getName(),
                 game.getDescription(),

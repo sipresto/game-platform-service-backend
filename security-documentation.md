@@ -39,7 +39,8 @@ Create the following realm roles:
 
 - Navigate to **Realm Settings → User Registration → Default Roles**
 - Assign default role: `player`
-
+- Navigate too **Realm Settings → Login
+- Set forgot password, remember me and user registration on 'on'
 ---
 
 ## 5. User Management
