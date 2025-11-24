@@ -11,7 +11,7 @@ import java.util.List;
 public class User {
     @Identity
     private final UserId id;
-    private final String username;
+    private String username;
     private List<GameId> ownedGames;
 
     public User(UserId id, String username, List<GameId> ownedGames) {
@@ -20,8 +20,8 @@ public class User {
         this.ownedGames = ownedGames;
     }
 
-    public static User create(String username) {
-        return new User(UserId.create(), username, List.of());
+    public static User createFromKeycloak(String keycloakId, String keycloakUsername) {
+        return new User(UserId.fromKeycloak(keycloakId), keycloakUsername, List.of());
     }
 
     public UserId getId() {
@@ -34,5 +34,12 @@ public class User {
 
     public List<GameId> getOwnedGames() {
         return ownedGames;
+    }
+
+    public void updateUsername(String newUsername) {
+        if (newUsername == null || newUsername.isBlank()) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
+        this.username = newUsername;
     }
 }

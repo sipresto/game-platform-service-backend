@@ -1,6 +1,17 @@
 name: kdg-ipj3-team20
 
 services:
+  # ---------------------
+  # REVERSE PROXY (DEV)
+  # ---------------------
+  reverse_proxy:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx-dev.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - dev
 
   # ---------------------
   # DATABASE (POSTGRES)
@@ -16,7 +27,7 @@ services:
     ports:
       - "5544:5432"
     networks:
-      - backend
+      - dev
     volumes:
       - ./postgresql/data:/var/lib/postgresql/data
       - ./init-scripts/sql:/docker-entrypoint-initdb.d/
@@ -33,13 +44,13 @@ services:
       - "5772:5672"
       - "15683:15672"
     networks:
-      - backend
+      - dev
     volumes:
       - ./rabbitmq/data:/var/lib/rabbitmq
       - ./rabbitmq/log:/var/log/rabbitmq
 
   # ---------------------
-  # KEYCLOAK (IDP / SSO)
+  # KEYCLOAK DATABASE (MYSQL)
   # ---------------------
   idp_mysql:
     image: mysql:9.0.1
@@ -53,11 +64,14 @@ services:
     ports:
       - "3407:3306"
     networks:
-      - kc
+      - dev
 
+  # ---------------------
+  # KEYCLOAK (IDP / SSO)
+  # ---------------------
   idp_keycloak:
     image: quay.io/keycloak/keycloak:26.3
-    command: start-dev
+    command: start-dev --http-relative-path=/auth
     environment:
       KEYCLOAK_ADMIN: "admin"
       KEYCLOAK_ADMIN_PASSWORD: "admin"
@@ -66,91 +80,16 @@ services:
       KC_DB_URL_DATABASE: "keycloak"
       KC_DB_USERNAME: "keycloak"
       KC_DB_PASSWORD: "password"
+      KC_PROXY: "edge"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME: "localhost"
+      KC_HOSTNAME_PORT: "80"
     ports:
       - "8280:8080"
-    depends_on:
-      - idp_mysql
     networks:
-      - kc
+      - dev
 
-#  # ---------------------
-#  # PLATFORM BACKEND
-#  # ---------------------
-#  platform_backend:
-#    build: ./platform-backend
-#    depends_on:
-#      - app_postgres
-#      - app_rabbitmq
-#      - idp_keycloak
-#    environment:
-#      SPRING_DATASOURCE_URL: "jdbc:postgresql://app_postgres:5432/platformdb"
-#      SPRING_DATASOURCE_USERNAME: "platform"
-#      SPRING_DATASOURCE_PASSWORD: "platformSecretPassword"
-#      RABBITMQ_URL: "amqp://user:password@app_rabbitmq:5672"
-#      KEYCLOAK_URL: "http://idp_keycloak:8080"
-#    ports:
-#      - "8181:8080"
-#    networks:
-#      - backend
-#      - kc
-#
-#  # ---------------------
-#  # PLATFORM FRONTEND
-#  # ---------------------
-#  platform_frontend:
-#    build: ./platform-frontend
-#    depends_on:
-#      - platform_backend
-#    ports:
-#      - "8380:80"
-#    networks:
-#      - backend
-#
-#  # ---------------------
-#  # GAME 1: TIC TAC TOE
-#  # ---------------------
-#  game_tictactoe:
-#    build: ./games/tictactoe
-#    environment:
-#      PLATFORM_URL: "http://platform_backend:8080"
-#    ports:
-#      - "9101:8080"
-#    networks:
-#      - backend
-#
-#  # ---------------------
-#  # GAME 2: SHOWCASE GAME
-#  # ---------------------
-#  game_showcase:
-#    build: ./games/showcase
-#    environment:
-#      PLATFORM_URL: "http://platform_backend:8080"
-#    ports:
-#      - "9102:8080"
-#    networks:
-#      - backend
-#
-#  # ------------------------------
-#  # EXTERNAL GAME ADAPTER (ACL)
-#  # ------------------------------
-#  external_game_adapter:
-#    build: ./external-game-adapter
-#    environment:
-#      PLATFORM_URL: "http://platform_backend:8080"
-#      RABBITMQ_URL: "amqp://user:password@app_rabbitmq:5672"
-#    ports:
-#      - "9103:8080"
-#    networks:
-#      - backend
-
-# ---------------------
-# NETWORKS
-# ---------------------
 networks:
-  kc:
-    name: kc-network
-    driver: bridge
-
-  backend:
-    name: back-network
+  dev:
+    name: dev-network
     driver: bridge

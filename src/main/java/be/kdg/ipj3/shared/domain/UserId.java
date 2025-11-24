@@ -1,21 +1,13 @@
 package be.kdg.ipj3.shared.domain;
 
-import org.jmolecules.ddd.annotation.ValueObject;
-
 import java.util.Objects;
-import java.util.UUID;
 
-@ValueObject
-public record UserId(UUID id) {
-    public UserId{
-        Objects.requireNonNull(id, "User id cannot be null");
-    }
+public record UserId(String value) {
 
-    public NotFoundException notFound() {
-        return new NotFoundException("User [" + id + "] not found");
-    }
-
-    public static UserId create() {
-        return new UserId(UUID.randomUUID());
+    public static UserId fromKeycloak(String keycloakId) {
+        if (keycloakId == null || keycloakId.isBlank()) {
+            throw new IllegalArgumentException("Keycloak ID cannot be null or empty");
+        }
+        return new UserId(keycloakId);
     }
 }

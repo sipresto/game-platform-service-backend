@@ -1,0 +1,28 @@
+# Ignore database data directories
+**/idp_mysql_data/
+**/postgresql/data/
+**/rabbitmq/data/
+**/rabbitmq/log/
+
+# Ignore build directories
+target/
+build/
+.node_modules/
+dist/
+
+# Ignore IDE files
+.idea/
+.vscode/
+*.iml
+
+# Ignore Git
+.git/
+.gitignore
+
+# Ignore logs
+*.log
+logs/
+
+# Ignore temporary files
+*.tmp
+*.temp

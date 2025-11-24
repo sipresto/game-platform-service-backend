@@ -3,9 +3,7 @@ package be.kdg.ipj3.catalog.api;
 import be.kdg.ipj3.catalog.application.GameService;
 import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,6 +20,15 @@ public class GameRestController {
     public ResponseEntity<List<GameDto>> getAllGames() {
         List<GameDto> dtos = gameService.getAllGames().stream().map(GameDto::from).toList();
         if (dtos.isEmpty()) {
+            throw new ResourceNotFoundException("No games found");
+        }
+        return ResponseEntity.ok(dtos);
+    }
+
+    @PostMapping("/filter")
+    public ResponseEntity<List<GameDto>> getAllGamesByFilter(@RequestBody GameFilterRequest filter) {
+        var dtos = gameService.filterGames(filter.minPrice(), filter.maxPrice(), filter.categories()).stream().map(GameDto::from).toList();
+        if(dtos.isEmpty()) {
             throw new ResourceNotFoundException("No games found");
         }
         return ResponseEntity.ok(dtos);
