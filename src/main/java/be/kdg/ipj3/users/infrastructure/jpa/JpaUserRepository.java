@@ -2,5 +2,5 @@ package be.kdg.ipj3.users.infrastructure.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface JpaUserRepository extends JpaRepository<UserJpaEntity, String> {
+public interface JpaUserRepository extends JpaRepository<JpaUserEntity, String> {
 }

@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "games")
-public class GameJpaEntity {
+public class JpaGameEntity {
     @Id
     @Column(name = "game_id")
     private UUID gameId;
@@ -27,9 +27,9 @@ public class GameJpaEntity {
     private List<AchievementJpaEntity> achievements;
 
 
-    protected GameJpaEntity() {} // for JPA
+    protected JpaGameEntity() {} // for JPA
 
-    public GameJpaEntity(GameId id, String name, String description, Money price, List<Achievement> achievements, List<Category> categories) {
+    public JpaGameEntity(GameId id, String name, String description, Money price, List<Achievement> achievements, List<Category> categories) {
         this.gameId = id.id();
         this.name = name;
         this.description = description;
@@ -41,8 +41,8 @@ public class GameJpaEntity {
         }
     }
 
-    public static GameJpaEntity fromDomain(Game game) {
-        return new GameJpaEntity(
+    public static JpaGameEntity fromDomain(Game game) {
+        return new JpaGameEntity(
                 game.getId(),
                 game.getName(),
                 game.getDescription(),

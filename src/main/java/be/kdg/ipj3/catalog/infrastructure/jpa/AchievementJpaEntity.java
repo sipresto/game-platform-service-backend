@@ -18,7 +18,7 @@ public class AchievementJpaEntity {
     private int points;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private GameJpaEntity game;
+    private JpaGameEntity game;
 
     public AchievementJpaEntity(UUID achievementId, String achievementName, String achievementDescription, int points) {
         this.achievementId = achievementId;
@@ -49,6 +49,6 @@ public class AchievementJpaEntity {
     }
 
     public void addGame(Game game) {
-        this.game = GameJpaEntity.fromDomain(game);
+        this.game = JpaGameEntity.fromDomain(game);
     }
 }

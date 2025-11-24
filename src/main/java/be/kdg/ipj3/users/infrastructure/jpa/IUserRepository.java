@@ -6,7 +6,7 @@ import be.kdg.ipj3.users.domain.User;
 
 import java.util.Optional;
 
-public interface UserRepository {
+public interface IUserRepository {
     Optional<User> findById(UserId userId);
     User save(User user);
     boolean existsById(UserId userId);

@@ -8,16 +8,16 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "users")
-public class UserJpaEntity {
+public class JpaUserEntity {
     @Id
     private String id;
 
     private String username;
 
-    protected UserJpaEntity() {
+    protected JpaUserEntity() {
     }
 
-    public UserJpaEntity(String id, String username) {
+    public JpaUserEntity(String id, String username) {
         this.id = id;
         this.username = username;
     }
@@ -38,7 +38,7 @@ public class UserJpaEntity {
         return new User(new UserId(id), username);
     }
 
-    public static UserJpaEntity fromDomain(User user){
-        return new UserJpaEntity(user.getId().value(), user.getUsername());
+    public static JpaUserEntity fromDomain(User user){
+        return new JpaUserEntity(user.getId().value(), user.getUsername());
     }
 }

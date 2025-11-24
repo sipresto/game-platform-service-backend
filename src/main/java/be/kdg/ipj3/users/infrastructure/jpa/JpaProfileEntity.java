@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "profiles")
-public class ProfileJpaEntity {
+public class JpaProfileEntity {
     @Id
     private String userId;
 
@@ -15,10 +15,10 @@ public class ProfileJpaEntity {
     @Column(length = 1000)
     private String bio;
 
-    protected ProfileJpaEntity() {
+    protected JpaProfileEntity() {
     }
 
-    public ProfileJpaEntity(String userId, String displayName, String bio) {
+    public JpaProfileEntity(String userId, String displayName, String bio) {
         this.userId = userId;
         this.displayName = displayName;
         this.bio = bio;
@@ -48,7 +48,7 @@ public class ProfileJpaEntity {
         return new Profile(new UserId(userId), displayName, bio);
     }
 
-    public static ProfileJpaEntity fromDomain(Profile profile) {
-        return new ProfileJpaEntity(profile.getOwner().value(), profile.getUsername(), profile.getBio());
+    public static JpaProfileEntity fromDomain(Profile profile) {
+        return new JpaProfileEntity(profile.getOwner().value(), profile.getUsername(), profile.getBio());
     }
 }

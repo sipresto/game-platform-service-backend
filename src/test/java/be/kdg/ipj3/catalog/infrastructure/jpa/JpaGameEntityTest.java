@@ -7,14 +7,13 @@ import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import org.junit.jupiter.api.Test;
 
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-public class GameJpaEntityTest {
+public class JpaGameEntityTest {
 
     @Test
     void testFromDomain() {
@@ -30,21 +29,21 @@ public class GameJpaEntityTest {
         Game game = new Game(gameId, "Game Name", "Description", price, achievements, categories);
 
         // Act
-        GameJpaEntity gameJpaEntity = GameJpaEntity.fromDomain(game);
+        JpaGameEntity jpaGameEntity = JpaGameEntity.fromDomain(game);
 
         // Assert
-        assertEquals(game.getId().id(), gameJpaEntity.getGameId());
-        assertEquals(game.getName(), gameJpaEntity.getName());
-        assertEquals(game.getDescription(), gameJpaEntity.getDescription());
-        assertEquals(game.getPrice().amount(), gameJpaEntity.getPrice());
-        assertTrue(gameJpaEntity.getCategories().contains("boardgame"));
-        assertTrue(gameJpaEntity.getCategories().contains("native"));
+        assertEquals(game.getId().id(), jpaGameEntity.getGameId());
+        assertEquals(game.getName(), jpaGameEntity.getName());
+        assertEquals(game.getDescription(), jpaGameEntity.getDescription());
+        assertEquals(game.getPrice().amount(), jpaGameEntity.getPrice());
+        assertTrue(jpaGameEntity.getCategories().contains("boardgame"));
+        assertTrue(jpaGameEntity.getCategories().contains("native"));
     }
 
     @Test
     void testToDomain() {
         //Arrange
-        GameJpaEntity gameJpaEntity = new GameJpaEntity(
+        JpaGameEntity jpaGameEntity = new JpaGameEntity(
                 new GameId(UUID.randomUUID()),
                 "Game Name",
                 "Description",
@@ -54,14 +53,14 @@ public class GameJpaEntityTest {
         );
 
         //Act
-        Game game = gameJpaEntity.toDomain();
+        Game game = jpaGameEntity.toDomain();
 
         //Assert
         assertNotNull(game);
-        assertEquals(gameJpaEntity.getGameId(), game.getId().id());
-        assertEquals(gameJpaEntity.getName(), game.getName());
-        assertEquals(gameJpaEntity.getDescription(), game.getDescription());
-        assertEquals(gameJpaEntity.getPrice(), game.getPrice().amount());
+        assertEquals(jpaGameEntity.getGameId(), game.getId().id());
+        assertEquals(jpaGameEntity.getName(), game.getName());
+        assertEquals(jpaGameEntity.getDescription(), game.getDescription());
+        assertEquals(jpaGameEntity.getPrice(), game.getPrice().amount());
         assertEquals(2, game.getCategories().size());
         assertTrue(game.getCategories().contains(Category.find("boardgame")));
         assertTrue(game.getCategories().contains(Category.find("native")));
@@ -70,7 +69,7 @@ public class GameJpaEntityTest {
     @Test
     void testEmptyCategories() {
         //Arrange
-        GameJpaEntity gameJpaEntity = new GameJpaEntity(
+        JpaGameEntity jpaGameEntity = new JpaGameEntity(
                 new GameId(UUID.randomUUID()),
                 "Game Name",
                 "Description",
@@ -80,6 +79,6 @@ public class GameJpaEntityTest {
         );
 
         //Act & Assert
-        assertTrue(gameJpaEntity.toDomain().getCategories().isEmpty());
+        assertTrue(jpaGameEntity.toDomain().getCategories().isEmpty());
     }
 }

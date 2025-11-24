@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public class DbUserRepository implements UserRepository {
+public class DbUserRepository implements IUserRepository {
     private final JpaUserRepository userRepo;
     private final JpaProfileRepository profileRepo;
 
@@ -21,12 +21,12 @@ public class DbUserRepository implements UserRepository {
     @Override
     public Optional<User> findById(UserId userId) {
         return userRepo.findById(userId.value())
-                .map(UserJpaEntity::toDomain);
+                .map(JpaUserEntity::toDomain);
     }
 
     @Override
     public User save(User user) {
-        userRepo.save(UserJpaEntity.fromDomain(user));
+        userRepo.save(JpaUserEntity.fromDomain(user));
         return user;
     }
 
@@ -38,12 +38,12 @@ public class DbUserRepository implements UserRepository {
     @Override
     public Optional<Profile> findProfileByUserId(UserId userId) {
         return profileRepo.findById(userId.value())
-                .map(ProfileJpaEntity::toDomain);
+                .map(JpaProfileEntity::toDomain);
     }
 
     @Override
     public Profile save(Profile profile) {
-        profileRepo.save(ProfileJpaEntity.fromDomain(profile));
+        profileRepo.save(JpaProfileEntity.fromDomain(profile));
         return profile;
     }
 }
