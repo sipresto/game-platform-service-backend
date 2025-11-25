@@ -1,0 +1,75 @@
+package be.kdg.ipj3.users.api;
+
+import be.kdg.ipj3.catalog.application.GameService;
+import be.kdg.ipj3.catalog.domain.Game;
+import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.users.application.UserService;
+import be.kdg.ipj3.users.domain.User;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api")
+public class UserController {
+    private final UserService userService;
+    private final GameService gameService;
+
+    public UserController(
+            UserService userService,
+            GameService gameService
+    ) {
+        this.userService = userService;
+        this.gameService = gameService;
+    }
+
+    /**
+     * Get current user's profile
+     * Automatically registers user on first login
+     */
+    @GetMapping("/user/profile")
+    public ResponseEntity<UserDto> getUserProfile(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        String keycloakId = jwt.getSubject();
+        String keycloakUsername = jwt.getClaim("preferred_username");
+
+        User user = userService.registerOrGetUser(keycloakId, keycloakUsername);
+
+        return ResponseEntity.ok(UserDto.fromDomain(user));
+    }
+
+    /**
+     * Update current user's username
+     */
+    @PutMapping("/user/username")
+    public ResponseEntity<Map<String, String>> updateUsername(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestBody Map<String, String> request
+    ) {
+        String keycloakId = jwt.getSubject();
+        String newUsername = request.get("username");
+
+        userService.updateUsername(keycloakId, newUsername);
+
+        return ResponseEntity.ok(Map.of("message", "Username updated successfully"));
+    }
+
+    /**
+     * Get user details along with their owned games.
+     */
+    @GetMapping("/users/{id}/games")
+    public ResponseEntity<UserDto> getUserWithGames(
+            @PathVariable UUID id
+    ) {
+        User user = userService.getUserWithGames(new UserId(id));
+        List<Game> games = gameService.findGamesByIds(user.getOwnedGames());
+        UserDto dto = UserDto.fromDomainWithGames(user, games);
+        return ResponseEntity.ok(dto);
+    }
+}

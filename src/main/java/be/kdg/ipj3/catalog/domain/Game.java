@@ -64,4 +64,12 @@ public class Game {
     public void addAchievement(Achievement achievement) {
         achievements.add(achievement);
     }
+
+    public boolean hasCategory(Category category) {
+        return categories.contains(category);
+    }
+
+    public boolean hasAchievements() {
+        return !achievements.isEmpty();
+    }
 }

@@ -1,6 +1,51 @@
 ### GET all games
 GET http://localhost/api/games
 Accept: application/json
+
+### POST games by filter - Board games only
+POST http://localhost/api/games/filter
 Content-Type: application/json
 
-###
+{
+  "categories": ["BOARDGAME", "NATIVE"]
+}
+
+### POST games by filter - Price range (under 2.00)
+POST http://localhost/api/games/filter
+Content-Type: application/json
+
+{
+  "minPrice": {
+    "currency": "EUR",
+    "amount": 0
+  },
+  "maxPrice": {
+    "currency": "EUR",
+    "amount": 2.00
+  }
+}
+
+### POST games by filter - Combined filters (boardgame under 5.00)
+POST http://localhost/api/games/filter
+Content-Type: application/json
+
+{
+  "categories": ["BOARDGAME"],
+  "maxPrice": {
+    "currency": "EUR",
+    "amount": 5.00
+  }
+}
+
+### POST games by filter - No results expected
+POST http://localhost/api/games/filter
+Content-Type: application/json
+
+{
+  "categories": ["STRATEGY"]
+}
+
+### GET user with owned games
+GET http://localhost/api/users/c9d8cc34-6087-4a6f-a6c2-e208fbbc6ed2/games
+Content-Type: application/json
+Accept: application/json

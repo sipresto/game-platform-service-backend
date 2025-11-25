@@ -2,6 +2,7 @@ package be.kdg.ipj3.catalog.infrastructure.jpa;
 
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
+import be.kdg.ipj3.catalog.infrastructure.GameRepository;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import org.junit.jupiter.api.Test;

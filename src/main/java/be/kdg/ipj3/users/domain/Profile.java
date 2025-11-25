@@ -1,30 +1,16 @@
 package be.kdg.ipj3.users.domain;
 
-import be.kdg.ipj3.shared.domain.UserId;
 import org.jmolecules.ddd.annotation.ValueObject;
 
+import java.util.Objects;
+
 @ValueObject
-public class Profile {
-    private final UserId owner;
-    private final String username;
-    private final String bio;
-
-    public Profile(UserId owner, String username, String bio) {
-        this.owner = owner;
-        this.username = username;
-        this.bio = bio;
+public record Profile (String displayName, String bio) {
+    public Profile {
+        Objects.requireNonNull(displayName);
     }
 
-    public UserId getOwner() {
-        return owner;
+    public Profile withDisplayName(String newDisplayName) {
+        return new Profile(newDisplayName, this.bio);
     }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
 }

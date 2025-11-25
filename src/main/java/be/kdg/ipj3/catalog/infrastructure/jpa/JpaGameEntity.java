@@ -17,7 +17,7 @@ import java.util.UUID;
 public class JpaGameEntity {
     @Id
     @Column(name = "game_id")
-    private UUID gameId;
+    private UUID id;
     private String name;
     private String description;
     private BigDecimal price;
@@ -31,7 +31,7 @@ public class JpaGameEntity {
     protected JpaGameEntity() {} // for JPA
 
     public JpaGameEntity(GameId id, String name, String description, Money price, String serviceUrl, List<Achievement> achievements, List<Category> categories) {
-        this.gameId = id.id();
+        this.id = id.id();
         this.name = name;
         this.description = description;
         this.price = price.amount();
@@ -68,7 +68,7 @@ public class JpaGameEntity {
         }
 
         return new Game(
-                new GameId(this.gameId),
+                new GameId(this.id),
                 this.name,
                 this.description,
                 Money.of(this.price),
@@ -78,8 +78,8 @@ public class JpaGameEntity {
         );
     }
 
-    public UUID getGameId() {
-        return gameId;
+    public UUID getId() {
+        return id;
     }
 
     public String getName() {
@@ -94,12 +94,12 @@ public class JpaGameEntity {
         return price;
     }
 
-    public String getCategories() {
-        return categories;
-    }
-
     public String getServiceUrl() {
         return serviceUrl;
+    }
+
+    public String getCategories() {
+        return categories;
     }
 
     public List<JpaAchievementEntity> getAchievements() {
