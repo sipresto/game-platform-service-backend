@@ -1,6 +1,0 @@
-@baseUrl = http://localhost:8095
-
-### Create game
-
-GET {{baseUrl}}/api/public/health
-Accept: application/json

@@ -21,8 +21,8 @@ public class JpaGameEntity {
     private String name;
     private String description;
     private BigDecimal price;
-    private String categories;
     private String serviceUrl;
+    private String categories;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
     private List<JpaAchievementEntity> achievements;
@@ -30,17 +30,17 @@ public class JpaGameEntity {
 
     protected JpaGameEntity() {} // for JPA
 
-    public JpaGameEntity(GameId id, String name, String description, Money price, List<Achievement> achievements, List<Category> categories, String serviceUrl) {
+    public JpaGameEntity(GameId id, String name, String description, Money price, String serviceUrl, List<Achievement> achievements, List<Category> categories) {
         this.gameId = id.id();
         this.name = name;
         this.description = description;
         this.price = price.amount();
+        this.serviceUrl = serviceUrl;
         achievements.forEach(achievement -> this.achievements.add(JpaAchievementEntity.fromDomain(achievement)));
         if (!categories.isEmpty()) {
             this.categories = "";
             categories.forEach(category -> this.categories += category.toString() + ", ");
         }
-        this.serviceUrl = serviceUrl;
     }
 
     public static JpaGameEntity fromDomain(Game game) {
@@ -49,9 +49,9 @@ public class JpaGameEntity {
                 game.getName(),
                 game.getDescription(),
                 game.getPrice(),
+                game.getServiceUrl(),
                 game.getAchievements(),
-                game.getCategories(),
-                game.getServiceUrl()
+                game.getCategories()
         );
     }
 
@@ -72,8 +72,8 @@ public class JpaGameEntity {
                 this.name,
                 this.description,
                 Money.of(this.price),
-                achievements,
                 this.serviceUrl,
+                achievements,
                 categories
         );
     }
@@ -100,5 +100,9 @@ public class JpaGameEntity {
 
     public String getServiceUrl() {
         return serviceUrl;
+    }
+
+    public List<JpaAchievementEntity> getAchievements() {
+        return achievements;
     }
 }

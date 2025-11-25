@@ -19,7 +19,7 @@ public class Game {
     private final List<Category> categories;
     private final List<Achievement> achievements = new ArrayList<>();
 
-    public Game(GameId id, String name, String description, Money price, List<Achievement> achievements, String serviceUrl, List<Category> categories) {
+    public Game(GameId id, String name, String description, Money price, String serviceUrl, List<Achievement> achievements, List<Category> categories) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -29,8 +29,8 @@ public class Game {
         this.categories = categories;
     }
 
-    public Game(String name, String description, Money price, List<Category> categories, String serviceUrl) {
-        this(GameId.create(), name, description, price, List.of(), serviceUrl, categories);
+    public Game(String name, String description, Money price, String serviceUrl, List<Category> categories) {
+        this(GameId.create(), name, description, price, serviceUrl, List.of(), categories);
     }
 
     public GameId getId() {
