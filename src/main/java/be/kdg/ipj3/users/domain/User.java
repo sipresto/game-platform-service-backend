@@ -5,6 +5,7 @@ import be.kdg.ipj3.shared.domain.UserId;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AggregateRoot
@@ -28,6 +29,7 @@ public class User {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
+        this.ownedGames = new ArrayList<>();
         this.profile = profile;
     }
 
