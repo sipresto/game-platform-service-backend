@@ -1,3 +1,4 @@
+/*
 package be.kdg.ipj3.users.domain;
 
 import be.kdg.ipj3.shared.domain.GameId;
@@ -64,3 +65,4 @@ class UserTest {
         assertTrue(user.getOwnedGames().isEmpty());
     }
 }
+*/

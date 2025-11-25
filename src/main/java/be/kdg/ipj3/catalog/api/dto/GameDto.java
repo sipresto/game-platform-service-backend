@@ -1,4 +1,4 @@
-package be.kdg.ipj3.catalog.api;
+package be.kdg.ipj3.catalog.api.dto;
 
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;

@@ -1,4 +1,4 @@
-package be.kdg.ipj3.sessions.domain.lobby;
+package be.kdg.ipj3.lobbies.domain.lobby;
 
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.UserId;

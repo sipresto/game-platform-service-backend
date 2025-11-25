@@ -1,28 +1,24 @@
 package be.kdg.ipj3.users.application;
 
-import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
+import be.kdg.ipj3.shared.domain.NotFoundException;
 import be.kdg.ipj3.shared.domain.UserId;
-import be.kdg.ipj3.users.domain.Profile;
-import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.IUserRepository;
-import org.springframework.beans.factory.annotation.Qualifier;
+import be.kdg.ipj3.users.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
 public class UserService {
-    private final IUserRepository repo;
+    private final IUserRepository userRepository;
 
-    public UserService(
-            @Qualifier("dbUserRepository") IUserRepository userRepository
-    ) {
-        this.repo = userRepository;
+    public UserService(IUserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public User getUserWithGames(UserId userId) {
-        return repo.getUserByIdWithGames(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+    public User getUserWithGames(UserId id) {
+        return userRepository.findByIdWithGames(id)
+                .orElseThrow(id::notFound);
     }
 
     /**
@@ -30,37 +26,35 @@ public class UserService {
      * This is called automatically on first login
      */
     public User registerOrGetUser(String keycloakId, String keycloakUsername) {
-        UserId userId = UserId.fromKeycloak(keycloakId);
+        if (keycloakId == null || keycloakId.isBlank()) {
+            throw new IllegalArgumentException("Keycloak id cannot be null or blank");
+        }
 
-        return repo.findById(userId)
+        return userRepository.findByKeycloakId(keycloakId)
                 .orElseGet(() -> {
                     User newUser = User.createFromKeycloak(keycloakId, keycloakUsername);
-                    repo.save(newUser);
-
-                    Profile newProfile = Profile.createFromUser(newUser);
-                    repo.save(newProfile);
-
+                    userRepository.save(newUser);
                     return newUser;
                 });
     }
 
-    public Profile getProfile(UserId userId) {
-        return repo.findProfileByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
+    public User getUser(UserId id) {
+        return userRepository.findById(id)
+                .orElseThrow(id::notFound);
     }
 
-    public User getUser(UserId userId) {
-        return repo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-    }
+    public void updateUsername(String keycloakId, String newUsername) {
+        if (newUsername == null || newUsername.isBlank()) {
+            throw new IllegalArgumentException("New username cannot be null or blank");
+        }
 
-    public void updateUsername(UserId userId, String newUsername) {
-        User user = getUser(userId);
+        if (keycloakId == null || keycloakId.isBlank()) {
+            throw new IllegalArgumentException("Keycloak id cannot be null or blank");
+        }
+
+        User user = userRepository.findByKeycloakId(keycloakId)
+                        .orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
         user.updateUsername(newUsername);
-        repo.save(user);
-
-        Profile profile = getProfile(userId);
-        profile.updateUsername(newUsername);
-        repo.save(profile);
+        userRepository.save(user);
     }
 }
