@@ -70,7 +70,9 @@ public class GameRepository implements IGameRepository {
         List<UUID> gameIds = ids.stream()
                 .map(GameId::id)
                 .toList();
-        return jpaGameRepository.findAllByIds(gameIds);
+        return jpaGameRepository.findAllByIds(gameIds).stream()
+                .map(JpaGameEntity::toDomain)
+                .toList();
     }
 
 

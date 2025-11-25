@@ -1,6 +1,5 @@
 package be.kdg.ipj3.catalog.infrastructure.jpa;
 
-import be.kdg.ipj3.catalog.domain.Game;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,7 +22,7 @@ public interface JpaGameRepository extends JpaRepository<JpaGameEntity, UUID> {
             @Param("category") String category);
 
     @Query("SELECT g FROM JpaGameEntity g WHERE g.id IN :ids")
-    List<Game> findAllByIds(List<UUID> gameIds);
+    List<JpaGameEntity> findAllByIds(List<UUID> gameIds);
 
     @Query("SELECT g.serviceUrl FROM JpaGameEntity g WHERE g.id = :id")
     Optional<String> findServiceUrlById(UUID id);
