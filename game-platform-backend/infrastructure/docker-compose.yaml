@@ -2,10 +2,14 @@ name: kdg-ipj3-team20
 
 services:
   # ---------------------
-  # PLATFORM BACKEND
+  # PLATFORM BACKEND (Optional Docker)
   # ---------------------
   platform_backend:
-    build: C:/Users/ftlbv/IdeaProjects/game-platform-service
+    build:
+      context: C:/Users/ftlbv/IdeaProjects/game-platform-service
+      dockerfile: Dockerfile
+    ports:
+      - "8095:8095"
     depends_on:
       - app_postgres
       - app_rabbitmq
@@ -16,11 +20,52 @@ services:
       SPRING_DATASOURCE_PASSWORD: "platformSecretPassword"
       RABBITMQ_URL: "amqp://user:password@app_rabbitmq:5672"
       KEYCLOAK_URL: "http://idp_keycloak:8080/auth"
+      SERVER_PORT: "8095"
     networks:
       - dev
+    restart: "no"
 
   # ---------------------
-  # FRONTEND (REACT - ALWAYS REBUILDS)
+  # TIC TAC TOE GAME BACKEND (Optional Docker)
+  # ---------------------
+  tictactoe_backend:
+    build:
+      context: C:/Users/ftlbv/IdeaProjects/tic-tac-toe-service
+      dockerfile: Dockerfile
+    ports:
+      - "8096:8096"
+    depends_on:
+      - app_postgres
+      - app_rabbitmq
+      - idp_keycloak
+      - ai_player
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://app_postgres:5432/platformdb?currentSchema=tic_tac_toe"
+      SPRING_DATASOURCE_USERNAME: "platform"
+      SPRING_DATASOURCE_PASSWORD: "platformSecretPassword"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "create-drop"
+      AI_SERVICE_URL: "http://ai_player:8000/games/tic-tac-toe/best-move"
+      GAME_BASE_URL: "http://tictactoe_backend:8096"
+      KEYCLOAK_URL: "http://idp_keycloak:8080/auth"
+      SERVER_PORT: "8096"
+    networks:
+      - dev
+    restart: "no"
+
+  # ---------------------
+  # AI PLAYER SERVICE
+  # ---------------------
+  ai_player:
+    image: matthiastruyzelaerekdg/integratieproject:ai-player
+    platform: linux/amd64
+    ports:
+      - "8000:8000"
+    networks:
+      - dev
+    restart: unless-stopped
+
+  # ---------------------
+  # FRONTEND (Optional Docker)
   # ---------------------
   frontend:
     build:
@@ -30,10 +75,23 @@ services:
       - "3000:80"
     networks:
       - dev
-    restart: always
+    restart: "no"
 
   # ---------------------
-  # REVERSE PROXY (DEV)
+  # TIC TAC TOE FRONTEND (Optional Docker)
+  # ---------------------
+  tictactoe_frontend:
+    build:
+      context: C:/Users/ftlbv/WebstormProjects/tic-tac-toe-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:80"
+    networks:
+      - dev
+    restart: "no"
+
+  # ---------------------
+  # REVERSE PROXY (Always runs)
   # ---------------------
   reverse_proxy:
     image: nginx:alpine
@@ -43,9 +101,13 @@ services:
       - ./nginx-dev.conf:/etc/nginx/nginx.conf:ro
     networks:
       - dev
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
-      - platform_backend
-      - frontend
+      - app_postgres
+      - app_rabbitmq
+      - idp_keycloak
+      - ai_player
     restart: always
 
   # ---------------------
