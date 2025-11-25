@@ -22,7 +22,7 @@ public interface JpaGameRepository extends JpaRepository<JpaGameEntity, UUID> {
             @Param("category") String category);
 
     @Query("SELECT g FROM JpaGameEntity g WHERE g.id IN :ids")
-    List<JpaGameEntity> findAllByIds(List<UUID> gameIds);
+    List<JpaGameEntity> findAllByIds(List<UUID> ids);
 
     @Query("SELECT g.serviceUrl FROM JpaGameEntity g WHERE g.id = :id")
     Optional<String> findServiceUrlById(UUID id);
