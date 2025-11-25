@@ -1,9 +1,12 @@
+@baseUrl = http://localhost
+@userId = cf0138b7-3272-4d1c-a34d-de88a47fe94c
+
 ### GET all games
 GET http://localhost/api/games
 Accept: application/json
 
 ### POST games by filter - Board games only
-POST http://localhost/api/games/filter
+POST {{baseUrl}}/api/games/filter
 Content-Type: application/json
 
 {
@@ -11,7 +14,7 @@ Content-Type: application/json
 }
 
 ### POST games by filter - Price range (under 2.00)
-POST http://localhost/api/games/filter
+POST {{baseUrl}}/api/games/filter
 Content-Type: application/json
 
 {
@@ -26,7 +29,7 @@ Content-Type: application/json
 }
 
 ### POST games by filter - Combined filters (boardgame under 5.00)
-POST http://localhost/api/games/filter
+POST {{baseUrl}}/api/games/filter
 Content-Type: application/json
 
 {
@@ -38,7 +41,7 @@ Content-Type: application/json
 }
 
 ### POST games by filter - No results expected
-POST http://localhost/api/games/filter
+POST {{baseUrl}}/api/games/filter
 Content-Type: application/json
 
 {
@@ -46,6 +49,6 @@ Content-Type: application/json
 }
 
 ### GET user with owned games
-GET http://localhost/api/users/c9d8cc34-6087-4a6f-a6c2-e208fbbc6ed2/games
+GET {{baseUrl}}/api/users/{{userId}}/games
 Content-Type: application/json
 Accept: application/json
