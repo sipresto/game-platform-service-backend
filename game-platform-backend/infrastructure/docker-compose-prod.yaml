@@ -1,4 +1,4 @@
-name: kdg-ipj3-team20
+name: kdg-ipj3-team20-prod
 
 services:
   # ---------------------
@@ -30,7 +30,7 @@ services:
   # ---------------------
   tictactoe_backend:
     build:
-      context: C:/Users/ftlbv/IdeaProjects/tic-tac-toe-service
+      context: C:/Users/ftlbv/IdeaProjects/tic-tac-toe-service-backend
       dockerfile: Dockerfile
     ports:
       - "8096:8096"
@@ -82,7 +82,7 @@ services:
   # ---------------------
   tictactoe_frontend:
     build:
-      context: C:/Users/ftlbv/WebstormProjects/tic-tac-toe-frontend
+      context: C:/Users/ftlbv/WebstormProjects/tic-tac-toe-service-frontend
       dockerfile: Dockerfile
     ports:
       - "3001:80"
