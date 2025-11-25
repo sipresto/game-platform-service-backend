@@ -2,6 +2,37 @@ name: kdg-ipj3-team20
 
 services:
   # ---------------------
+  # PLATFORM BACKEND
+  # ---------------------
+  platform_backend:
+    build: C:/Users/ftlbv/IdeaProjects/game-platform-service
+    depends_on:
+      - app_postgres
+      - app_rabbitmq
+      - idp_keycloak
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://app_postgres:5432/platformdb"
+      SPRING_DATASOURCE_USERNAME: "platform"
+      SPRING_DATASOURCE_PASSWORD: "platformSecretPassword"
+      RABBITMQ_URL: "amqp://user:password@app_rabbitmq:5672"
+      KEYCLOAK_URL: "http://idp_keycloak:8080/auth"
+    networks:
+      - dev
+
+  # ---------------------
+  # FRONTEND (REACT - ALWAYS REBUILDS)
+  # ---------------------
+  frontend:
+    build:
+      context: C:/Users/ftlbv/WebstormProjects/game-platform-service-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    networks:
+      - dev
+    restart: always
+
+  # ---------------------
   # REVERSE PROXY (DEV)
   # ---------------------
   reverse_proxy:
@@ -12,6 +43,10 @@ services:
       - ./nginx-dev.conf:/etc/nginx/nginx.conf:ro
     networks:
       - dev
+    depends_on:
+      - platform_backend
+      - frontend
+    restart: always
 
   # ---------------------
   # DATABASE (POSTGRES)
@@ -88,6 +123,8 @@ services:
       - "8280:8080"
     networks:
       - dev
+    depends_on:
+      - idp_mysql
 
 networks:
   dev:
