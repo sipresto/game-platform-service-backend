@@ -2,7 +2,7 @@
 @userId = cf0138b7-3272-4d1c-a34d-de88a47fe94c
 
 ### GET all games
-GET http://localhost/api/games
+GET {{baseUrl}}/api/games
 Accept: application/json
 
 ### POST games by filter - Board games only
