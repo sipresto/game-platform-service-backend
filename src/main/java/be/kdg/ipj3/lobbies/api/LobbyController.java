@@ -98,20 +98,4 @@ public class LobbyController {
         String gameUrl = lobbyService.startGame(serviceUrl, id, hostId, dto.difficulty());
         return ResponseEntity.ok(new GameUrlDto(gameUrl));
     }
-
-//    @PostMapping
-//    public ResponseEntity<GameUrlDto> startGame(
-//            @Valid @RequestBody GameStartDto dto
-//    ) {
-//        String serviceUrl = gameService.findServiceByGameId(new GameId(dto.gameId()));
-//
-//        List<UserId> playerIds = dto.players()
-//                .stream()
-//                .map(UserId::new)
-//                .toList();
-//
-//        String gameUrl = lobbyService.startGame(serviceUrl, playerIds, dto.difficulty());
-//
-//        return ResponseEntity.ok(new GameUrlDto(gameUrl));
-//    }
 }
