@@ -204,22 +204,35 @@ public class LobbyControllerTests {
     @Test
     void getLobbiesForGame_shouldReturnFilteredLobbies() throws Exception {
         // Arrange
-        UUID gameId1 = UUID.randomUUID();
-        UUID gameId2 = UUID.randomUUID();
+        UUID gameId = UUID.randomUUID();
+        Lobby lobbyForGame = new Lobby(LobbyId.create(), null, 4, new GameId(gameId), userId);
 
-        Lobby lobbyForGame1 = new Lobby(LobbyId.create(), null, 4, new GameId(gameId1), userId);
-        Lobby lobbyForGame2 = new Lobby(LobbyId.create(), "secret", 4, new GameId(gameId2), userId);
-
-        given(lobbyService.getAllOpenLobbies()).willReturn(List.of(lobbyForGame1, lobbyForGame2));
+        given(lobbyService.getOpenLobbiesForGame(gameId)).willReturn(List.of(lobbyForGame));
 
         // Act & Assert
-        mockMvc.perform(get("/api/lobbies/{gameId}", gameId1)
+        mockMvc.perform(get("/api/lobbies/{gameId}", gameId)
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value(lobbyForGame1.getId().id().toString()))
+                .andExpect(jsonPath("$[0].id").value(lobbyForGame.getId().id().toString()))
                 .andExpect(jsonPath("$[0].currentPlayerCount").value(1));
 
-        then(lobbyService).should().getAllOpenLobbies();
+        then(lobbyService).should().getOpenLobbiesForGame(gameId);
+    }
+
+    @Test
+    void getLobbiesForGame_shouldReturnEmptyList_whenNoLobbiesForGame() throws Exception {
+        // Arrange
+        UUID gameId = UUID.randomUUID();
+
+        given(lobbyService.getOpenLobbiesForGame(gameId)).willReturn(List.of());
+
+        // Act & Assert
+        mockMvc.perform(get("/api/lobbies/{gameId}", gameId)
+                        .with(validJwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+
+        then(lobbyService).should().getOpenLobbiesForGame(gameId);
     }
 }

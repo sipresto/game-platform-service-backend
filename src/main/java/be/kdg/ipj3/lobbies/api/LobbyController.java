@@ -101,12 +101,14 @@ public class LobbyController {
 
     @GetMapping("/{gameId}")
     public ResponseEntity<List<LobbyListDto>> getLobbiesForGame(@PathVariable UUID gameId) {
-        var openLobbies = lobbyService.getAllOpenLobbies();
-        var dtos = openLobbies.stream().filter(ol -> ol.getGame().id().equals(gameId)).map(l -> new LobbyListDto(
-                l.getId().id(),
-                l.getPlayers().size(),
-                l.isPrivate()
-        )).toList();
+        var openLobbies = lobbyService.getOpenLobbiesForGame(gameId);
+        var dtos = openLobbies.stream()
+                .map(l -> new LobbyListDto(
+                        l.getId().id(),
+                        l.getPlayers().size(),
+                        l.isPrivate()
+                ))
+                .toList();
 
         return ResponseEntity.ok(dtos);
     }
