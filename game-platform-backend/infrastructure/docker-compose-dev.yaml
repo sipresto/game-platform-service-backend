@@ -1,4 +1,4 @@
-name: kdg-ipj3-team20
+name: kdg-ipj3-team20-dev
 
 services:
   # ---------------------
@@ -88,6 +88,18 @@ services:
       - "8280:8080"
     networks:
       - dev
+
+  # ---------------------
+  # AI player
+  # ---------------------
+  ai_player:
+    image: matthiastruyzelaerekdg/integratieproject:ai-player
+    platform: linux/arm64
+    ports:
+      - "8000:8000"
+    networks:
+      - dev
+    restart: unless-stopped
 
 networks:
   dev:

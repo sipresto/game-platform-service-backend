@@ -1,0 +1,194 @@
+name: kdg-ipj3-team20-prod
+
+services:
+  # ---------------------
+  # PLATFORM BACKEND (Optional Docker)
+  # ---------------------
+  platform_backend:
+    build:
+      context: C:/Users/ftlbv/IdeaProjects/game-platform-service
+      dockerfile: Dockerfile
+    ports:
+      - "8095:8095"
+    depends_on:
+      - app_postgres
+      - app_rabbitmq
+      - idp_keycloak
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://app_postgres:5432/platformdb"
+      SPRING_DATASOURCE_USERNAME: "platform"
+      SPRING_DATASOURCE_PASSWORD: "platformSecretPassword"
+      RABBITMQ_URL: "amqp://user:password@app_rabbitmq:5672"
+      KEYCLOAK_URL: "http://idp_keycloak:8080/auth"
+      SERVER_PORT: "8095"
+    networks:
+      - dev
+    restart: "no"
+
+  # ---------------------
+  # TIC TAC TOE GAME BACKEND (Optional Docker)
+  # ---------------------
+  tictactoe_backend:
+    build:
+      context: C:/Users/ftlbv/IdeaProjects/tic-tac-toe-service-backend
+      dockerfile: Dockerfile
+    ports:
+      - "8096:8096"
+    depends_on:
+      - app_postgres
+      - app_rabbitmq
+      - idp_keycloak
+      - ai_player
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://app_postgres:5432/platformdb?currentSchema=tic_tac_toe"
+      SPRING_DATASOURCE_USERNAME: "platform"
+      SPRING_DATASOURCE_PASSWORD: "platformSecretPassword"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "create-drop"
+      AI_SERVICE_URL: "http://ai_player:8000/games/tic-tac-toe/best-move"
+      GAME_BASE_URL: "http://tictactoe_backend:8096"
+      KEYCLOAK_URL: "http://idp_keycloak:8080/auth"
+      SERVER_PORT: "8096"
+    networks:
+      - dev
+    restart: "no"
+
+  # ---------------------
+  # AI PLAYER SERVICE
+  # ---------------------
+  ai_player:
+    image: matthiastruyzelaerekdg/integratieproject:ai-player
+    platform: linux/amd64
+    ports:
+      - "8000:8000"
+    networks:
+      - dev
+    restart: unless-stopped
+
+  # ---------------------
+  # FRONTEND (Optional Docker)
+  # ---------------------
+  frontend:
+    build:
+      context: C:/Users/ftlbv/WebstormProjects/game-platform-service-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    networks:
+      - dev
+    restart: "no"
+
+  # ---------------------
+  # TIC TAC TOE FRONTEND (Optional Docker)
+  # ---------------------
+  tictactoe_frontend:
+    build:
+      context: C:/Users/ftlbv/WebstormProjects/tic-tac-toe-service-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:80"
+    networks:
+      - dev
+    restart: "no"
+
+  # ---------------------
+  # REVERSE PROXY (Always runs)
+  # ---------------------
+  reverse_proxy:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx-dev.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - dev
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - app_postgres
+      - app_rabbitmq
+      - idp_keycloak
+      - ai_player
+    restart: always
+
+  # ---------------------
+  # DATABASE (POSTGRES)
+  # ---------------------
+  app_postgres:
+    image: postgres:17.6-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: "platform"
+      POSTGRES_PASSWORD: "platformSecretPassword"
+      POSTGRES_DB: "platformdb"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5544:5432"
+    networks:
+      - dev
+    volumes:
+      - ./postgresql/data:/var/lib/postgresql/data
+      - ./init-scripts/sql:/docker-entrypoint-initdb.d/
+
+  # ---------------------
+  # RABBITMQ (EVENTING)
+  # ---------------------
+  app_rabbitmq:
+    image: rabbitmq:3.13.7-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: "user"
+      RABBITMQ_DEFAULT_PASS: "password"
+    ports:
+      - "5772:5672"
+      - "15683:15672"
+    networks:
+      - dev
+    volumes:
+      - ./rabbitmq/data:/var/lib/rabbitmq
+      - ./rabbitmq/log:/var/log/rabbitmq
+
+  # ---------------------
+  # KEYCLOAK DATABASE (MYSQL)
+  # ---------------------
+  idp_mysql:
+    image: mysql:9.0.1
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "keycloak"
+      MYSQL_USER: "keycloak"
+      MYSQL_PASSWORD: "password"
+    volumes:
+      - ./idp_mysql_data:/var/lib/mysql
+    ports:
+      - "3407:3306"
+    networks:
+      - dev
+
+  # ---------------------
+  # KEYCLOAK (IDP / SSO)
+  # ---------------------
+  idp_keycloak:
+    image: quay.io/keycloak/keycloak:26.3
+    command: start-dev --http-relative-path=/auth
+    environment:
+      KEYCLOAK_ADMIN: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "admin"
+      KC_DB: "mysql"
+      KC_DB_URL_HOST: "idp_mysql"
+      KC_DB_URL_DATABASE: "keycloak"
+      KC_DB_USERNAME: "keycloak"
+      KC_DB_PASSWORD: "password"
+      KC_PROXY: "edge"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME: "localhost"
+      KC_HOSTNAME_PORT: "80"
+    ports:
+      - "8280:8080"
+    networks:
+      - dev
+    depends_on:
+      - idp_mysql
+
+networks:
+  dev:
+    name: dev-network
+    driver: bridge

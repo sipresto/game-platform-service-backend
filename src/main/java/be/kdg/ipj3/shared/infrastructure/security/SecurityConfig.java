@@ -30,6 +30,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/api/games").permitAll()
+                        .requestMatchers("/api/lobby").permitAll()
                         .requestMatchers("/api/games/filter").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasRole("PLAYER")

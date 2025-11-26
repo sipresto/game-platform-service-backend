@@ -1,8 +1,8 @@
-@baseUrl = http://localhost:8095
+@baseUrl = http://localhost/api/platform
 
 ### Create game
 
-POST {{baseUrl}}/api/lobby
+POST {{baseUrl}}/lobby
 Content-Type: application/json
 Accept: application/json
 
