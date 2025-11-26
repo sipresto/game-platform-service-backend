@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class LobbyRepository implements ILobbyRepository {
@@ -34,6 +35,14 @@ public class LobbyRepository implements ILobbyRepository {
     @Override
     public List<Lobby> findByStatus(LobbyStatus status) {
         return jpaLobbyRepository.findByStatus(status.name())
+                .stream()
+                .map(JpaLobbyEntity::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Lobby> findByStatusAndGameId(LobbyStatus status, UUID gameId) {
+        return jpaLobbyRepository.findByStatusAndGameId(status.name(), gameId)
                 .stream()
                 .map(JpaLobbyEntity::toDomain)
                 .toList();

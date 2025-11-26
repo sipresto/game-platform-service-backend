@@ -78,13 +78,53 @@ class LobbyServiceTests {
     @Test
     void getAllOpenLobbies_shouldReturnListFromRepo() {
         // Arrange
-        given(lobbyRepository.findByStatus(LobbyStatus.OPEN)).willReturn(List.of());
+        List<Lobby> expectedLobbies = List.of(
+                new Lobby(LobbyId.create(), "pass1", 4, new GameId(UUID.randomUUID()), UserId.create()),
+                new Lobby(LobbyId.create(), "pass2", 2, new GameId(UUID.randomUUID()), UserId.create())
+        );
+
+        given(lobbyRepository.findByStatus(LobbyStatus.OPEN)).willReturn(expectedLobbies);
 
         // Act
-        lobbyService.getAllOpenLobbies();
+        List<Lobby> result = lobbyService.getAllOpenLobbies();
 
         // Assert
+        assertEquals(expectedLobbies, result);
         then(lobbyRepository).should().findByStatus(LobbyStatus.OPEN);
+    }
+
+    @Test
+    void getOpenLobbiesForGame_shouldReturnFilteredListFromRepo() {
+        // Arrange
+        UUID gameId = UUID.randomUUID();
+        List<Lobby> expectedLobbies = List.of(
+                new Lobby(LobbyId.create(), "pass1", 4, new GameId(gameId), UserId.create()),
+                new Lobby(LobbyId.create(), "pass2", 2, new GameId(gameId), UserId.create())
+        );
+
+        given(lobbyRepository.findByStatusAndGameId(LobbyStatus.OPEN, gameId)).willReturn(expectedLobbies);
+
+        // Act
+        List<Lobby> result = lobbyService.getOpenLobbiesForGame(gameId);
+
+        // Assert
+        assertEquals(expectedLobbies, result);
+        then(lobbyRepository).should().findByStatusAndGameId(LobbyStatus.OPEN, gameId);
+    }
+
+    @Test
+    void getOpenLobbiesForGame_shouldReturnEmptyList_whenNoLobbiesFound() {
+        // Arrange
+        UUID gameId = UUID.randomUUID();
+
+        given(lobbyRepository.findByStatusAndGameId(LobbyStatus.OPEN, gameId)).willReturn(List.of());
+
+        // Act
+        List<Lobby> result = lobbyService.getOpenLobbiesForGame(gameId);
+
+        // Assert
+        assertTrue(result.isEmpty());
+        then(lobbyRepository).should().findByStatusAndGameId(LobbyStatus.OPEN, gameId);
     }
 
     @Test

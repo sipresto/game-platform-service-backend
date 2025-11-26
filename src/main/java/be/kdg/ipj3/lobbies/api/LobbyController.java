@@ -98,4 +98,18 @@ public class LobbyController {
         String gameUrl = lobbyService.startGame(serviceUrl, id, hostId, dto.difficulty());
         return ResponseEntity.ok(new GameUrlDto(gameUrl));
     }
+
+    @GetMapping("/{gameId}")
+    public ResponseEntity<List<LobbyListDto>> getLobbiesForGame(@PathVariable UUID gameId) {
+        var openLobbies = lobbyService.getOpenLobbiesForGame(gameId);
+        var dtos = openLobbies.stream()
+                .map(l -> new LobbyListDto(
+                        l.getId().id(),
+                        l.getPlayers().size(),
+                        l.isPrivate()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(dtos);
+    }
 }
