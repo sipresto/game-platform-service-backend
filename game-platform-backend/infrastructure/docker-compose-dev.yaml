@@ -89,6 +89,18 @@ services:
     networks:
       - dev
 
+  # ---------------------
+  # AI player
+  # ---------------------
+  ai_player:
+    image: matthiastruyzelaerekdg/integratieproject:ai-player
+    platform: linux/arm64
+    ports:
+      - "8000:8000"
+    networks:
+      - dev
+    restart: unless-stopped
+
 networks:
   dev:
     name: dev-network

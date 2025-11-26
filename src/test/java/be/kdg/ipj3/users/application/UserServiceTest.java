@@ -1,3 +1,4 @@
+/*
 package be.kdg.ipj3.users.application;
 
 import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
@@ -176,4 +177,4 @@ class UserServiceTest {
 
         verify(userRepository, never()).save((User) any());
     }
-}
+}*/

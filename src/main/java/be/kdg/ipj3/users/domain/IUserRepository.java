@@ -6,9 +6,12 @@ import java.util.Optional;
 
 public interface IUserRepository {
     Optional<User> findById(UserId userId);
-    User save(User user);
+
+    void save(User user);
+
     boolean existsById(UserId userId);
-    Optional<Profile> findProfileByUserId(UserId userId);
-    Optional<User> getUserByIdWithGames(UserId userId);
-    Profile save(Profile profile);
+
+    Optional<User> findByIdWithGames(UserId userId);
+
+    Optional<User> findByKeycloakId(String keycloakId);
 }

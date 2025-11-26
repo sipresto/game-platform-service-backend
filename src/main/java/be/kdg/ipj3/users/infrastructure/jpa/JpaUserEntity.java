@@ -8,7 +8,6 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -16,8 +15,12 @@ public class JpaUserEntity {
 
     @Id
     @Column(name = "user_id")
-    private String userId;
+    private UUID id;
 
+    @Column(nullable = false)
+    private String keycloakId;
+
+    @Column(nullable = false)
     private String username;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -28,46 +31,49 @@ public class JpaUserEntity {
     @Column(name = "game_id")
     private List<UUID> ownedGames = new ArrayList<>();
 
-    protected JpaUserEntity() {}
+    private JpaProfile profile;
 
-    public JpaUserEntity(String userId, String username, List<GameId> ownedGames) {
-        this.userId = userId;
+    protected JpaUserEntity() {
+    } // for JPA
+
+    public JpaUserEntity(UUID id, String keycloakId, String username, JpaProfile profile) {
+        this.id = id;
+        this.keycloakId = keycloakId;
         this.username = username;
-
-        if (ownedGames != null) {
-            this.ownedGames = ownedGames.stream()
-                    .map(GameId::id)
-                    .collect(Collectors.toList());
-        } else {
-            this.ownedGames = new ArrayList<>();
-        }
+        this.profile = profile;
     }
 
     public static JpaUserEntity fromDomain(User user) {
-        return new JpaUserEntity(
-                user.getId().value(),
-                user.getUsername(),
-                user.getOwnedGames()
-        );
+        JpaUserEntity jpaUserEntity = new JpaUserEntity(user.getId().id(), user.getKeycloakId(),
+                user.getUsername(), JpaProfile.fromDomain(user.getProfile()));
+
+        user.getOwnedGames().stream()
+                .map(GameId::id)
+                .forEach(jpaUserEntity::addGame);
+
+        return jpaUserEntity;
     }
 
     public User toDomain() {
-        List<GameId> domainOwnedGames = new ArrayList<>();
-        if (this.ownedGames != null) {
-            domainOwnedGames = this.ownedGames.stream()
-                    .map(GameId::new)
-                    .collect(Collectors.toList());
-        }
+        User user = new User(new UserId(id), keycloakId, username, profile.toDomain());
 
-        return new User(
-                new UserId(this.userId),
-                this.username,
-                domainOwnedGames
-        );
+        ownedGames.stream()
+                .map(GameId::new)
+                .forEach(user::addGame);
+
+        return user;
     }
 
-    public String getUserId() {
-        return userId;
+    private void addGame(UUID gameId) {
+        this.ownedGames.add(gameId);
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getKeycloakId() {
+        return keycloakId;
     }
 
     public String getUsername() {
@@ -78,7 +84,7 @@ public class JpaUserEntity {
         return ownedGames;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public JpaProfile getProfile() {
+        return profile;
     }
 }

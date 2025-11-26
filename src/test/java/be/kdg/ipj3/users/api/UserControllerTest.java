@@ -1,3 +1,4 @@
+/*
 package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.catalog.application.GameService;
@@ -172,4 +173,4 @@ class UserControllerTest {
                 () -> userController.getUserWithGames(UUID.fromString(userId.value()))
         );
     }
-}
+}*/

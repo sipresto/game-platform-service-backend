@@ -1,7 +1,3 @@
-CREATE DATABASE platformdb;
-
-\c platformdb;
-
 CREATE SCHEMA IF NOT EXISTS game_platform;
 CREATE SCHEMA IF NOT EXISTS tic_tac_toe;
 CREATE SCHEMA IF NOT EXISTS connect_four;

@@ -6,9 +6,10 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public interface IGameJpaRepository extends JpaRepository<JpaGameEntity, UUID> {
+public interface JpaGameRepository extends JpaRepository<JpaGameEntity, UUID> {
 
     @Query("SELECT g FROM JpaGameEntity g WHERE " +
             "(:minPrice IS NULL OR g.price >= :minPrice) AND " +
@@ -19,4 +20,10 @@ public interface IGameJpaRepository extends JpaRepository<JpaGameEntity, UUID> {
             @Param("minPrice") BigDecimal minPrice,
             @Param("maxPrice") BigDecimal maxPrice,
             @Param("category") String category);
+
+    @Query("SELECT g FROM JpaGameEntity g WHERE g.id IN :ids")
+    List<JpaGameEntity> findAllByIds(List<UUID> ids);
+
+    @Query("SELECT g.serviceUrl FROM JpaGameEntity g WHERE g.id = :id")
+    Optional<String> findServiceUrlById(UUID id);
 }

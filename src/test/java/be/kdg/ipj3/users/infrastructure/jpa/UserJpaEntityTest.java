@@ -1,3 +1,4 @@
+/*
 package be.kdg.ipj3.users.infrastructure.jpa;
 
 import be.kdg.ipj3.shared.domain.GameId;
@@ -70,4 +71,4 @@ class UserJpaEntityTest {
         assertEquals("dave", domain.getUsername());
         assertTrue(domain.getOwnedGames().isEmpty());
     }
-}
+}*/

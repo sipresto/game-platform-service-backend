@@ -17,10 +17,11 @@ import java.util.UUID;
 public class JpaGameEntity {
     @Id
     @Column(name = "game_id")
-    private UUID gameId;
+    private UUID id;
     private String name;
     private String description;
     private BigDecimal price;
+    private String serviceUrl;
     private String categories;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
@@ -29,11 +30,12 @@ public class JpaGameEntity {
 
     protected JpaGameEntity() {} // for JPA
 
-    public JpaGameEntity(GameId id, String name, String description, Money price, List<Achievement> achievements, List<Category> categories) {
-        this.gameId = id.id();
+    public JpaGameEntity(GameId id, String name, String description, Money price, String serviceUrl, List<Achievement> achievements, List<Category> categories) {
+        this.id = id.id();
         this.name = name;
         this.description = description;
         this.price = price.amount();
+        this.serviceUrl = serviceUrl;
         achievements.forEach(achievement -> this.achievements.add(JpaAchievementEntity.fromDomain(achievement)));
         if (!categories.isEmpty()) {
             this.categories = "";
@@ -47,6 +49,7 @@ public class JpaGameEntity {
                 game.getName(),
                 game.getDescription(),
                 game.getPrice(),
+                game.getServiceUrl(),
                 game.getAchievements(),
                 game.getCategories()
         );
@@ -65,17 +68,18 @@ public class JpaGameEntity {
         }
 
         return new Game(
-                new GameId(this.gameId),
+                new GameId(this.id),
                 this.name,
                 this.description,
                 Money.of(this.price),
+                this.serviceUrl,
                 achievements,
                 categories
         );
     }
 
-    public UUID getGameId() {
-        return gameId;
+    public UUID getId() {
+        return id;
     }
 
     public String getName() {
@@ -90,7 +94,15 @@ public class JpaGameEntity {
         return price;
     }
 
+    public String getServiceUrl() {
+        return serviceUrl;
+    }
+
     public String getCategories() {
         return categories;
+    }
+
+    public List<JpaAchievementEntity> getAchievements() {
+        return achievements;
     }
 }
