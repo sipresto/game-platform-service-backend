@@ -1,0 +1,7 @@
+@baseUrl = http://localhost/api/platform
+@userId = cf0138b7-3272-4d1c-a34d-de88a47fe94c
+
+### Get sessions of user
+
+GET {{baseUrl}}/session/{{userId}}
+Accept: application/json
