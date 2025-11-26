@@ -6,7 +6,7 @@ services:
   # ---------------------
   platform_backend:
     build:
-      context: C:/Users/ftlbv/IdeaProjects/game-platform-service
+      context: ../..
       dockerfile: Dockerfile
     ports:
       - "8095:8095"
@@ -22,7 +22,7 @@ services:
       KEYCLOAK_URL: "http://idp_keycloak:8080/auth"
       SERVER_PORT: "8095"
     networks:
-      - dev
+      - prod
     restart: "no"
 
   # ---------------------
@@ -30,7 +30,7 @@ services:
   # ---------------------
   tictactoe_backend:
     build:
-      context: C:/Users/ftlbv/IdeaProjects/tic-tac-toe-service-backend
+      context: ../../../tic-tac-toe-service-backend
       dockerfile: Dockerfile
     ports:
       - "8096:8096"
@@ -49,7 +49,7 @@ services:
       KEYCLOAK_URL: "http://idp_keycloak:8080/auth"
       SERVER_PORT: "8096"
     networks:
-      - dev
+      - prod
     restart: "no"
 
   # ---------------------
@@ -61,20 +61,20 @@ services:
     ports:
       - "8000:8000"
     networks:
-      - dev
+      - prod
     restart: unless-stopped
 
   # ---------------------
-  # FRONTEND
+  # PLATFORM FRONTEND
   # ---------------------
   frontend:
     build:
-      context: C:/Users/ftlbv/WebstormProjects/game-platform-service-frontend
+      context: ../../../../WebstormProjects/game-platform-service-frontend
       dockerfile: Dockerfile
     ports:
       - "3000:80"
     networks:
-      - dev
+      - prod
     restart: "no"
 
   # ---------------------
@@ -82,12 +82,12 @@ services:
   # ---------------------
   tictactoe_frontend:
     build:
-      context: C:/Users/ftlbv/WebstormProjects/tic-tac-toe-service-frontend
+      context: ../../../../WebstormProjects/tic-tac-toe-service-frontend
       dockerfile: Dockerfile
     ports:
       - "3001:80"
     networks:
-      - dev
+      - prod
     restart: "no"
 
   # ---------------------
@@ -100,7 +100,7 @@ services:
     volumes:
       - ./nginx-prod.conf:/etc/nginx/nginx.conf:ro
     networks:
-      - dev
+      - prod
     depends_on:
       - platform_backend
       - tictactoe_backend
@@ -123,7 +123,7 @@ services:
     ports:
       - "5544:5432"
     networks:
-      - dev
+      - prod
     volumes:
       - ./postgresql/data:/var/lib/postgresql/data
       - ./init-scripts/sql:/docker-entrypoint-initdb.d/
@@ -140,7 +140,7 @@ services:
       - "5772:5672"
       - "15683:15672"
     networks:
-      - dev
+      - prod
     volumes:
       - ./rabbitmq/data:/var/lib/rabbitmq
       - ./rabbitmq/log:/var/log/rabbitmq
@@ -160,7 +160,7 @@ services:
     ports:
       - "3407:3306"
     networks:
-      - dev
+      - prod
 
   # ---------------------
   # KEYCLOAK (IDP / SSO)
@@ -183,11 +183,11 @@ services:
     ports:
       - "8280:8080"
     networks:
-      - dev
+      - prod
     depends_on:
       - idp_mysql
 
 networks:
-  dev:
-    name: dev-network
+  prod:
+    name: prod-network
     driver: bridge
