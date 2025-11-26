@@ -20,4 +20,8 @@ public class SessionService {
     public List<Session> findSessionsByUserId(UserId userId) {
         return sessionRepository.findSessionsByUserId(userId);
     }
+
+    public void save(Session session) {
+        sessionRepository.save(session);
+    }
 }
