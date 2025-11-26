@@ -1,7 +1,6 @@
 @baseUrl = http://localhost/api/platform
 @keycloakUrl = http://localhost/auth/realms/game_platform/protocol/openid-connect/token
 @clientId = game-platform
-@clientSecret = QqMaaH7wAxLq8xQRw9YxJQlFIzVRjTSn
 
 POST {{keycloakUrl}}
 Content-Type: application/x-www-form-urlencoded
