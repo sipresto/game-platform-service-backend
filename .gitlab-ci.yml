@@ -62,7 +62,7 @@ maven-package-job:
     - docker tag game-platform-service-backend:0.0.1-SNAPSHOT $CI_REGISTRY_IMAGE:latest
     - docker push $CI_REGISTRY_IMAGE:latest
   rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_TAG'
 
 include:
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
