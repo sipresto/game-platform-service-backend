@@ -14,17 +14,78 @@ public class Lobby {
     private final LobbyId id;
     private final int maxPlayers;
     private final GameId game;
+    private final String password;
+    private final UserId host;
     private final Set<UserId> players = new HashSet<>();
 
-    public Lobby(LobbyId id, int maxPlayers, GameId game, Set<UserId> players) {
+    private LobbyStatus status;
+    private String activeGameUrl;
+
+    public Lobby(LobbyId id, String password, int maxPlayers, GameId game, UserId host) {
         this.id = id;
+        this.password = password;
         this.maxPlayers = maxPlayers;
         this.game = game;
-        this.players.addAll(players);
+        this.host = host;
+        this.status = LobbyStatus.OPEN;
+        this.players.add(host);
     }
 
-    public Lobby(int maxPlayers, GameId game, Set<UserId> players) {
-        this(LobbyId.create(), maxPlayers, game, players);
+    public Lobby(LobbyId id, String password, int maxPlayers, GameId game, UserId host, Set<UserId> players, LobbyStatus status, String activeGameUrl) {
+        this.id = id;
+        this.password = password;
+        this.maxPlayers = maxPlayers;
+        this.game = game;
+        this.host = host;
+        this.players.addAll(players);
+        this.status = status;
+        this.activeGameUrl = activeGameUrl;
+    }
+
+    public void join(UserId player, String providedPassword) {
+        if (status != LobbyStatus.OPEN) {
+            throw new IllegalStateException("Lobby is not open for joining.");
+        }
+        if (players.size() >= maxPlayers) {
+            throw new IllegalStateException("Lobby is full.");
+        }
+        if (players.contains(player)) {
+            return;
+        }
+
+        if (isPrivate() && !this.password.equals(providedPassword)) {
+            throw new IllegalArgumentException("Invalid lobby password.");
+        }
+
+        players.add(player);
+    }
+
+    public void leave(UserId player) {
+        players.remove(player);
+        if (players.isEmpty()) {
+            this.status = LobbyStatus.CLOSED;
+        }
+    }
+
+    public void validateReadyToStart(UserId requestor) {
+        if (!this.host.equals(requestor)) {
+            throw new IllegalStateException("Only the host can start the game.");
+        }
+        if (status != LobbyStatus.OPEN) {
+            throw new IllegalStateException("Game has already started or is closed.");
+        }
+        if (players.isEmpty()) {
+            throw new IllegalStateException("Cannot start an empty lobby.");
+        }
+    }
+
+    public void markAsInGame(String gameUrl) {
+        this.status = LobbyStatus.IN_GAME;
+        this.activeGameUrl = gameUrl;
+    }
+
+    public boolean isPrivate() {
+        return password != null && !password.isBlank();
     }
 
     public LobbyId getId() {
@@ -43,11 +104,8 @@ public class Lobby {
         return Set.copyOf(players);
     }
 
-    public void addPlayer(UserId player) {
-        players.add(player);
-    }
-
-    public void removePlayer(UserId player) {
-        players.remove(player);
-    }
+    public LobbyStatus getStatus() { return status; }
+    public String getActiveGameUrl() { return activeGameUrl; }
+    public String getPassword() { return password; }
+    public UserId getHost() { return host; }
 }

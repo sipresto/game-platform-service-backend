@@ -1,15 +1,47 @@
 @baseUrl = http://localhost/api/platform
+@keycloakUrl = http://localhost/auth/realms/game_platform/protocol/openid-connect/token
+@clientId = game-platform
+@clientSecret = R4HlYySrlWmAKObuHf1N0HAtSm3hiThC
+@username = Johnny
+@password = Test123
 
-### Create game
 
-POST {{baseUrl}}/lobby
-Content-Type: application/json
+POST http://localhost/auth/realms/game_platform/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id=game-platform&client_secret=R4HlYySrlWmAKObuHf1N0HAtSm3hiThC&username=Johnny&password=Test123&grant_type=password&scope=openid
+
+> {%
+    client.global.set("token", response.body.access_token);
+%}
+
+### GET all open lobbies
+GET {{baseUrl}}/lobbies
 Accept: application/json
+Authorization: Bearer {{token}}
+
+### POST create a public lobby
+POST {{baseUrl}}/lobbies
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "password": "",
+  "maxPlayers": 2,
+  "gameId": "c3c1d2b0-82fa-43a7-b326-0eb96136ecbc"
+}
+
+> {%
+    client.global.set("lobbyId", response.body['id']);
+%}
+
+
+### POST start game as host
+POST {{baseUrl}}/lobbies/{{lobbyId}}/start
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "gameId": "c3c1d2b0-82fa-43a7-b326-0eb96136ecbc",
-  "players": [
-    "8e5823e3-1b6d-4c90-96ef-2fbdb0e43bc0"
-  ],
-  "difficulty": "HARD"
+  "difficulty": "EASY"
 }
