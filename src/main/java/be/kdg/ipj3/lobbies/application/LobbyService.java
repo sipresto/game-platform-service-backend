@@ -72,18 +72,4 @@ public class LobbyService {
     public List<Lobby> getAllOpenLobbies() {
         return lobbyRepository.findByStatus(LobbyStatus.OPEN);
     }
-
-//    public String startGame(String serviceUrl, List<UserId> players, Difficulty difficulty) {
-//        try {
-//            List<UUID> playerIds = players.stream()
-//                    .map(UserId::id)
-//                    .toList();
-//
-//            GameStartRequestDto dto = new GameStartRequestDto(playerIds, difficulty);
-//
-//            return gameClient.startGame(serviceUrl, dto).gameUrl();
-//        } catch (Exception e) {
-//            throw new GameServiceUnavailableException("Game service is currently unavailable.");
-//        }
-//    }
 }

@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -109,6 +110,30 @@ public class LobbyControllerTests {
     }
 
     @Test
+    void createLobby_shouldCallRegisterOrGetUser() throws Exception {
+        // Arrange
+        UUID gameId = UUID.randomUUID();
+        CreateLobbyDto dto = new CreateLobbyDto("pwd", 4, gameId);
+        LobbyId newLobbyId = LobbyId.create();
+        Lobby createdLobby = new Lobby(newLobbyId, "pwd", 4, new GameId(gameId), userId);
+
+        given(lobbyService.createLobby(anyString(), anyInt(), any(GameId.class), any(UserId.class)))
+                .willReturn(createdLobby);
+
+        // Act
+        mockMvc.perform(post("/api/lobbies")
+                        .with(validJwt())
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(newLobbyId.id().toString()));
+
+        // Assert
+        then(userService).should().registerOrGetUser(eq("keycloak-id"), eq("test-user"));
+        then(lobbyService).should().createLobby(eq("pwd"), eq(4), eq(new GameId(gameId)), eq(userId));
+    }
+
+    @Test
     void joinLobby_shouldReturnOk() throws Exception {
         // Arrange
         UUID lobbyId = UUID.randomUUID();
@@ -174,5 +199,27 @@ public class LobbyControllerTests {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.message").value("Game service is down"));
+    }
+
+    @Test
+    void getLobbiesForGame_shouldReturnFilteredLobbies() throws Exception {
+        // Arrange
+        UUID gameId1 = UUID.randomUUID();
+        UUID gameId2 = UUID.randomUUID();
+
+        Lobby lobbyForGame1 = new Lobby(LobbyId.create(), null, 4, new GameId(gameId1), userId);
+        Lobby lobbyForGame2 = new Lobby(LobbyId.create(), "secret", 4, new GameId(gameId2), userId);
+
+        given(lobbyService.getAllOpenLobbies()).willReturn(List.of(lobbyForGame1, lobbyForGame2));
+
+        // Act & Assert
+        mockMvc.perform(get("/api/lobbies/{gameId}", gameId1)
+                        .with(validJwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(lobbyForGame1.getId().id().toString()))
+                .andExpect(jsonPath("$[0].currentPlayerCount").value(1));
+
+        then(lobbyService).should().getAllOpenLobbies();
     }
 }
