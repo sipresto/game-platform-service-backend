@@ -86,6 +86,18 @@ public class LobbyController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{id}/leave")
+    public ResponseEntity<Void> leaveLobby(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal Jwt token
+    ) {
+        UserId playerId = resolveUserId(token);
+        LobbyId lobbyId = new LobbyId(id);
+
+        lobbyService.leaveLobby(lobbyId, playerId);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/{id}/start")
     public ResponseEntity<GameUrlDto> startGame(
             @PathVariable String id,

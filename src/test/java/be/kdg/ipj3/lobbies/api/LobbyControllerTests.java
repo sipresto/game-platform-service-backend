@@ -150,6 +150,19 @@ public class LobbyControllerTests {
     }
 
     @Test
+    void leaveLobby_shouldReturnOk() throws Exception {
+        // Arrange
+        UUID lobbyId = UUID.randomUUID();
+
+        // Act & Assert
+        mockMvc.perform(post("/api/lobbies/{id}/leave", lobbyId)
+                        .with(validJwt()))
+                .andExpect(status().isOk());
+
+        then(lobbyService).should().leaveLobby(eq(new LobbyId(lobbyId)), eq(userId));
+    }
+
+    @Test
     void startGame_shouldReturnGameUrl_whenGameServiceIsAvailable() throws Exception {
         // Arrange
         UUID gameId = UUID.randomUUID();
