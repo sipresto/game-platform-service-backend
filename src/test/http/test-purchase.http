@@ -1,0 +1,25 @@
+@baseUrl = http://localhost/api/platform
+@keycloakUrl = http://localhost/auth/realms/game_platform/protocol/openid-connect/token
+@clientId = game-platform
+@clientSecret = QqMaaH7wAxLq8xQRw9YxJQlFIzVRjTSn
+
+POST {{keycloakUrl}}
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{clientId}}&client_secret={{clientSecret}}&username=Johnny&password=Test123&grant_type=password&scope=openid
+
+> {%
+    client.global.set("token", response.body.access_token);
+%}
+
+### POST buy game
+POST {{baseUrl}}/purchases/c3c1d2b0-82fa-43a7-b326-0eb96136ecbc
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### POST buy non-existing game
+POST {{baseUrl}}/purchases/c3c1d2b0-82fa-43a7-b326-0eb96136ecba
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}

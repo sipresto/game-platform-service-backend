@@ -49,4 +49,13 @@ public class GameService {
     public List<Game> findGamesByIds(List<GameId> ids) {
         return gameRepository.findGamesByIds(ids);
     }
+
+    public boolean existsById(GameId gameId) {
+        if (gameRepository.existsById(gameId)) {
+            return true;
+        }
+        else {
+            throw gameId.notFound();
+        }
+    }
 }

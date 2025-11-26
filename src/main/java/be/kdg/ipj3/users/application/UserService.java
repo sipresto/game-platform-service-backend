@@ -1,5 +1,6 @@
 package be.kdg.ipj3.users.application;
 
+import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.NotFoundException;
 import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.domain.IUserRepository;
@@ -55,6 +56,12 @@ public class UserService {
         User user = userRepository.findByKeycloakId(keycloakId)
                         .orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
         user.updateUsername(newUsername);
+        userRepository.save(user);
+    }
+
+    public void addGame(UserId id, GameId gameId) {
+        User user = userRepository.findById(id).orElseThrow(id::notFound);
+        user.addGame(gameId);
         userRepository.save(user);
     }
 }
