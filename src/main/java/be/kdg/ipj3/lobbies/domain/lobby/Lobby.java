@@ -5,7 +5,9 @@ import be.kdg.ipj3.shared.domain.UserId;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @AggregateRoot
@@ -15,8 +17,8 @@ public class Lobby {
     private final int maxPlayers;
     private final GameId game;
     private final String password;
-    private final UserId host;
-    private final Set<UserId> players = new HashSet<>();
+    private UserId host;
+    private final List<UserId> players = new ArrayList<>();
 
     private LobbyStatus status;
     private String activeGameUrl;
@@ -31,7 +33,7 @@ public class Lobby {
         this.players.add(host);
     }
 
-    public Lobby(LobbyId id, String password, int maxPlayers, GameId game, UserId host, Set<UserId> players, LobbyStatus status, String activeGameUrl) {
+    public Lobby(LobbyId id, String password, int maxPlayers, GameId game, UserId host, List<UserId> players, LobbyStatus status, String activeGameUrl) {
         this.id = id;
         this.password = password;
         this.maxPlayers = maxPlayers;
@@ -64,6 +66,11 @@ public class Lobby {
         players.remove(player);
         if (players.isEmpty()) {
             this.status = LobbyStatus.CLOSED;
+        }
+        else {
+            if (host.equals(player)) {
+                host = players.getFirst();
+            }
         }
     }
 

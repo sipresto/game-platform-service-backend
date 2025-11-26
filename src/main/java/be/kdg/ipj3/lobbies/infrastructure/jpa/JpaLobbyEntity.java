@@ -6,6 +6,8 @@ import be.kdg.ipj3.lobbies.domain.lobby.LobbyStatus;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.UserId;
 import jakarta.persistence.*;
+
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -32,7 +34,7 @@ public class JpaLobbyEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "lobby_players", joinColumns = @JoinColumn(name = "lobby_id"))
     @Column(name = "player_id")
-    private Set<UUID> players;
+    private List<UUID> players;
 
     @Column(nullable = false)
     private String status;
@@ -43,7 +45,7 @@ public class JpaLobbyEntity {
 
     protected JpaLobbyEntity() {} //for JPA
 
-    public JpaLobbyEntity(UUID id, String password, int maxPlayers, UUID gameId, UUID hostId, Set<UUID> players, String status, String activeGameUrl) {
+    public JpaLobbyEntity(UUID id, String password, int maxPlayers, UUID gameId, UUID hostId, List<UUID> players, String status, String activeGameUrl) {
         this.id = id;
         this.password = password;
         this.maxPlayers = maxPlayers;
@@ -63,7 +65,7 @@ public class JpaLobbyEntity {
                 lobby.getHost().id(),
                 lobby.getPlayers().stream()
                         .map(UserId::id)
-                        .collect(Collectors.toSet()),
+                        .collect(Collectors.toList()),
                 lobby.getStatus().name(),
                 lobby.getActiveGameUrl()
         );
@@ -78,7 +80,7 @@ public class JpaLobbyEntity {
                 new UserId(this.hostId),
                 this.players.stream()
                         .map(UserId::new)
-                        .collect(Collectors.toSet()),
+                        .collect(Collectors.toList()),
                 LobbyStatus.valueOf(this.status),
                 this.activeGameUrl
         );
@@ -104,7 +106,7 @@ public class JpaLobbyEntity {
         return hostId;
     }
 
-    public Set<UUID> getPlayers() {
+    public List<UUID> getPlayers() {
         return players;
     }
 

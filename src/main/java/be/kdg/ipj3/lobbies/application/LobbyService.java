@@ -77,4 +77,12 @@ public class LobbyService {
     public List<Lobby> getOpenLobbiesForGame(UUID gameId) {
         return lobbyRepository.findByStatusAndGameId(LobbyStatus.OPEN, gameId);
     }
+
+    public void leaveLobby(LobbyId lobbyId, UserId playerId) {
+        Lobby lobby = lobbyRepository.findById(lobbyId)
+                .orElseThrow(lobbyId::notFound);
+
+        lobby.leave(playerId);
+        lobbyRepository.save(lobby);
+    }
 }

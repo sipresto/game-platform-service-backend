@@ -76,6 +76,85 @@ class LobbyServiceTests {
     }
 
     @Test
+    void leaveLobby_shouldRemovePlayerAndAssignNewHost_whenHostLeaves() {
+        // Arrange
+        LobbyId lobbyId = LobbyId.create();
+        UserId host = UserId.create();
+        UserId p2 = UserId.create();
+        UserId p3 = UserId.create();
+
+        Lobby lobby = new Lobby(lobbyId, "pass", 4, new GameId(UUID.randomUUID()), host);
+        lobby.join(p2, "pass");
+        lobby.join(p3, "pass");
+
+        given(lobbyRepository.findById(lobbyId)).willReturn(Optional.of(lobby));
+
+        // Act
+        lobbyService.leaveLobby(lobbyId, host);
+
+        // Assert
+        assertFalse(lobby.getPlayers().contains(host));
+        assertEquals(p2, lobby.getHost(), "First remaining player should become host");
+        then(lobbyRepository).should().save(lobby);
+    }
+
+    @Test
+    void leaveLobby_shouldRemovePlayerOnly_whenNonHostLeaves() {
+        // Arrange
+        LobbyId lobbyId = LobbyId.create();
+        UserId host = UserId.create();
+        UserId p2 = UserId.create();
+        UserId p3 = UserId.create();
+
+        Lobby lobby = new Lobby(lobbyId, "pass", 4, new GameId(UUID.randomUUID()), host);
+        lobby.join(p2, "pass");
+        lobby.join(p3, "pass");
+
+        given(lobbyRepository.findById(lobbyId)).willReturn(Optional.of(lobby));
+
+        // Act
+        lobbyService.leaveLobby(lobbyId, p2);
+
+        // Assert
+        assertFalse(lobby.getPlayers().contains(p2));
+        assertEquals(host, lobby.getHost(), "Host should not change when non-host leaves");
+        then(lobbyRepository).should().save(lobby);
+    }
+
+    @Test
+    void leaveLobby_shouldCloseLobby_whenLastPlayerLeaves() {
+        // Arrange
+        LobbyId lobbyId = LobbyId.create();
+        UserId host = UserId.create();
+
+        Lobby lobby = new Lobby(lobbyId, "pass", 4, new GameId(UUID.randomUUID()), host);
+
+        given(lobbyRepository.findById(lobbyId)).willReturn(Optional.of(lobby));
+
+        // Act
+        lobbyService.leaveLobby(lobbyId, host);
+
+        // Assert
+        assertTrue(lobby.getPlayers().isEmpty());
+        assertEquals(LobbyStatus.CLOSED, lobby.getStatus(), "Lobby should be CLOSED when empty");
+        then(lobbyRepository).should().save(lobby);
+    }
+
+    @Test
+    void leaveLobby_shouldThrowException_whenLobbyNotFound() {
+        // Arrange
+        LobbyId lobbyId = LobbyId.create();
+        UserId player = UserId.create();
+
+        given(lobbyRepository.findById(lobbyId)).willReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> lobbyService.leaveLobby(lobbyId, player));
+        then(lobbyRepository).should().findById(lobbyId);
+        then(lobbyRepository).shouldHaveNoMoreInteractions();
+    }
+
+    @Test
     void getAllOpenLobbies_shouldReturnListFromRepo() {
         // Arrange
         List<Lobby> expectedLobbies = List.of(

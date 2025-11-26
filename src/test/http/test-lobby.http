@@ -29,6 +29,10 @@ Authorization: Bearer {{token}}
     client.global.set("lobbyId", response.body['id']);
 %}
 
+### POST leave lobby as host
+POST {{baseUrl}}/lobbies/{{lobbyId}}/leave
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
 ### POST start game as host
 POST {{baseUrl}}/lobbies/{{lobbyId}}/start
