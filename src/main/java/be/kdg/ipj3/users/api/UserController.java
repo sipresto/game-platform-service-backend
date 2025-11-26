@@ -33,7 +33,7 @@ public class UserController {
      * Automatically registers user on first login
      */
     @GetMapping("/user/profile")
-    public ResponseEntity<UserDto> getUserProfile(
+    public ResponseEntity<UserDto> findUserProfile(
             @AuthenticationPrincipal Jwt jwt
     ) {
         String keycloakId = jwt.getSubject();
@@ -64,7 +64,7 @@ public class UserController {
      * Get user details along with their owned games.
      */
     @GetMapping("/users/{id}/games")
-    public ResponseEntity<UserDto> getUserWithGames(
+    public ResponseEntity<UserDto> findUserWithGames(
             @PathVariable UUID id
     ) {
         User user = userService.getUserWithGames(new UserId(id));

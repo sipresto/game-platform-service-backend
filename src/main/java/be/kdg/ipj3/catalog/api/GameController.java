@@ -3,11 +3,14 @@ package be.kdg.ipj3.catalog.api;
 import be.kdg.ipj3.catalog.api.dto.GameDto;
 import be.kdg.ipj3.catalog.api.dto.GameFilterRequestDto;
 import be.kdg.ipj3.catalog.application.GameService;
+import be.kdg.ipj3.catalog.domain.Game;
+import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/games")
@@ -34,5 +37,13 @@ public class GameController {
             throw new ResourceNotFoundException("No games found");
         }
         return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GameDto> getGameById(
+            @PathVariable UUID id
+    ) {
+        GameDto gameDto = GameDto.from(gameService.findGameById(new GameId(id)));
+        return ResponseEntity.ok(gameDto);
     }
 }

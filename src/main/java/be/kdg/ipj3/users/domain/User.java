@@ -66,6 +66,11 @@ public class User {
     }
 
     public void addGame(GameId gameId) {
-        ownedGames.add(gameId);
+        if (!ownedGames.contains(gameId)) {
+            ownedGames.add(gameId);
+        }
+        else {
+            throw new IllegalArgumentException("Game already owned by this user");
+        }
     }
 }

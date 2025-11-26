@@ -6,25 +6,24 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 import java.time.Instant;
-import java.util.List;
 
 @AggregateRoot
 public class Purchase {
     @Identity
     private final PurchaseId id;
     private final UserId buyer;
-    private final List<GameId> games;
+    private final GameId game;
     private final Instant purchasedAt;
 
-    public Purchase(PurchaseId id, UserId buyer, List<GameId> games, Instant purchasedAt) {
+    public Purchase(PurchaseId id, UserId buyer, GameId game, Instant purchasedAt) {
         this.id  = id;
         this.buyer = buyer;
-        this.games = games;
+        this.game = game;
         this.purchasedAt = purchasedAt;
     }
 
-    public Purchase(UserId buyer, List<GameId> games) {
-        this(PurchaseId.create(), buyer, games, Instant.now());
+    public Purchase(UserId buyer, GameId game) {
+        this(PurchaseId.create(), buyer, game, Instant.now());
     }
 
     public PurchaseId getId() {
@@ -35,8 +34,8 @@ public class Purchase {
         return buyer;
     }
 
-    public List<GameId> getGames() {
-        return games;
+    public GameId getGame() {
+        return game;
     }
 
     public Instant getPurchasedAt() {

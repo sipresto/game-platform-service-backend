@@ -20,4 +20,6 @@ public interface IGameRepository {
     List<Game> filterGames(Money minPrice, Money maxPrice, List<Category> categories);
 
     List<Game> findGamesByIds(List<GameId> ids);
+
+    boolean existsById(GameId gameId);
 }

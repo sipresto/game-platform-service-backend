@@ -75,5 +75,10 @@ public class GameRepository implements IGameRepository {
                 .toList();
     }
 
+    @Override
+    public boolean existsById(GameId gameId) {
+        return jpaGameRepository.existsById(gameId.id());
+    }
+
 
 }
