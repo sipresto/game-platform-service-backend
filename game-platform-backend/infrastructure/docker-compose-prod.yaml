@@ -2,7 +2,7 @@ name: kdg-ipj3-team20-prod
 
 services:
   # ---------------------
-  # PLATFORM BACKEND (Optional Docker)
+  # PLATFORM BACKEND
   # ---------------------
   platform_backend:
     build:
@@ -26,7 +26,7 @@ services:
     restart: "no"
 
   # ---------------------
-  # TIC TAC TOE GAME BACKEND (Optional Docker)
+  # TIC TAC TOE GAME BACKEND
   # ---------------------
   tictactoe_backend:
     build:
@@ -65,7 +65,7 @@ services:
     restart: unless-stopped
 
   # ---------------------
-  # FRONTEND (Optional Docker)
+  # FRONTEND
   # ---------------------
   frontend:
     build:
@@ -78,7 +78,7 @@ services:
     restart: "no"
 
   # ---------------------
-  # TIC TAC TOE FRONTEND (Optional Docker)
+  # TIC TAC TOE FRONTEND
   # ---------------------
   tictactoe_frontend:
     build:
@@ -91,23 +91,22 @@ services:
     restart: "no"
 
   # ---------------------
-  # REVERSE PROXY (Always runs)
+  # REVERSE PROXY
   # ---------------------
   reverse_proxy:
     image: nginx:alpine
     ports:
       - "80:80"
     volumes:
-      - ./nginx-dev.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx-prod.conf:/etc/nginx/nginx.conf:ro
     networks:
       - dev
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     depends_on:
-      - app_postgres
-      - app_rabbitmq
+      - platform_backend
+      - tictactoe_backend
+      - frontend
+      - tictactoe_frontend
       - idp_keycloak
-      - ai_player
     restart: always
 
   # ---------------------
