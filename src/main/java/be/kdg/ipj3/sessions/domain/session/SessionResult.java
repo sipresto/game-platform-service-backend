@@ -4,5 +4,7 @@ public enum SessionResult {
     PLAYER_WIN,
     AI_WIN,
     DRAW,
-    ABANDONED
+    FINISHED,
+    ABANDONED,
+    RESIGNED
 }

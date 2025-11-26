@@ -21,7 +21,7 @@ public class SessionService {
         return sessionRepository.findSessionsByUserId(userId);
     }
 
-    private void save(Session session) {
+    public void save(Session session) {
         sessionRepository.save(session);
     }
 }
