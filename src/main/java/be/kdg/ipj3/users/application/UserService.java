@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -69,5 +70,9 @@ public class UserService {
 
     public List<GameId> findOwnedGamesByKeycloakId(String keycloakId) {
         return userRepository.findOwnedGamesByKeycloakId(keycloakId);
+    }
+
+    public Optional<User> findByKeycloakId(String keycloakId) {
+        return userRepository.findByKeycloakId(keycloakId);
     }
 }
