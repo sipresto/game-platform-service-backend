@@ -1,0 +1,6 @@
+@baseUrl = http://localhost/api/platform
+@userId = 5041ef49-f46c-4083-993f-10780835bef8
+
+### GET all owned games of a user
+GET {{baseUrl}}/user/{{userId}}/games
+Accept: application/json
