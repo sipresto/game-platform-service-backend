@@ -2,6 +2,9 @@ package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.catalog.application.GameService;
 import be.kdg.ipj3.catalog.domain.Game;
+import be.kdg.ipj3.shared.api.dto.LibraryGameDto;
+import be.kdg.ipj3.shared.domain.GameId;
+import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
 import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.User;
@@ -71,5 +74,24 @@ public class UserController {
         List<Game> games = gameService.findGamesByIds(user.getOwnedGames());
         UserDto dto = UserDto.fromDomainWithGames(user, games);
         return ResponseEntity.ok(dto);
+    }
+
+    /**
+     * Get the owned games of a user.
+     */
+    @GetMapping("/user/{id}/games")
+    public ResponseEntity<List<LibraryGameDto>> findOwnedGamesByKeycloakId(
+            @PathVariable String id
+    ) {
+        List<GameId> ownedGameIds = userService.findOwnedGamesByKeycloakId(id);
+        List<LibraryGameDto> dtos = gameService.findGamesByIds(ownedGameIds).stream()
+                .map(LibraryGameDto::from)
+                .toList();
+
+        if (dtos.isEmpty()) {
+            throw new ResourceNotFoundException("No games found");
+        }
+
+        return ResponseEntity.ok(dtos);
     }
 }

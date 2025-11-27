@@ -8,6 +8,8 @@ import be.kdg.ipj3.users.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class UserService {
@@ -63,5 +65,9 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(id::notFound);
         user.addGame(gameId);
         userRepository.save(user);
+    }
+
+    public List<GameId> findOwnedGamesByKeycloakId(String keycloakId) {
+        return userRepository.findOwnedGamesByKeycloakId(keycloakId);
     }
 }
