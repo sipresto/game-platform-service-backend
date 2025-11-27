@@ -42,7 +42,14 @@ VALUES ('02d0ae5f-9547-4efe-b55f-a2a29c9a3068',
         'HARD',
         null,
         'DRAW',
-        '2024-01-14T20:45:12Z');
+        '2024-01-14T20:45:12Z'),
+
+       ('24419a95-5308-4f7b-94df-305cf930d6ad',
+        'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc',
+        'EASY',
+        null,
+        'DRAW',
+        '2024-01-13T14:22:00Z');
 
 INSERT INTO session_players (session_id, player_id, player_order)
 VALUES ('02d0ae5f-9547-4efe-b55f-a2a29c9a3068', 'cf0138b7-3272-4d1c-a34d-de88a47fe94c', 0),
@@ -50,4 +57,5 @@ VALUES ('02d0ae5f-9547-4efe-b55f-a2a29c9a3068', 'cf0138b7-3272-4d1c-a34d-de88a47
        ('9233ba67-1cee-4f11-832f-63eb223e20de', 'cf0138b7-3272-4d1c-a34d-de88a47fe94c', 0),
        ('9233ba67-1cee-4f11-832f-63eb223e20de', '6d0cdf67-26c4-4354-a4df-9c4a7575dbb6', 1),
        ('c85f3878-6528-4dca-85c4-8912447bb422', '6d0cdf67-26c4-4354-a4df-9c4a7575dbb6', 0),
-       ('6c974240-6e1f-4e47-b39f-83a5f616af21', 'cf0138b7-3272-4d1c-a34d-de88a47fe94c', 0);
+       ('6c974240-6e1f-4e47-b39f-83a5f616af21', 'cf0138b7-3272-4d1c-a34d-de88a47fe94c', 0),
+       ('24419a95-5308-4f7b-94df-305cf930d6ad', '04518661-62b1-47f4-933d-87c6f85ba5fb', 0);
