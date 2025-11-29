@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-@TestConfiguration
+@Configuration
 class TestcontainersConfig {
 
     @Bean
