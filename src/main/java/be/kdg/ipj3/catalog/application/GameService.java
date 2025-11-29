@@ -5,7 +5,6 @@ import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.IGameRepository;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +41,7 @@ public class GameService {
     @Transactional(readOnly = true)
     public Game findGameById(GameId gameId) {
         return gameRepository.findById(gameId)
-                .orElseThrow(() -> new ResourceNotFoundException("Game with id " + gameId + " not found"));
+                .orElseThrow(gameId::notFound);
     }
 
     @Transactional(readOnly = true)

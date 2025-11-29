@@ -28,10 +28,8 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/api/games").permitAll()
-                        .requestMatchers("/api/lobby").permitAll()
+                        .requestMatchers("/api/games/**").permitAll()
                         .requestMatchers("/api/session/**").permitAll()
-                        .requestMatchers("/api/games/filter").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasRole("PLAYER")
                         .requestMatchers("/api/games/manage/**").hasRole("GAME_DEVELOPER")
