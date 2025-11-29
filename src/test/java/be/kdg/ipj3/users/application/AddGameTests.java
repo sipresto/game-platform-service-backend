@@ -46,7 +46,7 @@ public class AddGameTests {
         // Assert
         then(userRepository).should().findById(userDomainId);
         then(userRepository).should().save(user);
-        assertThat(user.getOwnedGames()).contains(gameDomainId); // This should now work
+        assertThat(user.getOwnedGames()).contains(gameDomainId);
     }
 
     @Test

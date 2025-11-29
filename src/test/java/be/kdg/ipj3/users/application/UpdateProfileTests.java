@@ -47,7 +47,7 @@ public class UpdateProfileTests {
 
         assertThat(user.getProfile().displayName()).isEqualTo(displayName);
         assertThat(user.getProfile().bio()).isEqualTo(bio);
-        assertThat(user.getUsername()).isEqualTo(displayName); // Username should be updated to match display name
+        assertThat(user.getUsername()).isEqualTo(displayName);
     }
 
     @Test
