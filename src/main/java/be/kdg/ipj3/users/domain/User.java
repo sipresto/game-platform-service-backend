@@ -57,12 +57,15 @@ public class User {
         return profile;
     }
 
-    public void updateUsername(String newUsername) {
-        if (newUsername == null || newUsername.isBlank()) {
-            throw new IllegalArgumentException("Username cannot be null or empty");
+    public void updateProfile(Profile newProfile) {
+        if (newProfile.displayName() == null || newProfile.displayName().isBlank()) {
+            newProfile = new Profile(profile.displayName(), newProfile.bio());
         }
-        this.username = newUsername;
-        this.profile = this.profile.withDisplayName(newUsername);
+        if(newProfile.bio() == null){
+            newProfile = new Profile(newProfile.displayName(), profile.bio());
+        }
+        this.username = newProfile.displayName();
+        this.profile = newProfile;
     }
 
     public void addGame(GameId gameId) {

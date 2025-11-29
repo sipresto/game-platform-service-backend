@@ -8,6 +8,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.Instant;
 import java.util.List;
@@ -30,6 +31,23 @@ public class GlobalExceptionHandler {
                 "Bad Request",
                 "Input niet valide",
                 fieldErrors,
+                Instant.now()
+        );
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiError> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        String message = String.format("Ongeldige parameter '%s': waarde '%s' kan niet worden geconverteerd naar %s",
+                ex.getName(),
+                ex.getValue(),
+                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "onbekend type");
+
+        ApiError body = new ApiError(
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                message,
+                List.of(),
                 Instant.now()
         );
         return ResponseEntity.badRequest().body(body);
@@ -94,6 +112,4 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
-
-
 }

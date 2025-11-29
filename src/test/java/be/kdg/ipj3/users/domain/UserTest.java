@@ -28,7 +28,7 @@ class UserTest {
     void updateUsername_UpdatesSuccessfully() {
         User user = new User(new UserId("123"), "oldName", List.of());
 
-        user.updateUsername("newName");
+        user.updateProfile("newName");
 
         assertEquals("newName", user.getUsername());
     }
@@ -39,7 +39,7 @@ class UserTest {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> user.updateUsername(null)
+                () -> user.updateProfile(null)
         );
     }
 
@@ -49,7 +49,7 @@ class UserTest {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> user.updateUsername("  ")
+                () -> user.updateProfile("  ")
         );
     }
 
