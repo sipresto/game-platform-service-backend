@@ -58,14 +58,16 @@ public class User {
     }
 
     public void updateProfile(Profile newProfile) {
-        if (newProfile.displayName() == null || newProfile.displayName().isBlank()) {
-            newProfile = new Profile(profile.displayName(), newProfile.bio());
-        }
-        if(newProfile.bio() == null){
-            newProfile = new Profile(newProfile.displayName(), profile.bio());
-        }
-        this.username = newProfile.displayName();
-        this.profile = newProfile;
+        String displayName = newProfile.displayName() == null || newProfile.displayName().isBlank()
+                ? profile.displayName()
+                : newProfile.displayName();
+
+        String bio = newProfile.bio() == null
+                ? profile.bio()
+                : newProfile.bio();
+
+        this.profile = new Profile(displayName, bio);
+        this.username = displayName;
     }
 
     public void addGame(GameId gameId) {

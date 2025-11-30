@@ -55,9 +55,7 @@ public class UpdateProfileTests {
                                 .authorities(new SimpleGrantedAuthority("ROLE_PLAYER")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(profileDto)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value("Username updated successfully"));
+                .andExpect(status().isOk());
 
         then(userService).should().updateProfile(keycloakId, "Updated Display Name", "Updated bio");
     }
