@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiError> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        String message = String.format("Ongeldige parameter '%s': waarde '%s' kan niet worden geconverteerd naar %s",
+        String message = String.format("Invalid parameter '%s': value '%s' cannot be converted too %s",
                 ex.getName(),
                 ex.getValue(),
                 ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "onbekend type");
@@ -106,7 +106,7 @@ public class GlobalExceptionHandler {
         ApiError body = new ApiError(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error",
-                "Er liep iets mis: " + ex.getMessage(),
+                "Something went wrong: " + ex.getMessage(),
                 List.of(),
                 Instant.now()
         );

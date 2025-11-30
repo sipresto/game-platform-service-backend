@@ -61,7 +61,7 @@ public class UserController {
 
         userService.updateProfile(keycloakId, profileDto.displayName(), profileDto.bio());
 
-        return ResponseEntity.ok(Map.of("message", "Username updated successfully"));
+        return ResponseEntity.ok().build();
     }
 
     /**
