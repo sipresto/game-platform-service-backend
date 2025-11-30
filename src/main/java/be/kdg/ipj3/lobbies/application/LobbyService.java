@@ -24,9 +24,7 @@ public class LobbyService {
 
 
     public Lobby createLobby(String password, int maxPlayers, GameId game, UserId host) {
-        LobbyId id = new LobbyId(UUID.randomUUID());
-
-        Lobby lobby = new Lobby(id, password, maxPlayers, game, host);
+        Lobby lobby = new Lobby(password, maxPlayers, game, host);
 
         lobbyRepository.save(lobby);
 
@@ -43,9 +41,7 @@ public class LobbyService {
         lobbyRepository.save(lobby);
     }
 
-    public String startGame(String serviceUrl, String lobbyIdString, UserId requestor, Difficulty difficulty) {
-        LobbyId lobbyId = new LobbyId(UUID.fromString(lobbyIdString));
-
+    public String startGame(String serviceUrl, LobbyId lobbyId, UserId requestor, Difficulty difficulty) {
         Lobby lobby = lobbyRepository.findById(lobbyId)
                 .orElseThrow(lobbyId::notFound);
 
@@ -69,12 +65,12 @@ public class LobbyService {
 
 
     @Transactional(readOnly = true)
-    public List<Lobby> getAllOpenLobbies() {
+    public List<Lobby> findAllOpenLobbies() {
         return lobbyRepository.findByStatus(LobbyStatus.OPEN);
     }
 
     @Transactional(readOnly = true)
-    public List<Lobby> getOpenLobbiesForGame(UUID gameId) {
+    public List<Lobby> findOpenLobbiesForGame(GameId gameId) {
         return lobbyRepository.findByStatusAndGameId(LobbyStatus.OPEN, gameId);
     }
 

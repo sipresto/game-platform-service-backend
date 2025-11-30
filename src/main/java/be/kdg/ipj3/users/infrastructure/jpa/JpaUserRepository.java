@@ -8,13 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface JpaUserRepository extends JpaRepository<JpaUserEntity, UUID> {
-    @Query("""
-    SELECT u
-    FROM JpaUserEntity u
-    JOIN FETCH u.ownedGames
-    WHERE u.id = :id
-""")
-    Optional<JpaUserEntity> findByIdWithGames(UUID id);
 
     Optional<JpaUserEntity> findByKeycloakId(String keycloakId);
 

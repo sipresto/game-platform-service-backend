@@ -6,11 +6,11 @@ import be.kdg.ipj3.lobbies.domain.lobby.LobbyId;
 import be.kdg.ipj3.lobbies.domain.lobby.LobbyStatus;
 import be.kdg.ipj3.lobbies.infrastructure.jpa.JpaLobbyEntity;
 import be.kdg.ipj3.lobbies.infrastructure.jpa.JpaLobbyRepository;
+import be.kdg.ipj3.shared.domain.GameId;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public class LobbyRepository implements ILobbyRepository {
@@ -41,8 +41,8 @@ public class LobbyRepository implements ILobbyRepository {
     }
 
     @Override
-    public List<Lobby> findByStatusAndGameId(LobbyStatus status, UUID gameId) {
-        return jpaLobbyRepository.findByStatusAndGameId(status.name(), gameId)
+    public List<Lobby> findByStatusAndGameId(LobbyStatus status, GameId gameId) {
+        return jpaLobbyRepository.findByStatusAndGameId(status.name(), gameId.id())
                 .stream()
                 .map(JpaLobbyEntity::toDomain)
                 .toList();

@@ -31,17 +31,6 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public boolean existsById(UserId userId) {
-        return jpaUserRepository.existsById(userId.id());
-    }
-
-    @Override
-    public Optional<User> findByIdWithGames(UserId userId) {
-        return jpaUserRepository.findByIdWithGames(userId.id())
-                .map(JpaUserEntity::toDomain);
-    }
-
-    @Override
     public Optional<User> findByKeycloakId(String keycloakId) {
         return jpaUserRepository.findByKeycloakId(keycloakId)
                 .map(JpaUserEntity::toDomain);

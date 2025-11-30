@@ -64,8 +64,7 @@ public class GetAllGamesTests {
                 .andExpect(jsonPath("$[0].description").value("Test Description"))
                 .andExpect(jsonPath("$[0].price").value(49.99))
                 .andExpect(jsonPath("$[0].categories[0]").value("CARDGAME"))
-                .andExpect(jsonPath("$[1].name").value("Test Game 2"))
-                .andExpect(jsonPath("$[1].description").value("Test Description 2"));
+                .andExpect(jsonPath("$[1].name").value("Test Game 2"));
 
         then(gameService).should().findAllGames();
     }

@@ -6,7 +6,6 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -19,19 +18,8 @@ public class Lobby {
     private final String password;
     private UserId host;
     private final List<UserId> players = new ArrayList<>();
-
     private LobbyStatus status;
     private String activeGameUrl;
-
-    public Lobby(LobbyId id, String password, int maxPlayers, GameId game, UserId host) {
-        this.id = id;
-        this.password = password;
-        this.maxPlayers = maxPlayers;
-        this.game = game;
-        this.host = host;
-        this.status = LobbyStatus.OPEN;
-        this.players.add(host);
-    }
 
     public Lobby(LobbyId id, String password, int maxPlayers, GameId game, UserId host, List<UserId> players, LobbyStatus status, String activeGameUrl) {
         this.id = id;
@@ -42,6 +30,10 @@ public class Lobby {
         this.players.addAll(players);
         this.status = status;
         this.activeGameUrl = activeGameUrl;
+    }
+
+    public Lobby(String password, int maxPlayers, GameId game, UserId host) {
+        this(LobbyId.create(), password, maxPlayers, game, host, List.of(host), LobbyStatus.OPEN, null);
     }
 
     public void join(UserId player, String providedPassword) {
@@ -64,13 +56,11 @@ public class Lobby {
 
     public void leave(UserId player) {
         players.remove(player);
+
         if (players.isEmpty()) {
             this.status = LobbyStatus.CLOSED;
-        }
-        else {
-            if (host.equals(player)) {
-                host = players.getFirst();
-            }
+        } else if (host.equals(player)) {
+            host = players.getFirst();
         }
     }
 

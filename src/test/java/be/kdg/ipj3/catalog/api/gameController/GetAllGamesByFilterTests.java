@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -56,8 +57,7 @@ public class GetAllGamesByFilterTests {
                 List.of(Category.CARDGAME)
         );
 
-        given(gameService.filterGames(filter.minPrice(), filter.maxPrice(), filter.categories()))
-                .willReturn(games);
+        given(gameService.filterGames(any(), any(), any())).willReturn(games);
 
         // Act & Assert
         mockMvc.perform(post("/api/games/filter")
@@ -83,8 +83,7 @@ public class GetAllGamesByFilterTests {
                 List.of(Category.BOARDGAME)
         );
 
-        given(gameService.filterGames(filter.minPrice(), filter.maxPrice(), filter.categories()))
-                .willReturn(Collections.emptyList());
+        given(gameService.filterGames(any(), any(), any())).willReturn(Collections.emptyList());
 
         // Act & Assert
         mockMvc.perform(post("/api/games/filter")

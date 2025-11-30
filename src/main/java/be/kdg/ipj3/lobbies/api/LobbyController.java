@@ -9,6 +9,7 @@ import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.User;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -40,15 +41,11 @@ public class LobbyController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LobbyListDto>> getLobbies() {
-        List<Lobby> lobbies = lobbyService.getAllOpenLobbies();
+    public ResponseEntity<List<LobbyListDto>> getAllOpenLobbies() {
+        List<Lobby> lobbies = lobbyService.findAllOpenLobbies();
 
         List<LobbyListDto> dtos = lobbies.stream()
-                .map(l -> new LobbyListDto(
-                        l.getId().id(),
-                        l.getPlayers().size(),
-                        l.isPrivate()
-                ))
+                .map(LobbyListDto::from)
                 .toList();
 
         return ResponseEntity.ok(dtos);
@@ -56,20 +53,24 @@ public class LobbyController {
 
     @PostMapping
     public ResponseEntity<LobbyCreatedResponseDto> createLobby(
-            @RequestBody CreateLobbyDto dto,
+            @Valid @RequestBody CreateLobbyDto dto,
             @AuthenticationPrincipal Jwt token
     ) {
         UserId hostId = resolveUserId(token);
 
-        Lobby createdLobby = lobbyService.createLobby(
-                dto.password(),
-                dto.maxPlayers(),
-                new GameId(dto.gameId()),
-                hostId
-        );
-        var lobbyId = new LobbyCreatedResponseDto(createdLobby.getId().id());
+        if (gameService.existsById(new GameId(dto.gameId()))) {
+            Lobby createdLobby = lobbyService.createLobby(
+                    dto.password(),
+                    dto.maxPlayers(),
+                    new GameId(dto.gameId()),
+                    hostId
+            );
+            var lobbyId = new LobbyCreatedResponseDto(createdLobby.getId().id());
 
-        return ResponseEntity.ok(lobbyId);
+            return ResponseEntity.ok(lobbyId);
+        }
+
+        return ResponseEntity.badRequest().build();
     }
 
 
@@ -100,26 +101,25 @@ public class LobbyController {
 
     @PostMapping("/{id}/start")
     public ResponseEntity<GameUrlDto> startGame(
-            @PathVariable String id,
-            @RequestBody GameStartDto dto,
+            @PathVariable UUID id,
+            @Valid @RequestBody GameStartDto dto,
             @AuthenticationPrincipal Jwt token
     ) {
         UserId hostId = resolveUserId(token);
         String serviceUrl = gameService.findServiceByGameId(new GameId(dto.gameId()));
 
-        String gameUrl = lobbyService.startGame(serviceUrl, id, hostId, dto.difficulty());
+        String gameUrl = lobbyService.startGame(serviceUrl, new LobbyId(id), hostId, dto.difficulty());
         return ResponseEntity.ok(new GameUrlDto(gameUrl));
     }
 
+    // TODO: change path to /game/{gameId}
     @GetMapping("/{gameId}")
-    public ResponseEntity<List<LobbyListDto>> getLobbiesForGame(@PathVariable UUID gameId) {
-        var openLobbies = lobbyService.getOpenLobbiesForGame(gameId);
+    public ResponseEntity<List<LobbyListDto>> getOpenLobbiesForGame(
+            @PathVariable UUID gameId
+    ) {
+        var openLobbies = lobbyService.findOpenLobbiesForGame(new GameId(gameId));
         var dtos = openLobbies.stream()
-                .map(l -> new LobbyListDto(
-                        l.getId().id(),
-                        l.getPlayers().size(),
-                        l.isPrivate()
-                ))
+                .map(LobbyListDto::from)
                 .toList();
 
         return ResponseEntity.ok(dtos);
