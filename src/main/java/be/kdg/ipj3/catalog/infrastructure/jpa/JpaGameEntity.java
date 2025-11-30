@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -22,7 +23,15 @@ public class JpaGameEntity {
     private String description;
     private BigDecimal price;
     private String serviceUrl;
-    private String categories;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "game_categories",
+            joinColumns = @JoinColumn(name = "game_id")
+    )
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    private Set<Category> categories;
 
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
     private List<JpaAchievementEntity> achievements;
@@ -36,11 +45,9 @@ public class JpaGameEntity {
         this.description = description;
         this.price = price.amount();
         this.serviceUrl = serviceUrl;
-        achievements.forEach(achievement -> this.achievements.add(JpaAchievementEntity.fromDomain(achievement)));
-        if (!categories.isEmpty()) {
-            this.categories = "";
-            categories.forEach(category -> this.categories += category.toString() + ", ");
-        }
+        this.achievements = new ArrayList<>();
+        achievements.forEach(a -> this.achievements.add(JpaAchievementEntity.fromDomain(a)));
+        this.categories = Set.copyOf(categories);
     }
 
     public static JpaGameEntity fromDomain(Game game) {
@@ -56,11 +63,7 @@ public class JpaGameEntity {
     }
 
     public Game toDomain() {
-        List<Category> categories = new ArrayList<>();
-        if (this.categories != null) {
-            List<String> categoriesStrings = List.of(this.categories.split(", "));
-            categoriesStrings.forEach(category -> categories.add(Category.find(category)));
-        }
+        List<Category> categories = new ArrayList<>(this.categories);
 
         List<Achievement> achievements = new ArrayList<>();
         if (this.achievements != null) {
@@ -98,9 +101,7 @@ public class JpaGameEntity {
         return serviceUrl;
     }
 
-    public String getCategories() {
-        return categories;
-    }
+    public Set<Category> getCategories() { return categories; }
 
     public List<JpaAchievementEntity> getAchievements() {
         return achievements;
