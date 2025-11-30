@@ -3,9 +3,7 @@ package be.kdg.ipj3.catalog.api;
 import be.kdg.ipj3.catalog.api.dto.GameDto;
 import be.kdg.ipj3.catalog.api.dto.GameFilterRequestDto;
 import be.kdg.ipj3.catalog.application.GameService;
-import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,19 +21,21 @@ public class GameController {
 
     @GetMapping
     public ResponseEntity<List<GameDto>> getAllGames() {
-        List<GameDto> dtos = gameService.findAllGames().stream().map(GameDto::from).toList();
-        if (dtos.isEmpty()) {
-            throw new ResourceNotFoundException("No games found");
-        }
+        List<GameDto> dtos = gameService.findAllGames().stream()
+                .map(GameDto::from)
+                .toList();
+
         return ResponseEntity.ok(dtos);
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<List<GameDto>> getAllGamesByFilter(@RequestBody GameFilterRequestDto filter) {
-        var dtos = gameService.filterGames(filter.minPrice(), filter.maxPrice(), filter.categories()).stream().map(GameDto::from).toList();
-        if (dtos.isEmpty()) {
-            throw new ResourceNotFoundException("No games found");
-        }
+    public ResponseEntity<List<GameDto>> getAllGamesByFilter(
+            @RequestBody GameFilterRequestDto filter
+    ) {
+        var dtos = gameService.filterGames(filter.minPrice(), filter.maxPrice(), filter.categories()).stream()
+                .map(GameDto::from)
+                .toList();
+
         return ResponseEntity.ok(dtos);
     }
 
@@ -44,6 +44,7 @@ public class GameController {
             @PathVariable UUID id
     ) {
         GameDto gameDto = GameDto.from(gameService.findGameById(new GameId(id)));
+
         return ResponseEntity.ok(gameDto);
     }
 }

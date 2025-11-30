@@ -6,8 +6,10 @@ import be.kdg.ipj3.shared.api.dto.LibraryGameDto;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
 import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.users.api.dto.UserDto;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.User;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -35,8 +37,8 @@ public class UserController {
      * Get current user's profile
      * Automatically registers user on first login
      */
-    @GetMapping("/user/profile")
-    public ResponseEntity<UserDto> findUserProfile(
+    @GetMapping("/user")
+    public ResponseEntity<UserDto> findUser(
             @AuthenticationPrincipal Jwt jwt
     ) {
         String keycloakId = jwt.getSubject();
@@ -48,19 +50,18 @@ public class UserController {
     }
 
     /**
-     * Update current user's username
+     * Update current user's profile
      */
-    @PutMapping("/user/username")
-    public ResponseEntity<Map<String, String>> updateUsername(
+    @PutMapping("/user/profile")
+    public ResponseEntity<Map<String, String>> updateProfile(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody Map<String, String> request
+            @RequestBody @Valid UserDto.ProfileDto profileDto
     ) {
         String keycloakId = jwt.getSubject();
-        String newUsername = request.get("username");
 
-        userService.updateUsername(keycloakId, newUsername);
+        userService.updateProfile(keycloakId, profileDto.displayName(), profileDto.bio());
 
-        return ResponseEntity.ok(Map.of("message", "Username updated successfully"));
+        return ResponseEntity.ok().build();
     }
 
     /**
