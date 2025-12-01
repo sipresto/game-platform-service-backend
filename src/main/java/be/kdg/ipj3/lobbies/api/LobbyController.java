@@ -31,6 +31,7 @@ public class LobbyController {
         this.userService = userService;
     }
 
+    // TODO: Not auto-register users, but verify if they are registered, using commented code below
     private UserId resolveUserId(Jwt token) {
         String keycloakId = token.getSubject();
         String keycloakUsername = token.getClaim("preferred_username");
@@ -39,6 +40,13 @@ public class LobbyController {
 
         return user.getId();
     }
+
+    /*private UserId resolveUserId(Jwt token) {
+        return userService
+                .findByKeycloakId(token.getSubject())
+                .map(User::getId)
+                .orElseThrow(() -> new UserNotFoundException(token.getSubject()));
+    }*/
 
     @GetMapping
     public ResponseEntity<List<LobbyListDto>> getAllOpenLobbies() {
@@ -106,6 +114,7 @@ public class LobbyController {
             @AuthenticationPrincipal Jwt token
     ) {
         UserId hostId = resolveUserId(token);
+        // TODO: Logic should change when GameStartDto gets reworked
         String serviceUrl = gameService.findServiceByGameId(new GameId(dto.gameId()));
 
         String gameUrl = lobbyService.startGame(serviceUrl, new LobbyId(id), hostId, dto.difficulty());
@@ -117,11 +126,17 @@ public class LobbyController {
     public ResponseEntity<List<LobbyListDto>> getOpenLobbiesForGame(
             @PathVariable UUID gameId
     ) {
-        var openLobbies = lobbyService.findOpenLobbiesForGame(new GameId(gameId));
-        var dtos = openLobbies.stream()
-                .map(LobbyListDto::from)
-                .toList();
+        if (gameService.existsById(new GameId(gameId))) {
+            var openLobbies = lobbyService.findOpenLobbiesForGame(new GameId(gameId));
 
-        return ResponseEntity.ok(dtos);
+            var dtos = openLobbies.stream()
+                    .map(LobbyListDto::from)
+                    .toList();
+
+            return ResponseEntity.ok(dtos);
+        }
+        else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

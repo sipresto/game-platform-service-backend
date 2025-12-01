@@ -18,4 +18,9 @@ public class PurchaseRepository implements IPurchaseRepository {
     public Purchase save(Purchase purchase) {
         return jpaPurchaseRepository.save(JpaPurchaseEntity.fromDomain(purchase)).toDomain();
     }
+
+    @Override
+    public void deleteAll() {
+        jpaPurchaseRepository.deleteAll();
+    }
 }

@@ -1,27 +1,26 @@
 package be.kdg.ipj3.shop.api.purchaseController;
 
-import be.kdg.ipj3.catalog.application.GameService;
+import be.kdg.ipj3.catalog.domain.Category;
+import be.kdg.ipj3.catalog.domain.Game;
+import be.kdg.ipj3.catalog.domain.IGameRepository;
 import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.NotFoundException;
+import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.shared.domain.UserId;
-import be.kdg.ipj3.shop.application.PurchaseService;
-import be.kdg.ipj3.shop.domain.Purchase;
-import be.kdg.ipj3.users.application.UserService;
+import be.kdg.ipj3.shop.domain.IPurchaseRepository;
+import be.kdg.ipj3.users.domain.IUserRepository;
 import be.kdg.ipj3.users.domain.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -29,22 +28,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@TestPropertySource(properties = {
-        "spring.sql.init.mode=never"
-})
 class BuyGameTests {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
-    private PurchaseService purchaseService;
+    @Autowired
+    private IPurchaseRepository purchaseRepository;
 
-    @MockitoBean
-    private UserService userService;
+    @Autowired
+    private IUserRepository userRepository;
 
-    @MockitoBean
-    private GameService gameService;
+    @Autowired
+    private IGameRepository gameRepository;
+
+    @BeforeEach
+    void setUp() {
+        purchaseRepository.deleteAll();
+        userRepository.deleteAll();
+        gameRepository.deleteAll();
+    }
 
     private JwtRequestPostProcessor validJwt() {
         return jwt().authorities(() -> "ROLE_PLAYER")
@@ -53,18 +56,32 @@ class BuyGameTests {
                         .claim("preferred_username", "test-user"));
     }
 
+    private UserId createTestUser() {
+        User user = User.createFromKeycloak("keycloak-id", "test-user");
+        userRepository.save(user);
+
+        return user.getId();
+    }
+
+    private GameId createTestGame() {
+        Game game = new Game(
+                "Game",
+                "Description",
+                Money.of(BigDecimal.valueOf(19.99)),
+                "https://test.com/service",
+                List.of(Category.NATIVE)
+        );
+        gameRepository.save(game);
+
+        return game.getId();
+    }
+
     @Test
     void buyGame_shouldReturnOk_whenGameExists() throws Exception {
         // Arrange
-        UserId userId = UserId.create();
-        User mockUser = new User(userId, "keycloak-id", "test-user", null);
-        given(userService.registerOrGetUser(any(), any())).willReturn(mockUser);
+        UserId userId = createTestUser();
 
-        GameId gameId = GameId.create();
-        given(gameService.existsById(any())).willReturn(true);
-
-        Purchase purchase = new Purchase(userId, gameId);
-        given(purchaseService.buy(any(), any())).willReturn(purchase);
+        GameId gameId = createTestGame();
 
         // Act & Assert
         mockMvc.perform(post("/api/purchases/" + gameId.id())
@@ -73,39 +90,38 @@ class BuyGameTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.buyer").value(userId.id().toString()))
                 .andExpect(jsonPath("$.game").value(gameId.id().toString()));
-
-        then(userService).should().registerOrGetUser(any(), any());
-        then(gameService).should().existsById(gameId);
-        then(purchaseService).should().buy(userId, gameId);
     }
 
     @Test
     void buyGame_shouldReturnNotFound_whenGameDoesNotExist() throws Exception {
         // Arrange
-        UserId userId = UserId.create();
-        User mockUser = new User(userId, "keycloak-id", "test-user", null);
-        given(userService.registerOrGetUser(any(), any())).willReturn(mockUser);
+        createTestUser();
 
-        GameId gameId = GameId.create();
-        given(gameService.existsById(any())).willThrow(new NotFoundException("Game not found"));
+        // Act & Assert
+        mockMvc.perform(post("/api/purchases/" + UUID.randomUUID())
+                        .with(validJwt()))
+                .andExpect(status().isNotFound());
+    }
+
+    // TODO: Change user auto-registration before enabling
+    /*@Test
+    void buyGame_shouldReturnNotFound_whenUserNotRegistered() throws Exception {
+        // Arrange
+        GameId gameId = createTestGame();
 
         // Act & Assert
         mockMvc.perform(post("/api/purchases/" + gameId.id())
                         .with(validJwt()))
-                .andExpect(status().isNotFound());
-
-        then(gameService).should().existsById(gameId);
-        then(purchaseService).shouldHaveNoInteractions();
-    }
+                .andExpect(status().isUnauthorized());
+    }*/
 
     @Test
     void buyGame_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
-        // Act & Assert
-        mockMvc.perform(post("/api/purchases/" + UUID.randomUUID()))
-                .andExpect(status().isUnauthorized());
+        // Arrange
+        GameId gameId = createTestGame();
 
-        then(userService).shouldHaveNoInteractions();
-        then(gameService).shouldHaveNoInteractions();
-        then(purchaseService).shouldHaveNoInteractions();
+        // Act & Assert
+        mockMvc.perform(post("/api/purchases/" + gameId.id()))
+                .andExpect(status().isUnauthorized());
     }
 }

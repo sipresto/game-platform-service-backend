@@ -42,4 +42,9 @@ public class UserRepository implements IUserRepository {
                 .map(GameId::new)
                 .toList();
     }
+
+    @Override
+    public void deleteAll() {
+        jpaUserRepository.deleteAll();
+    }
 }

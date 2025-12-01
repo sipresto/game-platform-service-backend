@@ -8,8 +8,14 @@ import java.util.Optional;
 
 @Repository
 public interface ILobbyRepository {
+
     void save(Lobby lobby);
+
     Optional<Lobby> findById(LobbyId id);
+
     List<Lobby> findByStatus(LobbyStatus status);
+
     List<Lobby> findByStatusAndGameId(LobbyStatus status, GameId gameId);
+
+    void deleteAll();
 }

@@ -47,4 +47,9 @@ public class LobbyRepository implements ILobbyRepository {
                 .map(JpaLobbyEntity::toDomain)
                 .toList();
     }
+
+    @Override
+    public void deleteAll() {
+        jpaLobbyRepository.deleteAll();
+    }
 }

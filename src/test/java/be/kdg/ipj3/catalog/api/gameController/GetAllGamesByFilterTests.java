@@ -1,36 +1,28 @@
 package be.kdg.ipj3.catalog.api.gameController;
 
 import be.kdg.ipj3.catalog.api.dto.GameFilterRequestDto;
-import be.kdg.ipj3.catalog.application.GameService;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
+import be.kdg.ipj3.catalog.domain.IGameRepository;
 import be.kdg.ipj3.shared.domain.Money;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@TestPropertySource(properties = {
-        "spring.sql.init.mode=never"
-})
 public class GetAllGamesByFilterTests {
 
     @Autowired
@@ -39,8 +31,13 @@ public class GetAllGamesByFilterTests {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
-    private GameService gameService;
+    @Autowired
+    private IGameRepository gameRepository;
+
+    @BeforeEach
+    void setUp() {
+        gameRepository.deleteAll();
+    }
 
     @Test
     void filterGames_shouldReturnFilteredGames_whenMatchesExist() throws Exception {
@@ -52,16 +49,13 @@ public class GetAllGamesByFilterTests {
                 "http://test.com/service",
                 List.of(Category.CARDGAME)
         );
-
-        List<Game> games = List.of(game);
+        gameRepository.save(game);
 
         GameFilterRequestDto filter = new GameFilterRequestDto(
                 Money.of(BigDecimal.valueOf(10)),
                 Money.of(BigDecimal.valueOf(30)),
                 List.of(Category.CARDGAME)
         );
-
-        given(gameService.filterGames(any(), any(), any())).willReturn(games);
 
         // Act & Assert
         mockMvc.perform(post("/api/games/filter")
@@ -74,8 +68,6 @@ public class GetAllGamesByFilterTests {
                 .andExpect(jsonPath("$[0].description").value("Filtered Description"))
                 .andExpect(jsonPath("$[0].price").value(20.00))
                 .andExpect(jsonPath("$[0].categories[0]").value("CARDGAME"));
-
-        then(gameService).should().filterGames(filter.minPrice(), filter.maxPrice(), filter.categories());
     }
 
     @Test
@@ -87,8 +79,6 @@ public class GetAllGamesByFilterTests {
                 List.of(Category.BOARDGAME)
         );
 
-        given(gameService.filterGames(any(), any(), any())).willReturn(Collections.emptyList());
-
         // Act & Assert
         mockMvc.perform(post("/api/games/filter")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -96,7 +86,5 @@ public class GetAllGamesByFilterTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
-
-        then(gameService).should().filterGames(filter.minPrice(), filter.maxPrice(), filter.categories());
     }
 }

@@ -68,4 +68,9 @@ public class GameRepository implements IGameRepository {
     public boolean existsById(GameId gameId) {
         return jpaGameRepository.existsById(gameId.id());
     }
+
+    @Override
+    public void deleteAll() {
+        jpaGameRepository.deleteAll();
+    }
 }

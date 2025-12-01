@@ -30,6 +30,7 @@ public class PurchaseController {
         this.gameService = gameService;
     }
 
+    // TODO: Not auto-register users, but verify if they are registered, using commented code below
     private UserId resolveUserId(Jwt token) {
         String keycloakId = token.getSubject();
         String keycloakUsername = token.getClaim("preferred_username");
@@ -38,6 +39,13 @@ public class PurchaseController {
 
         return user.getId();
     }
+
+    /*private UserId resolveUserId(Jwt token) {
+        return userService
+                .findByKeycloakId(token.getSubject())
+                .map(User::getId)
+                .orElseThrow(() -> new UserNotFoundException(token.getSubject()));
+    }*/
 
     @PostMapping("/{gameIdParam}")
     public ResponseEntity<PurchaseDto> buyGame(

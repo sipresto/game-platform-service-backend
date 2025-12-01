@@ -1,38 +1,34 @@
 package be.kdg.ipj3.lobbies.api.lobbyController;
 
-import be.kdg.ipj3.catalog.application.GameService;
+import be.kdg.ipj3.catalog.domain.Category;
+import be.kdg.ipj3.catalog.domain.Game;
+import be.kdg.ipj3.catalog.domain.IGameRepository;
 import be.kdg.ipj3.lobbies.api.dto.CreateLobbyDto;
-import be.kdg.ipj3.lobbies.application.LobbyService;
-import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
+import be.kdg.ipj3.lobbies.domain.lobby.ILobbyRepository;
 import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.NotFoundException;
-import be.kdg.ipj3.shared.domain.UserId;
-import be.kdg.ipj3.users.application.UserService;
+import be.kdg.ipj3.shared.domain.Money;
+import be.kdg.ipj3.users.domain.IUserRepository;
 import be.kdg.ipj3.users.domain.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import java.math.BigDecimal;
+import java.util.List;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@TestPropertySource(properties = {
-        "spring.sql.init.mode=never"
-})
 public class CreateLobbyTests {
 
     @Autowired
@@ -41,14 +37,21 @@ public class CreateLobbyTests {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
-    private LobbyService lobbyService;
+    @Autowired
+    private ILobbyRepository lobbyRepository;
 
-    @MockitoBean
-    private UserService userService;
+    @Autowired
+    private IUserRepository userRepository;
 
-    @MockitoBean
-    private GameService gameService;
+    @Autowired
+    private IGameRepository gameRepository;
+
+    @BeforeEach
+    void setUp() {
+        lobbyRepository.deleteAll();
+        userRepository.deleteAll();
+        gameRepository.deleteAll();
+    }
 
     private JwtRequestPostProcessor validJwt() {
         return jwt().jwt(builder -> builder
@@ -56,27 +59,32 @@ public class CreateLobbyTests {
                 .claim("preferred_username", "test-user"));
     }
 
+    private void createTestUser() {
+        User user = User.createFromKeycloak("keycloak-id", "test-user");
+        userRepository.save(user);
+    }
+
+    private GameId createTestGame() {
+        Game game = new Game(
+                "Game",
+                "Description",
+                Money.of(BigDecimal.valueOf(19.99)),
+                "https://test.com/service",
+                List.of(Category.NATIVE)
+        );
+        gameRepository.save(game);
+
+        return game.getId();
+    }
+
     @Test
     void createLobby_shouldReturnLobbyId_whenValidRequest() throws Exception {
         // Arrange
-        UserId userId = UserId.create();
-        User mockUser = new User(userId, "keycloak-id", "test-user", null);
-        given(userService.registerOrGetUser(any(), any())).willReturn(mockUser);
+        createTestUser();
 
-        given(gameService.existsById(any())).willReturn(true);
+        GameId gameId = createTestGame();
 
-        GameId gameId = GameId.create();
-        CreateLobbyDto dto = new CreateLobbyDto("pass", 2, gameId.id());
-
-        Lobby lobby = new Lobby(
-                "pass",
-                2,
-                gameId,
-                userId
-        );
-
-        given(lobbyService.createLobby(eq("pass"), eq(2), any(GameId.class), eq(userId)))
-                .willReturn(lobby);
+        CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
 
         // Act & Assert
         mockMvc.perform(post("/api/lobbies")
@@ -84,25 +92,17 @@ public class CreateLobbyTests {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(lobby.getId().id().toString()));
-
-        then(userService).should().registerOrGetUser("keycloak-id", "test-user");
-        then(gameService).should().existsById(gameId);
-        then(lobbyService).should().createLobby("pass", 2, gameId, userId);
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void createLobby_shouldReturnNotFound_whenInvalidGameId() throws Exception {
         // Arrange
-        UserId userId = UserId.create();
-        User mockUser = new User(userId, "keycloak-id", "test-user", null);
-        given(userService.registerOrGetUser(any(), any())).willReturn(mockUser);
-
-        given(gameService.existsById(any())).willThrow(new NotFoundException("Game not found"));
+        createTestUser();
 
         GameId gameId = GameId.create();
-        CreateLobbyDto dto = new CreateLobbyDto("pass", 2, gameId.id());
+
+        CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
 
         // Act & Assert
         mockMvc.perform(post("/api/lobbies")
@@ -110,47 +110,59 @@ public class CreateLobbyTests {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNotFound());
-
-        then(userService).should().registerOrGetUser("keycloak-id", "test-user");
-        then(gameService).should().existsById(gameId);
-        then(lobbyService).shouldHaveNoInteractions();
     }
+
+    // TODO: Change user auto-registration before enabling
+    /*@Test
+    void createLobby_shouldReturnNotFound_whenUserNotRegistered() throws Exception {
+        // Arrange
+        GameId gameId = createTestGame();
+
+        CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
+
+        // Act & Assert
+        mockMvc.perform(post("/api/lobbies")
+                        .with(validJwt())
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound());
+    }*/
 
     @Test
     void createLobby_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
         // Arrange
-        GameId gameId = GameId.create();
-        CreateLobbyDto dto = new CreateLobbyDto("pass", 2, gameId.id());
+        createTestUser();
+
+        GameId gameId = createTestGame();
+
+        CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
 
         // Act & Assert
         mockMvc.perform(post("/api/lobbies")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isUnauthorized());
-
-        then(userService).shouldHaveNoInteractions();
-        then(gameService).shouldHaveNoInteractions();
-        then(lobbyService).shouldHaveNoInteractions();
     }
 
     @Test
     void createLobby_shouldReturnBadRequest_whenInvalidDto() throws Exception {
         // Arrange
-        String invalidJson = """
+        createTestUser();
+
+        GameId gameId = createTestGame();
+
+        String dto = """
                 {
-                  "password": "pass",
+                  "password": "password",
                   "maxPlayers": 30,
                   "gameId": "%s"
                 }
-                """.formatted(GameId.create().id());
+                """.formatted(gameId.id());
 
         mockMvc.perform(post("/api/lobbies")
                         .with(validJwt())
                         .contentType("application/json")
-                        .content(invalidJson))
+                        .content(dto))
                 .andExpect(status().isBadRequest());
-
-        then(gameService).shouldHaveNoInteractions();
-        then(lobbyService).shouldHaveNoInteractions();
     }
 }
