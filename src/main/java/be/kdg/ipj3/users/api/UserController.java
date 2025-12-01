@@ -9,6 +9,7 @@ import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.api.dto.UserDto;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.Visibility;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -94,5 +95,15 @@ public class UserController {
         }
 
         return ResponseEntity.ok(dtos);
+    }
+
+    /**
+     * Updates the visibility settings of the user
+     */
+    @PutMapping("/user/{id}/privacy")
+    public ResponseEntity<Void> updatePrivacySettings(@RequestBody Visibility visibility, @PathVariable UUID id) {
+        var userId = new UserId(id);
+        userService.updatePrivacySettings(visibility, userId);
+        return ResponseEntity.ok().build();
     }
 }

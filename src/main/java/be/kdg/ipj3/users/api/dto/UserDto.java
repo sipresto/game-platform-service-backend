@@ -4,6 +4,7 @@ import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.shared.api.SmallGameDto;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.Visibility;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,15 +17,17 @@ public record UserDto(
         @NotBlank String keycloakId,
         @NotBlank String username,
         @Valid List<SmallGameDto> games,
-        @Valid @NotNull ProfileDto profile
-) {
+        @Valid @NotNull ProfileDto profile,
+        @NotNull Visibility visibility
+        ) {
     public static UserDto fromDomain(User user) {
         return new UserDto(
                 user.getId().id(),
                 user.getKeycloakId(),
                 user.getUsername(),
                 List.of(),
-                ProfileDto.fromDomain(user.getProfile())
+                ProfileDto.fromDomain(user.getProfile()),
+                user.getProfile_visibility()
         );
     }
 
@@ -34,7 +37,8 @@ public record UserDto(
                 user.getKeycloakId(),
                 user.getUsername(),
                 games.stream().map(SmallGameDto::fromDomain).toList(),
-                ProfileDto.fromDomain(user.getProfile())
+                ProfileDto.fromDomain(user.getProfile()),
+                user.getProfile_visibility()
         );
     }
 

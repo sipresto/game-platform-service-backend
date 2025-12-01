@@ -16,6 +16,7 @@ public class User {
     private String username;
     private List<GameId> ownedGames;
     private Profile profile;
+    private Visibility profile_visibility;
 
     public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, Profile profile) {
         this.id = id;
@@ -31,6 +32,7 @@ public class User {
         this.username = username;
         this.ownedGames = new ArrayList<>();
         this.profile = profile;
+        this.profile_visibility = Visibility.PUBLIC;
     }
 
     public static User createFromKeycloak(String keycloakId, String keycloakUsername) {
@@ -70,6 +72,10 @@ public class User {
         this.username = displayName;
     }
 
+    public void updateVisibility(Visibility visibility) {
+        this.profile_visibility = visibility;
+    }
+
     public void addGame(GameId gameId) {
         if (!ownedGames.contains(gameId)) {
             ownedGames.add(gameId);
@@ -77,5 +83,9 @@ public class User {
         else {
             throw new IllegalArgumentException("Game already owned by this user");
         }
+    }
+
+    public Visibility getProfile_visibility() {
+        return profile_visibility;
     }
 }
