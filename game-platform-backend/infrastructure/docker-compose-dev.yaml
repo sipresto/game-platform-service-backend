@@ -90,11 +90,11 @@ services:
       - dev
 
   # ---------------------
-  # AI player
+  # AI PLAYER SERVICE
   # ---------------------
   ai_player:
     image: matthiastruyzelaerekdg/integratieproject:ai-player
-    platform: linux/arm64
+    platform: linux/amd64
     ports:
       - "8000:8000"
     networks:
@@ -103,5 +103,5 @@ services:
 
 networks:
   dev:
-    name: dev-network
+    name: dev-network-fresh
     driver: bridge

@@ -9,8 +9,4 @@ public record Profile (String displayName, String bio) {
     public Profile {
         Objects.requireNonNull(displayName);
     }
-
-    public Profile withDisplayName(String newDisplayName) {
-        return new Profile(newDisplayName, this.bio);
-    }
 }

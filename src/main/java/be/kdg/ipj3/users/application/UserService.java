@@ -4,6 +4,7 @@ import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.NotFoundException;
 import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.domain.IUserRepository;
+import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,18 +43,15 @@ public class UserService {
                 .orElseThrow(id::notFound);
     }
 
-    public void updateUsername(String keycloakId, String newUsername) {
-        if (newUsername == null || newUsername.isBlank()) {
-            throw new IllegalArgumentException("New username cannot be null or blank");
-        }
-
+    public void updateProfile(String keycloakId, String displayName, String newBio) {
         if (keycloakId == null || keycloakId.isBlank()) {
             throw new IllegalArgumentException("Keycloak id cannot be null or blank");
         }
 
         User user = userRepository.findByKeycloakId(keycloakId)
                         .orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
-        user.updateUsername(newUsername);
+
+        user.updateProfile(new Profile(displayName, newBio));
         userRepository.save(user);
     }
 

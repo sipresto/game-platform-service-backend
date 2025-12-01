@@ -1,4 +1,4 @@
-package be.kdg.ipj3.users.api;
+package be.kdg.ipj3.users.api.dto;
 
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.shared.api.SmallGameDto;
