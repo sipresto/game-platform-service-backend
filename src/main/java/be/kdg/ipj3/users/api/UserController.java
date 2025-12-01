@@ -4,7 +4,6 @@ import be.kdg.ipj3.catalog.application.GameService;
 import be.kdg.ipj3.shared.api.dto.LibraryGameDto;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
-import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.api.dto.UserDto;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.User;
