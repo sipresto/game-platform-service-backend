@@ -5,7 +5,6 @@ import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.domain.IUserRepository;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.Visibility;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -42,54 +40,46 @@ class UpdatePrivacySettingsTests {
     @InjectMocks
     private UserService userService;
 
-    private UserId testUserId;
-    private UUID testUuid;
-
-    @BeforeEach
-    void setUp() {
-        testUuid = UUID.randomUUID();
-        testUserId = new UserId(testUuid);
-    }
-
-    @ParameterizedTest
-    @EnumSource(Visibility.class)
-    void updatePrivacySettings_shouldUpdateUserVisibilityAndSave_whenUserExists(Visibility visibility) {
+    @Test
+    void updatePrivacySettingsByKeycloakId_shouldUpdateVisibilityAndSave_whenUserExists() {
         // Arrange
-        given(userRepository.findById(testUserId))
+        String keycloakId = "test-keycloak-id";
+        given(userRepository.findByKeycloakId(keycloakId))
                 .willReturn(Optional.of(mockUser));
 
         // Act
-        userService.updatePrivacySettings(visibility, testUserId);
+        userService.updatePrivacySettingsByKeycloakId(Visibility.FRIENDS_ONLY, keycloakId);
 
         // Assert
-        then(mockUser).should().updateVisibility(visibility);
+        then(mockUser).should().updateVisibility(Visibility.FRIENDS_ONLY);
         then(userRepository).should().save(mockUser);
     }
 
     @Test
-    void updatePrivacySettings_shouldThrowNotFoundException_whenUserDoesNotExist() {
+    void updatePrivacySettingsByKeycloakId_shouldThrowNotFoundException_whenUserDoesNotExist() {
         // Arrange
-        given(userRepository.findById(testUserId))
+        String keycloakId = "non-existent-keycloak-id";
+        given(userRepository.findByKeycloakId(keycloakId))
                 .willReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> userService.updatePrivacySettings(Visibility.PUBLIC, testUserId))
+        assertThatThrownBy(() -> userService.updatePrivacySettingsByKeycloakId(Visibility.PUBLIC, keycloakId))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("User with userId")
-                .hasMessageContaining(testUuid.toString());
+                .hasMessageContaining("User with keycloak id [" + keycloakId + "] not found");
 
-        then(userRepository).should(never()).save(any());
+        then(userRepository).should(never()).save(mockUser);
         then(mockUser).shouldHaveNoInteractions();
     }
 
     @Test
-    void updatePrivacySettings_shouldCallUpdateVisibilityExactlyOnce_whenInvoked() {
+    void updatePrivacySettingsByKeycloakId_shouldCallUpdateVisibilityExactlyOnce_whenInvoked() {
         // Arrange
-        given(userRepository.findById(testUserId))
+        String keycloakId = "test-keycloak-id";
+        given(userRepository.findByKeycloakId(keycloakId))
                 .willReturn(Optional.of(mockUser));
 
         // Act
-        userService.updatePrivacySettings(Visibility.FRIENDS_ONLY, testUserId);
+        userService.updatePrivacySettingsByKeycloakId(Visibility.FRIENDS_ONLY, keycloakId);
 
         // Assert
         then(mockUser).should().updateVisibility(Visibility.FRIENDS_ONLY);
@@ -97,13 +87,14 @@ class UpdatePrivacySettingsTests {
     }
 
     @Test
-    void updatePrivacySettings_shouldNotModifyOtherUserProperties() {
+    void updatePrivacySettingsByKeycloakId_shouldNotModifyOtherUserProperties() {
         // Arrange
-        given(userRepository.findById(testUserId))
+        String keycloakId = "test-keycloak-id";
+        given(userRepository.findByKeycloakId(keycloakId))
                 .willReturn(Optional.of(mockUser));
 
         // Act
-        userService.updatePrivacySettings(Visibility.PRIVATE, testUserId);
+        userService.updatePrivacySettingsByKeycloakId(Visibility.PRIVATE, keycloakId);
 
         // Assert
         then(mockUser).should().updateVisibility(Visibility.PRIVATE);
@@ -112,32 +103,34 @@ class UpdatePrivacySettingsTests {
     }
 
     @Test
-    void updatePrivacySettings_shouldPropagateUserIdCorrectly() {
+    void updatePrivacySettingsByKeycloakId_shouldPropagateKeycloakIdCorrectly() {
         // Arrange
-        User realUser = createTestUserWithId(testUserId);
-        given(userRepository.findById(testUserId))
+        String keycloakId = "test-keycloak-id";
+        User realUser = createTestUserWithKeycloakId(keycloakId);
+        given(userRepository.findByKeycloakId(keycloakId))
                 .willReturn(Optional.of(realUser));
 
         // Act
-        userService.updatePrivacySettings(Visibility.PUBLIC, testUserId);
+        userService.updatePrivacySettingsByKeycloakId(Visibility.PUBLIC, keycloakId);
 
         // Assert
         then(userRepository).should().save(userCaptor.capture());
         User savedUser = userCaptor.getValue();
-        assertThat(savedUser.getId()).isEqualTo(testUserId);
+        assertThat(savedUser.getKeycloakId()).isEqualTo(keycloakId);
         assertThat(savedUser.getProfile_visibility()).isEqualTo(Visibility.PUBLIC);
     }
 
     @Test
-    void updatePrivacySettings_shouldHandleMultipleVisibilityChanges() {
+    void updatePrivacySettingsByKeycloakId_shouldHandleMultipleVisibilityChanges() {
         // Arrange
-        given(userRepository.findById(testUserId))
+        String keycloakId = "test-keycloak-id";
+        given(userRepository.findByKeycloakId(keycloakId))
                 .willReturn(Optional.of(mockUser));
 
         // Act
-        userService.updatePrivacySettings(Visibility.PRIVATE, testUserId);
-        userService.updatePrivacySettings(Visibility.FRIENDS_ONLY, testUserId);
-        userService.updatePrivacySettings(Visibility.PUBLIC, testUserId);
+        userService.updatePrivacySettingsByKeycloakId(Visibility.PRIVATE, keycloakId);
+        userService.updatePrivacySettingsByKeycloakId(Visibility.FRIENDS_ONLY, keycloakId);
+        userService.updatePrivacySettingsByKeycloakId(Visibility.PUBLIC, keycloakId);
 
         // Assert
         then(mockUser).should().updateVisibility(Visibility.PRIVATE);
@@ -147,17 +140,18 @@ class UpdatePrivacySettingsTests {
     }
 
     @Test
-    void updatePrivacySettings_shouldPreserveUserStateExceptVisibility() {
+    void updatePrivacySettingsByKeycloakId_shouldPreserveUserStateExceptVisibility() {
         // Arrange
-        User realUser = createTestUserWithId(testUserId);
+        String keycloakId = "test-keycloak-id";
+        User realUser = createTestUserWithKeycloakId(keycloakId);
         String originalUsername = realUser.getUsername();
         var originalProfile = realUser.getProfile();
 
-        given(userRepository.findById(testUserId))
+        given(userRepository.findByKeycloakId(keycloakId))
                 .willReturn(Optional.of(realUser));
 
         // Act
-        userService.updatePrivacySettings(Visibility.FRIENDS_ONLY, testUserId);
+        userService.updatePrivacySettingsByKeycloakId(Visibility.FRIENDS_ONLY, keycloakId);
 
         // Assert
         assertThat(realUser.getUsername()).isEqualTo(originalUsername);
@@ -167,19 +161,42 @@ class UpdatePrivacySettingsTests {
     }
 
     @Test
-    void updatePrivacySettings_shouldThrowExceptionWhenUserIdIsNull() {
-        // Arrange
-        UserId nullUserId = null;
-
+    void updatePrivacySettingsByKeycloakId_shouldThrowIllegalArgumentException_whenKeycloakIdIsNull() {
         // Act & Assert
-        assertThatThrownBy(() -> userService.updatePrivacySettings(Visibility.PUBLIC, nullUserId))
-                .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> userService.updatePrivacySettingsByKeycloakId(Visibility.PUBLIC, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Keycloak id cannot be null or blank");
     }
 
-    private User createTestUserWithId(UserId userId) {
+    @Test
+    void updatePrivacySettingsByKeycloakId_shouldThrowIllegalArgumentException_whenKeycloakIdIsBlank() {
+        // Act & Assert
+        assertThatThrownBy(() -> userService.updatePrivacySettingsByKeycloakId(Visibility.PUBLIC, ""))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Keycloak id cannot be null or blank");
+    }
+
+    @ParameterizedTest
+    @EnumSource(Visibility.class)
+    void updatePrivacySettingsByKeycloakId_shouldWorkWithAllVisibilityTypes(Visibility visibility) {
+        // Arrange
+        String keycloakId = "test-keycloak-id";
+        User realUser = createTestUserWithKeycloakId(keycloakId);
+        given(userRepository.findByKeycloakId(keycloakId))
+                .willReturn(Optional.of(realUser));
+
+        // Act
+        userService.updatePrivacySettingsByKeycloakId(visibility, keycloakId);
+
+        // Assert
+        assertThat(realUser.getProfile_visibility()).isEqualTo(visibility);
+        then(userRepository).should().save(realUser);
+    }
+
+    private User createTestUserWithKeycloakId(String keycloakId) {
         return new User(
-                userId,
-                "test-keycloak-id",
+                UserId.create(),
+                keycloakId,
                 "testuser",
                 java.util.List.of(),
                 new be.kdg.ipj3.users.domain.Profile("Test User", "Test bio")

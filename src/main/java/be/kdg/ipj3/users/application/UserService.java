@@ -75,8 +75,13 @@ public class UserService {
         return userRepository.findByKeycloakId(keycloakId);
     }
 
-    public void updatePrivacySettings(Visibility visibility, UserId userId){
-        var user = userRepository.findById(userId).orElseThrow(()->new NotFoundException("User with userId [" + userId + "] not found"));
+    public void updatePrivacySettingsByKeycloakId(Visibility visibility, String keycloakId){
+        if (keycloakId == null || keycloakId.isBlank()) {
+            throw new IllegalArgumentException("Keycloak id cannot be null or blank");
+        }
+
+        User user = userRepository.findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
         user.updateVisibility(visibility);
         userRepository.save(user);
     }

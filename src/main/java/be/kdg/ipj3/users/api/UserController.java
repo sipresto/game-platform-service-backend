@@ -100,10 +100,13 @@ public class UserController {
     /**
      * Updates the visibility settings of the user
      */
-    @PutMapping("/user/{id}/privacy")
-    public ResponseEntity<Void> updatePrivacySettings(@RequestBody Visibility visibility, @PathVariable UUID id) {
-        var userId = new UserId(id);
-        userService.updatePrivacySettings(visibility, userId);
+    @PutMapping("/user/privacy")
+    public ResponseEntity<Void> updatePrivacySettings(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestBody Visibility visibility
+    ) {
+        String keycloakId = jwt.getSubject();
+        userService.updatePrivacySettingsByKeycloakId(visibility, keycloakId);
         return ResponseEntity.ok().build();
     }
 }
