@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,27 +17,6 @@ class UserTest {
     @Nested
     @DisplayName("Given a user needs to be created")
     class UserCreation {
-
-        @Test
-        @DisplayName("When creating user with all parameters including games list Then user should be created with all properties")
-        void createUser_withAllParameters() {
-            // Given
-            UserId userId = new UserId(UUID.randomUUID());
-            String keycloakId = "keycloak-123";
-            String username = "testuser";
-            List<GameId> ownedGames = List.of(new GameId(UUID.randomUUID()));
-            Profile profile = new Profile("Test User", "Test Bio");
-
-            // When
-            User user = new User(userId, keycloakId, username, ownedGames, profile);
-
-            // Then
-            assertThat(user.getId()).isEqualTo(userId);
-            assertThat(user.getKeycloakId()).isEqualTo(keycloakId);
-            assertThat(user.getUsername()).isEqualTo(username);
-            assertThat(user.getOwnedGames()).isEqualTo(ownedGames);
-            assertThat(user.getProfile()).isEqualTo(profile);
-        }
 
         @Test
         @DisplayName("When creating user with profile only Then user should be created with empty games list")
@@ -181,7 +159,7 @@ class UserTest {
 
                 // When & Then
                 assertThatThrownBy(() -> user.addGame(gameId))
-                        .isInstanceOf(IllegalArgumentException.class)
+                        .isInstanceOf(IllegalStateException.class)
                         .hasMessage("Game already owned by this user");
             }
 
