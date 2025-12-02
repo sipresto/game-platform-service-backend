@@ -28,4 +28,9 @@ public class SessionRepository implements ISessionRepository {
                 .map(JpaSessionEntity::toDomain)
                 .toList();
     }
+
+    @Override
+    public void deleteAll() {
+        jpaSessionRepository.deleteAll();
+    }
 }

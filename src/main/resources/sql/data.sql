@@ -1,7 +1,11 @@
-INSERT INTO games(price, game_id, categories, description, name, service_url)
-VALUES (1.99, 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc', 'native, boardgame',
+INSERT INTO games(price, game_id, description, name, service_url)
+VALUES (1.99, 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc',
         'Tic Tac Toe is a puzzle game for two players, "X" and "O", who take turns marking spaces in a 3×3 grid. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row wins the game.',
         'Tic-Tac-Toe', '/api/games/tictactoe');
+
+INSERT INTO game_categories (game_id, category)
+VALUES ('c3c1d2b0-82fa-43a7-b326-0eb96136ecbc', 'NATIVE'),
+       ('c3c1d2b0-82fa-43a7-b326-0eb96136ecbc', 'BOARDGAME');
 
 INSERT INTO users(user_id, keycloak_id, username, display_name)
 VALUES ('cf0138b7-3272-4d1c-a34d-de88a47fe94c', 'c9d8cc34-6087-4a6f-a6c2-e208fbbc6ed2', 'xanderv', 'XanderV'),

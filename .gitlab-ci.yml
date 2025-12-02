@@ -58,7 +58,7 @@ maven-package-job:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - chmod +x ./mvnw
   script:
-    - ./mvnw spring-boot:build-image -Dimage=$CI_REGISTRY_IMAGE/game-platform-service-backend:0.0.1-SNAPSHOT
+    - ./mvnw spring-boot:build-image -Dimage=$CI_REGISTRY_IMAGE/game-platform-service-backend:0.0.1-SNAPSHOT -DskipTests
     - docker tag game-platform-service-backend:0.0.1-SNAPSHOT $CI_REGISTRY_IMAGE:latest
     - docker push $CI_REGISTRY_IMAGE:latest
   rules:

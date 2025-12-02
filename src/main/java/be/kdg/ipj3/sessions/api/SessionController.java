@@ -2,7 +2,7 @@ package be.kdg.ipj3.sessions.api;
 
 import be.kdg.ipj3.sessions.api.dto.SessionDto;
 import be.kdg.ipj3.sessions.application.SessionService;
-import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
+import be.kdg.ipj3.shared.domain.NotFoundException;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.User;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+// TODO: change session to sessions (in frontend as well)
 @RestController
 @RequestMapping("/api/session")
 public class SessionController {
@@ -24,20 +25,17 @@ public class SessionController {
         this.userService = userService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<List<SessionDto>> getSessionsByKeycloakId(
-            @PathVariable String id
+    // TODO: change to /user/{userId} and change this to receiving UserId instead of keycloak id
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<SessionDto>> getSessionsByUserId(
+            @PathVariable String userId
     ) {
-        User user = userService.findByKeycloakId(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with keycloak id " + id));
+        User user = userService.findByKeycloakId(userId)
+                .orElseThrow(() -> new NotFoundException("User not found with keycloak id " + userId));
 
         List<SessionDto> dtos = sessionService.findSessionsByUserId(user.getId()).stream()
                 .map(SessionDto::fromDomain)
                 .toList();
-
-        if (dtos.isEmpty()) {
-            throw new ResourceNotFoundException("No games found");
-        }
 
         return ResponseEntity.ok(dtos);
     }

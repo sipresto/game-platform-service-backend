@@ -1,11 +1,9 @@
 package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.catalog.application.GameService;
-import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.shared.api.dto.LibraryGameDto;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
-import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.api.dto.UserDto;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.User;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
@@ -63,19 +60,6 @@ public class UserController {
         userService.updateProfile(keycloakId, profileDto.displayName(), profileDto.bio());
 
         return ResponseEntity.ok().build();
-    }
-
-    /**
-     * Get user details along with their owned games.
-     */
-    @GetMapping("/users/{id}/games")
-    public ResponseEntity<UserDto> findUserWithGames(
-            @PathVariable UUID id
-    ) {
-        User user = userService.getUserWithGames(new UserId(id));
-        List<Game> games = gameService.findGamesByIds(user.getOwnedGames());
-        UserDto dto = UserDto.fromDomainWithGames(user, games);
-        return ResponseEntity.ok(dto);
     }
 
     /**

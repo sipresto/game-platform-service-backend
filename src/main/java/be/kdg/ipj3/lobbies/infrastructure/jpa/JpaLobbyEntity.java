@@ -8,7 +8,6 @@ import be.kdg.ipj3.shared.domain.UserId;
 import jakarta.persistence.*;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
