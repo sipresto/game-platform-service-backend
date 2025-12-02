@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -50,7 +51,7 @@ public class UpdatePrivacyTests {
 
         User mockUser = createMockUser(keycloakId, keycloakUsername);
         given(userService.findByKeycloakId(keycloakId))
-                .willReturn(Optional.of(mockUser));
+                .willReturn(mockUser);
 
         // Act & Assert
         mockMvc.perform(put("/api/user/privacy")
@@ -78,7 +79,7 @@ public class UpdatePrivacyTests {
 
         User mockUser = createMockUser(keycloakId, keycloakUsername);
         given(userService.findByKeycloakId(keycloakId))
-                .willReturn(Optional.of(mockUser));
+                .willReturn(mockUser);
 
         // Act & Assert
         mockMvc.perform(put("/api/user/privacy")
@@ -106,7 +107,7 @@ public class UpdatePrivacyTests {
 
         User mockUser = createMockUser(keycloakId, keycloakUsername);
         given(userService.findByKeycloakId(keycloakId))
-                .willReturn(Optional.of(mockUser));
+                .willReturn(mockUser);
 
         // Act & Assert
         mockMvc.perform(put("/api/user/privacy")

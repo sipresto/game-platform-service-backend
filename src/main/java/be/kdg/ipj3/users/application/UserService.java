@@ -66,8 +66,8 @@ public class UserService {
         return userRepository.findOwnedGamesByKeycloakId(keycloakId);
     }
 
-    public Optional<User> findByKeycloakId(String keycloakId) {
-        return userRepository.findByKeycloakId(keycloakId);
+    public User findByKeycloakId(String keycloakId) {
+        return userRepository.findByKeycloakId(keycloakId).orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
     }
 
     public void updatePrivacySettingsByKeycloakId(Visibility visibility, User user){

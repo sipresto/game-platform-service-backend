@@ -34,7 +34,7 @@ public class LobbyController {
 
     private UserId resolveUserId(Jwt token) {
         String keycloakId = token.getSubject();
-        User user = userService.findByKeycloakId(keycloakId).orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
+        User user = userService.findByKeycloakId(keycloakId);
         return user.getId();
     }
 

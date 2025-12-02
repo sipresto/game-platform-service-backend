@@ -91,7 +91,7 @@ public class UserController {
             @RequestBody Visibility visibility
     ) {
         String keycloakId = jwt.getSubject();
-        User user = userService.findByKeycloakId(keycloakId).orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
+        User user = userService.findByKeycloakId(keycloakId);
         userService.updatePrivacySettingsByKeycloakId(visibility, user);
         return ResponseEntity.ok().build();
     }
