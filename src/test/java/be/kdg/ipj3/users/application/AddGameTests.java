@@ -21,7 +21,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
-class AddGameUnitTests {
+class AddGameTests {
 
     @Mock
     private IUserRepository userRepository;

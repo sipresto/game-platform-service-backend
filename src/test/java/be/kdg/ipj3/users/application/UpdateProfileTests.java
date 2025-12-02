@@ -20,7 +20,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
-class UpdateProfileUnitTests {
+class UpdateProfileTests {
 
     @Mock
     private IUserRepository userRepository;
