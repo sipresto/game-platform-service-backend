@@ -30,8 +30,7 @@ public class SessionController {
     public ResponseEntity<List<SessionDto>> getSessionsByUserId(
             @PathVariable String userId
     ) {
-        User user = userService.findByKeycloakId(userId)
-                .orElseThrow(() -> new NotFoundException("User not found with keycloak id " + userId));
+        User user = userService.findByKeycloakId(userId);
 
         List<SessionDto> dtos = sessionService.findSessionsByUserId(user.getId()).stream()
                 .map(SessionDto::fromDomain)

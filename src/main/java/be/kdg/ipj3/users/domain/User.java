@@ -14,18 +14,29 @@ public class User {
     private final UserId id;
     private final String keycloakId;
     private String username;
-    private final List<GameId> ownedGames = new ArrayList<>();
+    private List<GameId> ownedGames;
     private Profile profile;
+    private Visibility visibility;
+
+    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, Profile profile) {
+        this.id = id;
+        this.keycloakId = keycloakId;
+        this.username = username;
+        this.ownedGames = ownedGames;
+        this.profile = profile;
+    }
 
     public User(UserId id, String keycloakId, String username, Profile profile) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
+        this.ownedGames = new ArrayList<>();
         this.profile = profile;
+        this.visibility = Visibility.PUBLIC;
     }
 
     public static User createFromKeycloak(String keycloakId, String keycloakUsername) {
-        return new User(UserId.create(), keycloakId, keycloakUsername, new Profile(keycloakUsername, ""));
+        return new User(UserId.create(), keycloakId, keycloakUsername, List.of(), new Profile(keycloakUsername, ""));
     }
 
     public UserId getId() {
@@ -61,12 +72,20 @@ public class User {
         this.username = displayName;
     }
 
+    public void updateVisibility(Visibility visibility) {
+        this.visibility = visibility;
+    }
+
     public void addGame(GameId gameId) {
         if (!ownedGames.contains(gameId)) {
             ownedGames.add(gameId);
         }
         else {
-            throw new IllegalStateException("Game already owned by this user");
+            throw new IllegalArgumentException("Game already owned by this user");
         }
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
     }
 }

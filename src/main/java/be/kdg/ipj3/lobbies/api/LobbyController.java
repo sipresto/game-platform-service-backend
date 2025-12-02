@@ -6,6 +6,7 @@ import be.kdg.ipj3.lobbies.application.LobbyService;
 import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
 import be.kdg.ipj3.lobbies.domain.lobby.LobbyId;
 import be.kdg.ipj3.shared.domain.GameId;
+import be.kdg.ipj3.shared.domain.NotFoundException;
 import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.User;
@@ -31,22 +32,11 @@ public class LobbyController {
         this.userService = userService;
     }
 
-    // TODO: Not auto-register users, but verify if they are registered, using commented code below
     private UserId resolveUserId(Jwt token) {
         String keycloakId = token.getSubject();
-        String keycloakUsername = token.getClaim("preferred_username");
-
-        User user = userService.registerOrGetUser(keycloakId, keycloakUsername);
-
+        User user = userService.findByKeycloakId(keycloakId);
         return user.getId();
     }
-
-    /*private UserId resolveUserId(Jwt token) {
-        return userService
-                .findByKeycloakId(token.getSubject())
-                .map(User::getId)
-                .orElseThrow(() -> new UserNotFoundException(token.getSubject()));
-    }*/
 
     @GetMapping
     public ResponseEntity<List<LobbyListDto>> getAllOpenLobbies() {

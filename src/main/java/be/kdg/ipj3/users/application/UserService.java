@@ -6,6 +6,7 @@ import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.domain.IUserRepository;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.Visibility;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +66,12 @@ public class UserService {
         return userRepository.findOwnedGamesByKeycloakId(keycloakId);
     }
 
-    public Optional<User> findByKeycloakId(String keycloakId) {
-        return userRepository.findByKeycloakId(keycloakId);
+    public User findByKeycloakId(String keycloakId) {
+        return userRepository.findByKeycloakId(keycloakId).orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
+    }
+
+    public void updatePrivacySettingsByKeycloakId(Visibility visibility, User user){
+        user.updateVisibility(visibility);
+        userRepository.save(user);
     }
 }

@@ -3,10 +3,12 @@ package be.kdg.ipj3.users.api;
 import be.kdg.ipj3.catalog.application.GameService;
 import be.kdg.ipj3.shared.api.dto.LibraryGameDto;
 import be.kdg.ipj3.shared.domain.GameId;
+import be.kdg.ipj3.shared.domain.NotFoundException;
 import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
 import be.kdg.ipj3.users.api.dto.UserDto;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.Visibility;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -78,5 +80,19 @@ public class UserController {
         }
 
         return ResponseEntity.ok(dtos);
+    }
+
+    /**
+     * Updates the visibility settings of the user
+     */
+    @PutMapping("/user/privacy")
+    public ResponseEntity<Void> updatePrivacySettings(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestBody Visibility visibility
+    ) {
+        String keycloakId = jwt.getSubject();
+        User user = userService.findByKeycloakId(keycloakId);
+        userService.updatePrivacySettingsByKeycloakId(visibility, user);
+        return ResponseEntity.ok().build();
     }
 }

@@ -3,6 +3,7 @@ package be.kdg.ipj3.users.infrastructure.jpa;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.Visibility;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -23,6 +24,10 @@ public class JpaUserEntity {
     @Column(nullable = false)
     private String username;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private Visibility visibility;
+
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
             name = "owned_games",
@@ -36,16 +41,17 @@ public class JpaUserEntity {
     protected JpaUserEntity() {
     } // for JPA
 
-    public JpaUserEntity(UUID id, String keycloakId, String username, JpaProfile profile) {
+    public JpaUserEntity(UUID id, String keycloakId, String username, JpaProfile profile, Visibility visibility) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
         this.profile = profile;
+        this.visibility = visibility;
     }
 
     public static JpaUserEntity fromDomain(User user) {
         JpaUserEntity jpaUserEntity = new JpaUserEntity(user.getId().id(), user.getKeycloakId(),
-                user.getUsername(), JpaProfile.fromDomain(user.getProfile()));
+                user.getUsername(), JpaProfile.fromDomain(user.getProfile()), user.getVisibility());
 
         user.getOwnedGames().stream()
                 .map(GameId::id)
@@ -61,6 +67,7 @@ public class JpaUserEntity {
                 .map(GameId::new)
                 .forEach(user::addGame);
 
+        user.updateVisibility(this.visibility);
         return user;
     }
 
