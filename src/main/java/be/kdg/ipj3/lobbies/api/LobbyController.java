@@ -66,19 +66,19 @@ public class LobbyController {
     ) {
         UserId hostId = resolveUserId(token);
 
-        if (gameService.existsById(new GameId(dto.gameId()))) {
-            Lobby createdLobby = lobbyService.createLobby(
-                    dto.password(),
-                    dto.maxPlayers(),
-                    new GameId(dto.gameId()),
-                    hostId
-            );
-            var lobbyId = new LobbyCreatedResponseDto(createdLobby.getId().id());
-
-            return ResponseEntity.ok(lobbyId);
+        if (!gameService.existsById(new GameId(dto.gameId()))) {
+            return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.badRequest().build();
+        Lobby createdLobby = lobbyService.createLobby(
+                dto.password(),
+                dto.maxPlayers(),
+                new GameId(dto.gameId()),
+                hostId
+        );
+        var lobbyId = new LobbyCreatedResponseDto(createdLobby.getId().id());
+
+        return ResponseEntity.ok(lobbyId);
     }
 
 
@@ -126,17 +126,16 @@ public class LobbyController {
     public ResponseEntity<List<LobbyListDto>> getOpenLobbiesForGame(
             @PathVariable UUID gameId
     ) {
-        if (gameService.existsById(new GameId(gameId))) {
-            var openLobbies = lobbyService.findOpenLobbiesForGame(new GameId(gameId));
-
-            var dtos = openLobbies.stream()
-                    .map(LobbyListDto::from)
-                    .toList();
-
-            return ResponseEntity.ok(dtos);
-        }
-        else {
+        if (!gameService.existsById(new GameId(gameId))) {
             return ResponseEntity.badRequest().build();
         }
+
+        var openLobbies = lobbyService.findOpenLobbiesForGame(new GameId(gameId));
+
+        var dtos = openLobbies.stream()
+                .map(LobbyListDto::from)
+                .toList();
+
+        return ResponseEntity.ok(dtos);
     }
 }

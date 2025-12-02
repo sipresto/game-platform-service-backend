@@ -56,13 +56,13 @@ public class PurchaseController {
 
         GameId gameId = new GameId(gameIdParam);
 
-        if (gameService.existsById(gameId)) {
-            userService.addGame(userId, gameId);
-            Purchase purchase = purchaseService.buy(userId, gameId);
-            return ResponseEntity.ok(PurchaseDto.fromDomain(purchase));
-        }
-        else {
+        if (!gameService.existsById(gameId)) {
             return ResponseEntity.badRequest().build();
         }
+
+        userService.addGame(userId, gameId);
+        Purchase purchase = purchaseService.buy(userId, gameId);
+
+        return ResponseEntity.ok(PurchaseDto.fromDomain(purchase));
     }
 }
