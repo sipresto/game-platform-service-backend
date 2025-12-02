@@ -11,11 +11,9 @@ public interface IUserRepository {
 
     void save(User user);
 
-    boolean existsById(UserId userId);
-
-    Optional<User> findByIdWithGames(UserId userId);
-
     Optional<User> findByKeycloakId(String keycloakId);
 
     List<GameId> findOwnedGamesByKeycloakId(String keycloakId);
+
+    void deleteAll();
 }

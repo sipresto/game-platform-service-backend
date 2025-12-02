@@ -22,4 +22,6 @@ public interface IGameRepository {
     List<Game> findGamesByIds(List<GameId> ids);
 
     boolean existsById(GameId gameId);
+
+    void deleteAll();
 }

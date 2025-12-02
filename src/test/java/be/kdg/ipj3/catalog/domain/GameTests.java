@@ -2,14 +2,12 @@ package be.kdg.ipj3.catalog.domain;
 
 import be.kdg.ipj3.shared.domain.Money;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 class GameTests {
 
     @Test

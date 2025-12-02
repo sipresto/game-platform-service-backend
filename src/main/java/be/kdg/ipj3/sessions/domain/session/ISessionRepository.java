@@ -8,4 +8,6 @@ public interface ISessionRepository {
     void save(Session session);
 
     List<Session> findSessionsByUserId(UserId userId);
+
+    void deleteAll();
 }

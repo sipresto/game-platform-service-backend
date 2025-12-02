@@ -21,11 +21,6 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User getUserWithGames(UserId id) {
-        return userRepository.findByIdWithGames(id)
-                .orElseThrow(id::notFound);
-    }
-
     /**
      * Register or get existing user from Keycloak JWT
      * This is called automatically on first login

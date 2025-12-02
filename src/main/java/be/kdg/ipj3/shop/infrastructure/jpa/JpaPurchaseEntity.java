@@ -50,5 +50,19 @@ public class JpaPurchaseEntity {
         return new Purchase(new PurchaseId(this.id), new UserId(this.buyer), new GameId(this.game), this.purchasedAt);
     }
 
+    public UUID getId() {
+        return id;
+    }
 
+    public UUID getBuyer() {
+        return buyer;
+    }
+
+    public UUID getGame() {
+        return game;
+    }
+
+    public Instant getPurchasedAt() {
+        return purchasedAt;
+    }
 }

@@ -81,4 +81,32 @@ public class JpaSessionEntity {
                 this.completedAt
         );
     }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public UUID getGameId() {
+        return gameId;
+    }
+
+    public List<UUID> getPlayers() {
+        return players;
+    }
+
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public UUID getWinnerId() {
+        return winnerId;
+    }
+
+    public SessionResult getResult() {
+        return result;
+    }
+
+    public Instant getCompletedAt() {
+        return completedAt;
+    }
 }

@@ -48,20 +48,9 @@ public class GameRepository implements IGameRepository {
         BigDecimal minPriceAmount = minPrice != null ? minPrice.amount() : null;
         BigDecimal maxPriceAmount = maxPrice != null ? maxPrice.amount() : null;
 
-        if (categories == null || categories.isEmpty()) {
-            return jpaGameRepository.filterGames(minPriceAmount, maxPriceAmount, null)
-                    .stream()
-                    .map(JpaGameEntity::toDomain)
-                    .toList();
-        }
-
-        return categories.stream()
-                .flatMap(category ->
-                        jpaGameRepository.filterGames(minPriceAmount, maxPriceAmount, category.name())
-                                .stream()
-                                .map(JpaGameEntity::toDomain)
-                )
-                .distinct()
+        return jpaGameRepository.filterGames(minPriceAmount, maxPriceAmount, categories)
+                .stream()
+                .map(JpaGameEntity::toDomain)
                 .toList();
     }
 
@@ -80,5 +69,8 @@ public class GameRepository implements IGameRepository {
         return jpaGameRepository.existsById(gameId.id());
     }
 
-
+    @Override
+    public void deleteAll() {
+        jpaGameRepository.deleteAll();
+    }
 }
