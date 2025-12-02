@@ -16,7 +16,7 @@ public class User {
     private String username;
     private List<GameId> ownedGames;
     private Profile profile;
-    private Visibility profileVisibility;
+    private Visibility visibility;
 
     public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, Profile profile) {
         this.id = id;
@@ -32,7 +32,7 @@ public class User {
         this.username = username;
         this.ownedGames = new ArrayList<>();
         this.profile = profile;
-        this.profileVisibility = Visibility.PUBLIC;
+        this.visibility = Visibility.PUBLIC;
     }
 
     public static User createFromKeycloak(String keycloakId, String keycloakUsername) {
@@ -73,7 +73,7 @@ public class User {
     }
 
     public void updateVisibility(Visibility visibility) {
-        this.profileVisibility = visibility;
+        this.visibility = visibility;
     }
 
     public void addGame(GameId gameId) {
@@ -86,6 +86,6 @@ public class User {
     }
 
     public Visibility getVisibility() {
-        return profileVisibility;
+        return visibility;
     }
 }
