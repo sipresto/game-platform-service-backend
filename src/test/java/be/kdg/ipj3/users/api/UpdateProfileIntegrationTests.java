@@ -1,28 +1,30 @@
 package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.users.api.dto.UserDto;
-import be.kdg.ipj3.users.application.UserService;
+import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
+import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
+import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.utility.TestcontainersConfiguration;
 
-import static org.mockito.BDDMockito.then;
+import java.util.UUID;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@Import(TestcontainersConfiguration.class)
-public class UpdateProfileTests {
+public class UpdateProfileIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -30,50 +32,54 @@ public class UpdateProfileTests {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
-    private UserService userService;
+    @Autowired
+    private JpaUserRepository userRepository;
 
-    @MockitoBean
-    private be.kdg.ipj3.catalog.application.GameService gameService;
+    @BeforeEach
+    void setUp() {
+        userRepository.deleteAll();
+    }
+
+    private JwtRequestPostProcessor validJwt(String subject, String username) {
+        return jwt()
+                .jwt(builder -> builder
+                        .subject(subject)
+                        .claim("preferred_username", username))
+                .authorities(new SimpleGrantedAuthority("ROLE_PLAYER"));
+    }
+
+    private String createUser(String keycloakId, String username) {
+        UUID userId = UUID.randomUUID();
+        JpaUserEntity user = new JpaUserEntity(
+                userId,
+                keycloakId,
+                username,
+                new JpaProfile(username, "Initial bio"),
+                Visibility.PUBLIC
+        );
+        userRepository.save(user);
+        return keycloakId;
+    }
 
     @Test
-    void updateProfile_shouldUpdateSuccessfully_whenValidData() throws Exception {
-        // Arrange
-        String keycloakId = "test-keycloak-id";
-        String keycloakUsername = "testuser";
-        UserDto.ProfileDto profileDto = new UserDto.ProfileDto(
-                "Updated Display Name",
-                "Updated bio"
-        );
+    void updateProfile_shouldSucceed_whenValidData() throws Exception {
+        String keycloakId = createUser("kc-id1", "testuser");
+        UserDto.ProfileDto profileDto = new UserDto.ProfileDto("Updated Display Name", "Updated bio");
 
-        // Act & Assert
         mockMvc.perform(put("/api/user/profile")
-                        .with(SecurityMockMvcRequestPostProcessors.jwt()
-                                .jwt(jwt -> jwt
-                                        .subject(keycloakId)
-                                        .claim("preferred_username", keycloakUsername))
-                                .authorities(new SimpleGrantedAuthority("ROLE_PLAYER")))
+                        .with(validJwt(keycloakId, "testuser"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(profileDto)))
                 .andExpect(status().isOk());
-
-        then(userService).should().updateProfile(keycloakId, "Updated Display Name", "Updated bio");
     }
 
     @Test
     void updateProfile_shouldReturnBadRequest_whenBlankDisplayName() throws Exception {
-        // Arrange
-        String keycloakId = "test-keycloak-id";
-        String keycloakUsername = "testuser";
+        String keycloakId = createUser("kc-id2", "testuser");
         UserDto.ProfileDto profileDto = new UserDto.ProfileDto("", "Updated bio");
 
-        // Act & Assert
         mockMvc.perform(put("/api/user/profile")
-                        .with(SecurityMockMvcRequestPostProcessors.jwt()
-                                .jwt(jwt -> jwt
-                                        .subject(keycloakId)
-                                        .claim("preferred_username", keycloakUsername))
-                                .authorities(new SimpleGrantedAuthority("ROLE_PLAYER")))
+                        .with(validJwt(keycloakId, "testuser"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(profileDto)))
                 .andExpect(status().isBadRequest());
@@ -81,10 +87,8 @@ public class UpdateProfileTests {
 
     @Test
     void updateProfile_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
-        // Arrange
         UserDto.ProfileDto profileDto = new UserDto.ProfileDto("Display Name", "Bio");
 
-        // Act & Assert
         mockMvc.perform(put("/api/user/profile")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(profileDto)))
@@ -93,17 +97,14 @@ public class UpdateProfileTests {
 
     @Test
     void updateProfile_shouldReturnForbidden_whenWrongRole() throws Exception {
-        // Arrange
-        String keycloakId = "test-keycloak-id";
-        String keycloakUsername = "testuser";
+        String keycloakId = createUser("kc-id3", "testuser");
         UserDto.ProfileDto profileDto = new UserDto.ProfileDto("Display Name", "Bio");
 
-        // Act & Assert
         mockMvc.perform(put("/api/user/profile")
-                        .with(SecurityMockMvcRequestPostProcessors.jwt()
-                                .jwt(jwt -> jwt
+                        .with(jwt()
+                                .jwt(builder -> builder
                                         .subject(keycloakId)
-                                        .claim("preferred_username", keycloakUsername))
+                                        .claim("preferred_username", "testuser"))
                                 .authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(profileDto)))

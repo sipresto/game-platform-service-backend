@@ -36,6 +36,14 @@ public class JpaUserEntity {
     @Column(name = "game_id")
     private List<UUID> ownedGames = new ArrayList<>();
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "user_friends",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "friend_id")
+    private List<UUID> friends = new ArrayList<>();
+
     private JpaProfile profile;
 
     protected JpaUserEntity() {
@@ -50,22 +58,34 @@ public class JpaUserEntity {
     }
 
     public static JpaUserEntity fromDomain(User user) {
-        JpaUserEntity jpaUserEntity = new JpaUserEntity(user.getId().id(), user.getKeycloakId(),
-                user.getUsername(), JpaProfile.fromDomain(user.getProfile()), user.getVisibility());
+        JpaUserEntity jpaUserEntity = new JpaUserEntity(
+                user.getId().id(),
+                user.getKeycloakId(),
+                user.getUsername(),
+                JpaProfile.fromDomain(user.getProfile()),
+                user.getVisibility()
+        );
 
         user.getOwnedGames().stream()
                 .map(GameId::id)
                 .forEach(jpaUserEntity::addGame);
+
+        user.getFriends().stream()
+                .map(UserId::id)
+                .forEach(jpaUserEntity::addFriend);
 
         return jpaUserEntity;
     }
 
     public User toDomain() {
         User user = new User(new UserId(id), keycloakId, username, profile.toDomain());
-
         ownedGames.stream()
                 .map(GameId::new)
                 .forEach(user::addGame);
+
+        friends.stream()
+                .map(UserId::new)
+                .forEach(user::addFriend);
 
         user.updateVisibility(this.visibility);
         return user;
@@ -75,6 +95,13 @@ public class JpaUserEntity {
         this.ownedGames.add(gameId);
     }
 
+    private void addFriend(UUID friendId) {
+        if (!this.friends.contains(friendId)) {
+            this.friends.add(friendId);
+        }
+    }
+
+    // getters
     public UUID getId() {
         return id;
     }
@@ -89,6 +116,10 @@ public class JpaUserEntity {
 
     public List<UUID> getOwnedGames() {
         return ownedGames;
+    }
+
+    public List<UUID> getFriends() {
+        return friends;
     }
 
     public JpaProfile getProfile() {

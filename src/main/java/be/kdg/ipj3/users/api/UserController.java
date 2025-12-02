@@ -3,7 +3,6 @@ package be.kdg.ipj3.users.api;
 import be.kdg.ipj3.catalog.application.GameService;
 import be.kdg.ipj3.shared.api.dto.LibraryGameDto;
 import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.NotFoundException;
 import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
 import be.kdg.ipj3.users.api.dto.UserDto;
 import be.kdg.ipj3.users.application.UserService;
@@ -94,5 +93,23 @@ public class UserController {
         User user = userService.findByKeycloakId(keycloakId);
         userService.updatePrivacySettingsByKeycloakId(visibility, user);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Unsecured endpoint that gets all users whose accounts are public
+     */
+    @GetMapping("/users")
+    public ResponseEntity<List<UserDto>> findAllPublicUsers(){
+        return ResponseEntity.ok(userService.GetAllPublicUsers().stream().map(UserDto::fromDomain).toList());
+    }
+
+    /**
+     * Gets friends of a user
+     */
+    @GetMapping("/friends")
+    public ResponseEntity<List<UserDto>> findFriendsForUser(@AuthenticationPrincipal Jwt jwt){
+        var user = userService.findByKeycloakId(jwt.getSubject());
+        var friends = userService.GetFriendsOfUser(user);
+        return ResponseEntity.ok(friends.stream().map(UserDto::fromDomain).toList());
     }
 }
