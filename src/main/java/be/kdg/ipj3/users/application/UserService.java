@@ -70,13 +70,7 @@ public class UserService {
         return userRepository.findByKeycloakId(keycloakId);
     }
 
-    public void updatePrivacySettingsByKeycloakId(Visibility visibility, String keycloakId){
-        if (keycloakId == null || keycloakId.isBlank()) {
-            throw new IllegalArgumentException("Keycloak id cannot be null or blank");
-        }
-
-        User user = userRepository.findByKeycloakId(keycloakId)
-                .orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
+    public void updatePrivacySettingsByKeycloakId(Visibility visibility, User user){
         user.updateVisibility(visibility);
         userRepository.save(user);
     }

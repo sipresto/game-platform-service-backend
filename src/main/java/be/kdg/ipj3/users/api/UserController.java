@@ -3,6 +3,7 @@ package be.kdg.ipj3.users.api;
 import be.kdg.ipj3.catalog.application.GameService;
 import be.kdg.ipj3.shared.api.dto.LibraryGameDto;
 import be.kdg.ipj3.shared.domain.GameId;
+import be.kdg.ipj3.shared.domain.NotFoundException;
 import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
 import be.kdg.ipj3.users.api.dto.UserDto;
 import be.kdg.ipj3.users.application.UserService;
@@ -90,7 +91,8 @@ public class UserController {
             @RequestBody Visibility visibility
     ) {
         String keycloakId = jwt.getSubject();
-        userService.updatePrivacySettingsByKeycloakId(visibility, keycloakId);
+        User user = userService.findByKeycloakId(keycloakId).orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
+        userService.updatePrivacySettingsByKeycloakId(visibility, user);
         return ResponseEntity.ok().build();
     }
 }

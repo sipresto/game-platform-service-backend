@@ -159,7 +159,7 @@ class UserTest {
 
                 // When & Then
                 assertThatThrownBy(() -> user.addGame(gameId))
-                        .isInstanceOf(IllegalStateException.class)
+                        .isInstanceOf(IllegalArgumentException.class)
                         .hasMessage("Game already owned by this user");
             }
 

@@ -51,7 +51,7 @@ public class JpaUserEntity {
 
     public static JpaUserEntity fromDomain(User user) {
         JpaUserEntity jpaUserEntity = new JpaUserEntity(user.getId().id(), user.getKeycloakId(),
-                user.getUsername(), JpaProfile.fromDomain(user.getProfile()), user.getProfile_visibility());
+                user.getUsername(), JpaProfile.fromDomain(user.getProfile()), user.getVisibility());
 
         user.getOwnedGames().stream()
                 .map(GameId::id)

@@ -27,7 +27,7 @@ public record UserDto(
                 user.getUsername(),
                 List.of(),
                 ProfileDto.fromDomain(user.getProfile()),
-                user.getProfile_visibility()
+                user.getVisibility()
         );
     }
 
@@ -38,7 +38,7 @@ public record UserDto(
                 user.getUsername(),
                 games.stream().map(SmallGameDto::fromDomain).toList(),
                 ProfileDto.fromDomain(user.getProfile()),
-                user.getProfile_visibility()
+                user.getVisibility()
         );
     }
 

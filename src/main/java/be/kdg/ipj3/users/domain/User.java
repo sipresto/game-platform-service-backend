@@ -14,20 +14,29 @@ public class User {
     private final UserId id;
     private final String keycloakId;
     private String username;
-    private final List<GameId> ownedGames = new ArrayList<>();
+    private List<GameId> ownedGames;
     private Profile profile;
-    private Visibility profile_visibility;
+    private Visibility profileVisibility;
+
+    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, Profile profile) {
+        this.id = id;
+        this.keycloakId = keycloakId;
+        this.username = username;
+        this.ownedGames = ownedGames;
+        this.profile = profile;
+    }
 
     public User(UserId id, String keycloakId, String username, Profile profile) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
+        this.ownedGames = new ArrayList<>();
         this.profile = profile;
-        this.profile_visibility = Visibility.PUBLIC;
+        this.profileVisibility = Visibility.PUBLIC;
     }
 
     public static User createFromKeycloak(String keycloakId, String keycloakUsername) {
-        return new User(UserId.create(), keycloakId, keycloakUsername, new Profile(keycloakUsername, ""));
+        return new User(UserId.create(), keycloakId, keycloakUsername, List.of(), new Profile(keycloakUsername, ""));
     }
 
     public UserId getId() {
@@ -64,7 +73,7 @@ public class User {
     }
 
     public void updateVisibility(Visibility visibility) {
-        this.profile_visibility = visibility;
+        this.profileVisibility = visibility;
     }
 
     public void addGame(GameId gameId) {
@@ -72,11 +81,11 @@ public class User {
             ownedGames.add(gameId);
         }
         else {
-            throw new IllegalStateException("Game already owned by this user");
+            throw new IllegalArgumentException("Game already owned by this user");
         }
     }
 
-    public Visibility getProfile_visibility() {
-        return profile_visibility;
+    public Visibility getVisibility() {
+        return profileVisibility;
     }
 }

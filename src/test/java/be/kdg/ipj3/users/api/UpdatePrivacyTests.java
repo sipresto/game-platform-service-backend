@@ -1,6 +1,10 @@
 package be.kdg.ipj3.users.api;
 
+import be.kdg.ipj3.shared.domain.NotFoundException;
 import be.kdg.ipj3.users.application.UserService;
+import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.Profile;
+import be.kdg.ipj3.users.domain.Visibility;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +18,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
+import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -27,9 +34,6 @@ public class UpdatePrivacyTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @MockitoBean
     private UserService userService;
@@ -44,6 +48,10 @@ public class UpdatePrivacyTests {
         String keycloakUsername = "testuser";
         String visibility = "FRIENDS_ONLY";
 
+        User mockUser = createMockUser(keycloakId, keycloakUsername);
+        given(userService.findByKeycloakId(keycloakId))
+                .willReturn(Optional.of(mockUser));
+
         // Act & Assert
         mockMvc.perform(put("/api/user/privacy")
                         .with(SecurityMockMvcRequestPostProcessors.jwt()
@@ -56,8 +64,8 @@ public class UpdatePrivacyTests {
                 .andExpect(status().isOk());
 
         then(userService).should().updatePrivacySettingsByKeycloakId(
-                eq(be.kdg.ipj3.users.domain.Visibility.FRIENDS_ONLY),
-                eq(keycloakId)
+                eq(Visibility.FRIENDS_ONLY),
+                eq(mockUser)
         );
     }
 
@@ -68,6 +76,10 @@ public class UpdatePrivacyTests {
         String keycloakUsername = "testuser";
         String visibility = "PRIVATE";
 
+        User mockUser = createMockUser(keycloakId, keycloakUsername);
+        given(userService.findByKeycloakId(keycloakId))
+                .willReturn(Optional.of(mockUser));
+
         // Act & Assert
         mockMvc.perform(put("/api/user/privacy")
                         .with(SecurityMockMvcRequestPostProcessors.jwt()
@@ -80,8 +92,8 @@ public class UpdatePrivacyTests {
                 .andExpect(status().isOk());
 
         then(userService).should().updatePrivacySettingsByKeycloakId(
-                eq(be.kdg.ipj3.users.domain.Visibility.PRIVATE),
-                eq(keycloakId)
+                eq(Visibility.PRIVATE),
+                eq(mockUser)
         );
     }
 
@@ -92,6 +104,10 @@ public class UpdatePrivacyTests {
         String keycloakUsername = "testuser";
         String visibility = "PUBLIC";
 
+        User mockUser = createMockUser(keycloakId, keycloakUsername);
+        given(userService.findByKeycloakId(keycloakId))
+                .willReturn(Optional.of(mockUser));
+
         // Act & Assert
         mockMvc.perform(put("/api/user/privacy")
                         .with(SecurityMockMvcRequestPostProcessors.jwt()
@@ -104,8 +120,8 @@ public class UpdatePrivacyTests {
                 .andExpect(status().isOk());
 
         then(userService).should().updatePrivacySettingsByKeycloakId(
-                eq(be.kdg.ipj3.users.domain.Visibility.PUBLIC),
-                eq(keycloakId)
+                eq(Visibility.PUBLIC),
+                eq(mockUser)
         );
     }
 
@@ -206,32 +222,6 @@ public class UpdatePrivacyTests {
     }
 
     @Test
-    void updatePrivacySettings_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
-        // Arrange
-        String keycloakId = "non-existent-keycloak-id";
-        String keycloakUsername = "testuser";
-        String visibility = "FRIENDS_ONLY";
-
-        // Mock the service to throw NotFoundException when user doesn't exist
-        doThrow(new be.kdg.ipj3.shared.domain.NotFoundException("User with keycloak id [" + keycloakId + "] not found"))
-                .when(userService).updatePrivacySettingsByKeycloakId(
-                        eq(be.kdg.ipj3.users.domain.Visibility.FRIENDS_ONLY),
-                        eq(keycloakId)
-                );
-
-        // Act & Assert
-        mockMvc.perform(put("/api/user/privacy")
-                        .with(SecurityMockMvcRequestPostProcessors.jwt()
-                                .jwt(jwt -> jwt
-                                        .subject(keycloakId)
-                                        .claim("preferred_username", keycloakUsername))
-                                .authorities(new SimpleGrantedAuthority("ROLE_PLAYER")))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("\"" + visibility + "\""))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     void updatePrivacySettings_shouldReturnBadRequest_whenMissingRequestBody() throws Exception {
         // Arrange
         String keycloakId = "test-keycloak-id";
@@ -268,5 +258,9 @@ public class UpdatePrivacyTests {
                 .andExpect(status().isBadRequest());
 
         then(userService).shouldHaveNoInteractions();
+    }
+
+    private User createMockUser(String keycloakId, String username) {
+        return User.createFromKeycloak(keycloakId, username);
     }
 }
