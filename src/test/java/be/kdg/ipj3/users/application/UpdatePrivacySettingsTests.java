@@ -13,7 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class UpdatePrivacySettingsTests {
@@ -30,21 +31,26 @@ class UpdatePrivacySettingsTests {
     @Test
     void updatePrivacySettings_shouldUpdateVisibilityAndSave_whenValidUserProvided() {
         // Arrange
-        User user = mock(User.class);
+        User user = new User(
+                new UserId(UUID.randomUUID()),
+                "kc-id",
+                "username",
+                new Profile("Display", "Bio")
+        );
         Visibility newVisibility = Visibility.FRIENDS_ONLY;
 
         // Act
         userService.updatePrivacySettingsByKeycloakId(newVisibility, user);
 
         // Assert
-        then(user).should().updateVisibility(newVisibility);
+        assertThat(user.getVisibility()).isEqualTo(newVisibility);
         then(userRepository).should().save(user);
     }
 
     @Test
     void updatePrivacySettings_shouldSaveUserWithUpdatedVisibility_whenRealUser() {
         // Arrange
-        User realUser = new User(
+        User user = new User(
                 new UserId(UUID.randomUUID()),
                 "kc-id",
                 "username",
@@ -53,12 +59,12 @@ class UpdatePrivacySettingsTests {
         Visibility newVisibility = Visibility.PUBLIC;
 
         // Act
-        userService.updatePrivacySettingsByKeycloakId(newVisibility, realUser);
+        userService.updatePrivacySettingsByKeycloakId(newVisibility, user);
 
         // Assert
         then(userRepository).should().save(userCaptor.capture());
         User saved = userCaptor.getValue();
-        assertThat(saved).isSameAs(realUser);
+        assertThat(saved).isSameAs(user);
         assertThat(saved.getVisibility()).isEqualTo(newVisibility);
     }
 

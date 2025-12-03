@@ -14,10 +14,10 @@ public class User {
     private final UserId id;
     private final String keycloakId;
     private String username;
-    private List<GameId> ownedGames;
+    private final List<GameId> ownedGames;
     private Profile profile;
     private Visibility visibility;
-    private List<UserId> friends;
+    private final List<UserId> friends;
 
     public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, Profile profile) {
         this.id = id;

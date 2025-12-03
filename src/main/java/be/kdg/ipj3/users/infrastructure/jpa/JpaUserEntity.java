@@ -34,7 +34,7 @@ public class JpaUserEntity {
             joinColumns = @JoinColumn(name = "user_id")
     )
     @Column(name = "game_id")
-    private List<UUID> ownedGames = new ArrayList<>();
+    private final List<UUID> ownedGames = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
@@ -42,7 +42,7 @@ public class JpaUserEntity {
             joinColumns = @JoinColumn(name = "user_id")
     )
     @Column(name = "friend_id")
-    private List<UUID> friends = new ArrayList<>();
+    private final List<UUID> friends = new ArrayList<>();
 
     private JpaProfile profile;
 
@@ -96,12 +96,9 @@ public class JpaUserEntity {
     }
 
     private void addFriend(UUID friendId) {
-        if (!this.friends.contains(friendId)) {
-            this.friends.add(friendId);
-        }
+        this.friends.add(friendId);
     }
 
-    // getters
     public UUID getId() {
         return id;
     }
@@ -124,5 +121,9 @@ public class JpaUserEntity {
 
     public JpaProfile getProfile() {
         return profile;
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
     }
 }

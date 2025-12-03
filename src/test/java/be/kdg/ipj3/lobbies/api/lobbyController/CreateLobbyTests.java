@@ -5,6 +5,7 @@ import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.IGameRepository;
 import be.kdg.ipj3.lobbies.api.dto.CreateLobbyDto;
 import be.kdg.ipj3.lobbies.domain.lobby.ILobbyRepository;
+import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.users.domain.IUserRepository;
@@ -19,19 +20,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.utility.TestcontainersConfiguration;
 
-import java.math.BigDecimal;
-import java.util.List;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@Import(TestcontainersConfiguration.class)
 public class CreateLobbyTests {
 
     @Autowired
@@ -71,46 +69,57 @@ public class CreateLobbyTests {
         Game game = new Game(
                 "Game",
                 "Description",
-                Money.of(BigDecimal.valueOf(19.99)),
+                Money.of(new java.math.BigDecimal("19.99")),
                 "https://test.com/service",
-                List.of(Category.NATIVE)
+                java.util.List.of(Category.NATIVE)
         );
         gameRepository.save(game);
-
         return game.getId();
     }
 
     @Test
-    void createLobby_shouldReturnLobbyId_whenValidRequest() throws Exception {
+    void createLobby_shouldReturnLobbyId_andPersistLobby_whenValidRequest() throws Exception {
         // Arrange
         createTestUser();
-
         GameId gameId = createTestGame();
-
         CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
 
         // Act & Assert
-        mockMvc.perform(post("/api/lobbies")
+        String responseContent = mockMvc.perform(post("/api/lobbies")
                         .with(validJwt())
-                        .contentType("application/json")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Optional<Lobby> maybe = lobbyRepository.findAll()
+                .stream()
+                .filter(l -> l.getGame().equals(gameId))
+                .findAny();
+
+        Lobby created = maybe.orElseThrow(() ->
+                new AssertionError("Lobby not found in DB after create, gameId=" + gameId)
+        );
+
+        assertThat(created.getMaxPlayers()).isEqualTo(2);
+        assertThat(created.getGame()).isEqualTo(gameId);
+        assertThat(created.getPassword()).isEqualTo("password");
+        assertThat(created.getStatus()).isEqualTo(be.kdg.ipj3.lobbies.domain.lobby.LobbyStatus.OPEN);
+        assertThat(created.getPlayers()).isNotEmpty();
     }
 
     @Test
     void createLobby_shouldReturnNotFound_whenInvalidGameId() throws Exception {
-        // Arrange
         createTestUser();
-
-        GameId gameId = GameId.create();
-
+        GameId gameId = GameId.create();  // not persisted
         CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
 
-        // Act & Assert
         mockMvc.perform(post("/api/lobbies")
                         .with(validJwt())
-                        .contentType("application/json")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNotFound());
     }
@@ -133,39 +142,33 @@ public class CreateLobbyTests {
 
     @Test
     void createLobby_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
-        // Arrange
         createTestUser();
-
         GameId gameId = createTestGame();
-
         CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
 
-        // Act & Assert
         mockMvc.perform(post("/api/lobbies")
-                        .contentType("application/json")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     void createLobby_shouldReturnBadRequest_whenInvalidDto() throws Exception {
-        // Arrange
         createTestUser();
-
         GameId gameId = createTestGame();
 
-        String dto = """
-                {
-                  "password": "password",
-                  "maxPlayers": 30,
-                  "gameId": "%s"
-                }
-                """.formatted(gameId.id());
+        String invalidDto = """
+            {
+              "password": "password",
+              "maxPlayers": 30,
+              "gameId": "%s"
+            }
+            """.formatted(gameId.id());
 
         mockMvc.perform(post("/api/lobbies")
                         .with(validJwt())
-                        .contentType("application/json")
-                        .content(dto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidDto))
                 .andExpect(status().isBadRequest());
     }
 }

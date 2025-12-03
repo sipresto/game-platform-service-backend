@@ -19,10 +19,6 @@ import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 class CreateLobbyTests {
-
-    @Mock
-    private GameClient gameClient;
-
     @Mock
     private ILobbyRepository lobbyRepository;
 

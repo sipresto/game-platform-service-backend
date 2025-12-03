@@ -8,10 +8,10 @@ import java.util.UUID;
 public record PurchaseDto(UUID id, UUID buyer, UUID game, Instant purchasedAt) {
     public static PurchaseDto fromDomain(Purchase purchase) {
         return new PurchaseDto(
-                purchase.getId().id(),
-                purchase.getBuyer().id(),
-                purchase.getGame().id(),
-                purchase.getPurchasedAt()
+                purchase.id().id(),
+                purchase.buyer().id(),
+                purchase.game().id(),
+                purchase.purchasedAt()
         );
     }
 }

@@ -6,34 +6,16 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 @AggregateRoot
-public class AchievementProgress {
-    @Identity
-    private final UserId player;
-    @Identity
-    private final AchievementId achievement;
-    private final int amountNeeded;
-    private final int amountGotten;
+public record AchievementProgress(@Identity UserId player, @Identity AchievementId achievement, int amountNeeded,
+                                  int amountGotten) {
 
-    public AchievementProgress(UserId player, AchievementId achievement, int amountNeeded, int amountGotten) {
-        this.player = player;
-        this.achievement = achievement;
-        this.amountNeeded = amountNeeded;
-        this.amountGotten = amountGotten;
-    }
-
-    public UserId getPlayer() {
+    @Override
+    public UserId player() {
         return player;
     }
 
-    public AchievementId getAchievement() {
+    @Override
+    public AchievementId achievement() {
         return achievement;
-    }
-
-    public int getAmountNeeded() {
-        return amountNeeded;
-    }
-
-    public int getAmountGotten() {
-        return amountGotten;
     }
 }

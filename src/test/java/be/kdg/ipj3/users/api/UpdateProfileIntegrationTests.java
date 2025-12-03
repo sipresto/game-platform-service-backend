@@ -16,11 +16,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -71,6 +73,17 @@ public class UpdateProfileIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(profileDto)))
                 .andExpect(status().isOk());
+
+        // --- extra: verify DB state
+        Optional<JpaUserEntity> opt = userRepository.findByKeycloakId(keycloakId);
+        JpaUserEntity updated = opt.orElseThrow(
+                () -> new AssertionError("User not found in database after profile update")
+        );
+
+        assertThat(updated.getProfile().toDomain().displayName())
+                .isEqualTo("Updated Display Name");
+        assertThat(updated.getProfile().toDomain().bio())
+                .isEqualTo("Updated bio");
     }
 
     @Test

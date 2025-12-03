@@ -4,7 +4,6 @@ import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
 import be.kdg.ipj3.lobbies.domain.lobby.LobbyId;
 import be.kdg.ipj3.lobbies.domain.lobby.LobbyStatus;
 import be.kdg.ipj3.lobbies.domain.lobby.ILobbyRepository;
-import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.UserId;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,9 +25,6 @@ class LeaveLobbyTests {
 
     @Mock
     private ILobbyRepository lobbyRepository;
-
-    @Mock
-    private GameClient gameClient;
 
     @InjectMocks
     private LobbyService lobbyService;

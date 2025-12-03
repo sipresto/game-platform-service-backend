@@ -14,11 +14,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -62,12 +64,18 @@ public class UpdatePrivacyIntegrationTests {
         String keycloakId = createUser("kc-id", "testuser");
         String visibility = "FRIENDS_ONLY";
 
-        // Act & Assert
+        // Act
         mockMvc.perform(put("/api/user/privacy")
                         .with(validJwt(keycloakId, "testuser"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("\"" + visibility + "\""))
                 .andExpect(status().isOk());
+
+        Optional<JpaUserEntity> opt = userRepository.findByKeycloakId(keycloakId);
+        JpaUserEntity updated = opt.orElseThrow(() -> new AssertionError("User not found in database after update"));
+
+        assertThat(updated.getVisibility())
+                .isEqualTo(Visibility.valueOf(visibility));
     }
 
     @Test

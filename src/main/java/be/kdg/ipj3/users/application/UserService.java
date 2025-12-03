@@ -75,11 +75,11 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public List<User> GetAllPublicUsers(){
+    public List<User> getAllPublicUsers(){
         return userRepository.findAllPublicUsers();
     }
 
-    public List<User> GetFriendsOfUser(User user){
+    public List<User> getFriendsAndSelf(User user){
         List<User> usersReturn = new ArrayList<>();
         usersReturn.add(user);
         usersReturn.addAll(userRepository.findFriends(user.getId()));

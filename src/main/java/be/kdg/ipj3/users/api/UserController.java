@@ -100,7 +100,8 @@ public class UserController {
      */
     @GetMapping("/users")
     public ResponseEntity<List<UserDto>> findAllPublicUsers(){
-        return ResponseEntity.ok(userService.GetAllPublicUsers().stream().map(UserDto::fromDomain).toList());
+        var publicUsers = userService.getAllPublicUsers().stream().map(UserDto::fromDomain).toList();
+        return ResponseEntity.ok(publicUsers);
     }
 
     /**
@@ -109,7 +110,7 @@ public class UserController {
     @GetMapping("/friends")
     public ResponseEntity<List<UserDto>> findFriendsForUser(@AuthenticationPrincipal Jwt jwt){
         var user = userService.findByKeycloakId(jwt.getSubject());
-        var friends = userService.GetFriendsOfUser(user);
-        return ResponseEntity.ok(friends.stream().map(UserDto::fromDomain).toList());
+        var friends = userService.getFriendsAndSelf(user).stream().map(UserDto::fromDomain).toList();
+        return ResponseEntity.ok(friends);
     }
 }

@@ -36,7 +36,7 @@ class GetFriendsOfUserTests {
         given(userRepository.findFriends(mainUser.getId())).willReturn(List.of(friend1, friend2));
 
         // Act
-        List<User> result = userService.GetFriendsOfUser(mainUser);
+        List<User> result = userService.getFriendsAndSelf(mainUser);
 
         // Assert
         assertThat(result).containsExactly(mainUser, friend1, friend2);
@@ -50,7 +50,7 @@ class GetFriendsOfUserTests {
         given(userRepository.findFriends(mainUser.getId())).willReturn(List.of());
 
         // Act
-        List<User> result = userService.GetFriendsOfUser(mainUser);
+        List<User> result = userService.getFriendsAndSelf(mainUser);
 
         // Assert
         assertThat(result).containsExactly(mainUser);

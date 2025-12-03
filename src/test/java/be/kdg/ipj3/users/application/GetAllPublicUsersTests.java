@@ -34,7 +34,7 @@ class GetAllPublicUsersTests {
         given(userRepository.findAllPublicUsers()).willReturn(List.of(user1, user2));
 
         // Act
-        List<User> result = userService.GetAllPublicUsers();
+        List<User> result = userService.getAllPublicUsers();
 
         // Assert
         assertThat(result).containsExactly(user1, user2);
@@ -47,7 +47,7 @@ class GetAllPublicUsersTests {
         given(userRepository.findAllPublicUsers()).willReturn(List.of());
 
         // Act
-        List<User> result = userService.GetAllPublicUsers();
+        List<User> result = userService.getAllPublicUsers();
 
         // Assert
         assertThat(result).isEmpty();

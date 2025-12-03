@@ -51,11 +51,13 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public List<User> findAllPublicUsers() {
-        return jpaUserRepository.findAllByVisibility(Visibility.PUBLIC).stream().map(JpaUserEntity::toDomain).toList();
+        var publicUsers = jpaUserRepository.findAllByVisibility(Visibility.PUBLIC);
+        return publicUsers.stream().map(JpaUserEntity::toDomain).toList();
     }
 
     @Override
     public List<User> findFriends(UserId userId) {
-        return jpaUserRepository.findFriends(userId.id()).stream().map(JpaUserEntity::toDomain).toList();
+        var friends = jpaUserRepository.findFriends(userId.id());
+        return friends.stream().map(JpaUserEntity::toDomain).toList();
     }
 }
