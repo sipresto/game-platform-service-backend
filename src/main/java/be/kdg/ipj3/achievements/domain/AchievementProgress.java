@@ -5,20 +5,27 @@ import be.kdg.ipj3.shared.domain.UserId;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
+import java.time.Instant;
+
 @AggregateRoot
 public class AchievementProgress {
     @Identity
+    private final AchievementProgressId id;
     private final UserId player;
-    @Identity
     private final AchievementId achievement;
-    private final int amountNeeded;
-    private final int amountGotten;
+    private final int currentProgress;
+    private final Instant completedAt;
 
-    public AchievementProgress(UserId player, AchievementId achievement, int amountNeeded, int amountGotten) {
+    public AchievementProgress(UserId player, AchievementId achievement, int currentProgress, Instant completedAt) {
+        this.id = new AchievementProgressId(player, achievement);
         this.player = player;
         this.achievement = achievement;
-        this.amountNeeded = amountNeeded;
-        this.amountGotten = amountGotten;
+        this.currentProgress = currentProgress;
+        this.completedAt = completedAt;
+    }
+
+    public AchievementProgressId getId() {
+        return id;
     }
 
     public UserId getPlayer() {
@@ -29,11 +36,28 @@ public class AchievementProgress {
         return achievement;
     }
 
-    public int getAmountNeeded() {
-        return amountNeeded;
+    public int getCurrentProgress() {
+        return currentProgress;
     }
 
-    public int getAmountGotten() {
-        return amountGotten;
+    public Instant getCompletedAt() {
+        return completedAt;
+    }
+
+    public AchievementProgress incrementProgress(int amount, int requiredValue) {
+        if (isCompleted()) {
+            return this;
+        }
+
+        int newProgress = this.currentProgress + amount;
+        Instant completedTime = (newProgress >= requiredValue && completedAt == null)
+                ? Instant.now()
+                : this.completedAt;
+
+        return new AchievementProgress(player, achievement, newProgress, completedTime);
+    }
+
+    public boolean isCompleted() {
+        return completedAt != null;
     }
 }

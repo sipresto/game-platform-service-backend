@@ -1,7 +1,6 @@
 package be.kdg.ipj3.catalog.domain;
 
 import be.kdg.ipj3.shared.domain.AchievementId;
-import be.kdg.ipj3.shared.domain.GameId;
 import org.jmolecules.ddd.annotation.Entity;
 import org.jmolecules.ddd.annotation.Identity;
 
@@ -11,19 +10,19 @@ public class Achievement {
     private final AchievementId id;
     private final String name;
     private final String description;
-    private int points;
-    private final GameId game;
+    private final int requiredValue;
+    private final int points;
 
-    public Achievement(AchievementId id, String name, String description, int points, GameId game) {
+    public Achievement(AchievementId id, String name, String description, int requiredValue, int points) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.requiredValue = requiredValue;
         this.points = points;
-        this.game = game;
     }
 
-    public Achievement(String name, String description, int points, GameId game) {
-        this(AchievementId.create(), name, description, points, game);
+    public Achievement(String name, String description, int requiredValue, int points) {
+        this(AchievementId.create(), name, description, requiredValue, points);
     }
 
     public AchievementId getId() {
@@ -38,20 +37,11 @@ public class Achievement {
         return description;
     }
 
+    public int getRequiredValue() {
+        return requiredValue;
+    }
+
     public int getPoints() {
         return points;
     }
-
-    public GameId getGameId() {
-        return game;
-    }
-
-    public void addPoints(int points) {
-        this.points += points;
-    }
-
-    public void removePoints(int points) {
-        this.points -= points;
-    }
-
 }
