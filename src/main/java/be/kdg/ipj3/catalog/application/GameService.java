@@ -1,5 +1,6 @@
 package be.kdg.ipj3.catalog.application;
 
+import be.kdg.ipj3.catalog.domain.Achievement;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.IGameRepository;
@@ -56,5 +57,9 @@ public class GameService {
         else {
             throw gameId.notFound();
         }
+    }
+
+    public List<Achievement> findAchievementsByGameId(GameId game) {
+        return gameRepository.findAchievementsByGameId(game);
     }
 }

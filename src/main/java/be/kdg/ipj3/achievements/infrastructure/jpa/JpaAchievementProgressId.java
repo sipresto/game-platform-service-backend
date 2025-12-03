@@ -16,7 +16,7 @@ public class JpaAchievementProgressId {
 
     protected JpaAchievementProgressId() {} // for JPA
 
-    JpaAchievementProgressId(UUID userId, UUID achievementId) {
+    public JpaAchievementProgressId(UUID userId, UUID achievementId) {
         this.userId = userId;
         this.achievementId = achievementId;
     }

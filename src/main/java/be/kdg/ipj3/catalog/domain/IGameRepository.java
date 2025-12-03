@@ -24,4 +24,6 @@ public interface IGameRepository {
     boolean existsById(GameId gameId);
 
     void deleteAll();
+
+    List<Achievement> findAchievementsByGameId(GameId id);
 }
