@@ -6,6 +6,7 @@ import be.kdg.ipj3.catalog.domain.IGameRepository;
 import be.kdg.ipj3.lobbies.api.dto.CreateLobbyDto;
 import be.kdg.ipj3.lobbies.domain.lobby.ILobbyRepository;
 import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
+import be.kdg.ipj3.lobbies.domain.lobby.LobbyStatus;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.users.domain.IUserRepository;
@@ -107,7 +108,7 @@ public class CreateLobbyTests {
         assertThat(created.getMaxPlayers()).isEqualTo(2);
         assertThat(created.getGame()).isEqualTo(gameId);
         assertThat(created.getPassword()).isEqualTo("password");
-        assertThat(created.getStatus()).isEqualTo(be.kdg.ipj3.lobbies.domain.lobby.LobbyStatus.OPEN);
+        assertThat(created.getStatus()).isEqualTo(LobbyStatus.OPEN);
         assertThat(created.getPlayers()).isNotEmpty();
     }
 

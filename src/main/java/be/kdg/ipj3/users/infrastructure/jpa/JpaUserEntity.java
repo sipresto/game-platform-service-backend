@@ -95,6 +95,10 @@ public class JpaUserEntity {
         this.ownedGames.add(gameId);
     }
 
+    /**
+     *  This is only to be used for testing!
+     *  This was made in sprint 2 when friend logic was not present yet.
+     */
     private void addFriend(UUID friendId) {
         this.friends.add(friendId);
     }
