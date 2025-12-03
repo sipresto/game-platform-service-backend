@@ -39,10 +39,10 @@ public class JpaPurchaseEntity {
 
     public static JpaPurchaseEntity fromDomain(Purchase purchase) {
         return new JpaPurchaseEntity(
-                purchase.getId().id(),
-                purchase.getBuyer().id(),
-                purchase.getGame().id(),
-                purchase.getPurchasedAt()
+                purchase.id().id(),
+                purchase.buyer().id(),
+                purchase.game().id(),
+                purchase.purchasedAt()
         );
     }
 

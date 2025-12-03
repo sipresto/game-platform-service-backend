@@ -16,7 +16,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
-public class FindOwnedGamesByKeycloakIdTests {
+class FindOwnedGamesByKeycloakIdTests {
 
     @Mock
     private IUserRepository userRepository;
@@ -32,7 +32,6 @@ public class FindOwnedGamesByKeycloakIdTests {
                 new GameId(UUID.randomUUID()),
                 new GameId(UUID.randomUUID())
         );
-
         given(userRepository.findOwnedGamesByKeycloakId(keycloakId)).willReturn(expectedGameIds);
 
         // Act
@@ -47,7 +46,6 @@ public class FindOwnedGamesByKeycloakIdTests {
     void findOwnedGamesByKeycloakId_shouldReturnEmptyList_whenUserHasNoGames() {
         // Arrange
         String keycloakId = "test-keycloak-id";
-
         given(userRepository.findOwnedGamesByKeycloakId(keycloakId)).willReturn(List.of());
 
         // Act

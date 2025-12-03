@@ -1,0 +1,82 @@
+package be.kdg.ipj3.lobbies.application;
+
+import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
+import be.kdg.ipj3.lobbies.domain.lobby.LobbyId;
+import be.kdg.ipj3.lobbies.domain.lobby.LobbyStatus;
+import be.kdg.ipj3.lobbies.domain.lobby.ILobbyRepository;
+import be.kdg.ipj3.shared.domain.GameId;
+import be.kdg.ipj3.shared.domain.UserId;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
+@ExtendWith(MockitoExtension.class)
+class LeaveLobbyTests {
+
+    @Mock
+    private ILobbyRepository lobbyRepository;
+
+    @InjectMocks
+    private LobbyService lobbyService;
+
+    @Captor
+    private ArgumentCaptor<Lobby> lobbyCaptor;
+
+    private Lobby lobby;
+    private LobbyId lobbyId;
+    private UserId player;
+    private UserId host;
+
+    @BeforeEach
+    void setUp() {
+        lobbyId = new LobbyId(UUID.randomUUID());
+        player = new UserId(UUID.randomUUID());
+        host = new UserId(UUID.randomUUID());
+        lobby = new Lobby(
+                lobbyId,
+                "",
+                4,
+                new GameId(UUID.randomUUID()),
+                host,
+                List.of(host),
+                LobbyStatus.OPEN,
+                null
+        );
+        lobby.join(player, lobby.getPassword());
+    }
+
+    @Test
+    void leaveLobby_shouldRemovePlayerAndSave_whenLobbyExists() {
+        // Arrange
+        given(lobbyRepository.findById(lobbyId)).willReturn(Optional.of(lobby));
+
+        // Act
+        lobbyService.leaveLobby(lobbyId, player);
+
+        // Assert
+        then(lobbyRepository).should().save(lobbyCaptor.capture());
+        Lobby saved = lobbyCaptor.getValue();
+        assertThat(saved.getPlayers()).doesNotContain(player);
+    }
+
+    @Test
+    void leaveLobby_shouldThrow_whenLobbyNotFound() {
+        // Arrange
+        LobbyId nonExisting = new LobbyId(UUID.randomUUID());
+        given(lobbyRepository.findById(nonExisting)).willReturn(Optional.empty());
+
+        // Act & Assert
+        assertThatThrownBy(() -> lobbyService.leaveLobby(nonExisting, player))
+                .isInstanceOf(RuntimeException.class);
+    }
+}

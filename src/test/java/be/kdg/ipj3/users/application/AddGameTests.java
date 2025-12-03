@@ -15,13 +15,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
-public class AddGameTests {
+class AddGameTests {
 
     @Mock
     private IUserRepository userRepository;
@@ -32,38 +32,37 @@ public class AddGameTests {
     @Test
     void addGame_shouldAddGameToUser_whenUserExists() {
         // Arrange
-        UUID userId = UUID.randomUUID();
-        UserId userDomainId = new UserId(userId);
-        UUID gameId = UUID.randomUUID();
-        GameId gameDomainId = new GameId(gameId);
-        User user = new User(userDomainId, "keycloak-id", "testuser", new Profile("Test User", "Bio"));
+        UUID userUuid = UUID.randomUUID();
+        UserId userId = new UserId(userUuid);
+        GameId gameId = new GameId(UUID.randomUUID());
+        User user = new User(userId, "kc-id", "testuser", new Profile("Test", "Bio"));
 
-        given(userRepository.findById(userDomainId)).willReturn(Optional.of(user));
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
         // Act
-        userService.addGame(userDomainId, gameDomainId);
+        userService.addGame(userId, gameId);
 
         // Assert
-        then(userRepository).should().findById(userDomainId);
+        then(userRepository).should().findById(userId);
         then(userRepository).should().save(user);
-        assertThat(user.getOwnedGames()).contains(gameDomainId);
+        assertThat(user.getOwnedGames()).contains(gameId);
     }
 
     @Test
     void addGame_shouldThrowNotFoundException_whenUserDoesNotExist() {
         // Arrange
-        UUID userId = UUID.randomUUID();
-        UserId userDomainId = new UserId(userId);
-        GameId gameDomainId = new GameId(UUID.randomUUID());
+        UUID userUuid = UUID.randomUUID();
+        UserId userId = new UserId(userUuid);
+        GameId gameId = new GameId(UUID.randomUUID());
 
-        given(userRepository.findById(userDomainId)).willReturn(Optional.empty());
+        given(userRepository.findById(userId)).willReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> userService.addGame(userDomainId, gameDomainId))
+        assertThatThrownBy(() -> userService.addGame(userId, gameId))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining(userId.toString());
+                .hasMessageContaining(userUuid.toString());
 
-        then(userRepository).should().findById(userDomainId);
+        then(userRepository).should().findById(userId);
         then(userRepository).shouldHaveNoMoreInteractions();
     }
 }

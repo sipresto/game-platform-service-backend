@@ -10,8 +10,8 @@ import be.kdg.ipj3.users.domain.Visibility;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -73,5 +73,16 @@ public class UserService {
     public void updatePrivacySettingsByKeycloakId(Visibility visibility, User user){
         user.updateVisibility(visibility);
         userRepository.save(user);
+    }
+
+    public List<User> getAllPublicUsers(){
+        return userRepository.findAllPublicUsers();
+    }
+
+    public List<User> getFriendsAndSelf(User user){
+        List<User> usersReturn = new ArrayList<>();
+        usersReturn.add(user);
+        usersReturn.addAll(userRepository.findFriends(user.getId()));
+        return usersReturn;
     }
 }

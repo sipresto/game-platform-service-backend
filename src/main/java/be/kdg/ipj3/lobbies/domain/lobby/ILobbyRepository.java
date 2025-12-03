@@ -17,5 +17,7 @@ public interface ILobbyRepository {
 
     List<Lobby> findByStatusAndGameId(LobbyStatus status, GameId gameId);
 
+    List<Lobby> findAll();
+
     void deleteAll();
 }

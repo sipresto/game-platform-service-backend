@@ -14,21 +14,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.utility.TestcontainersConfiguration;
-
+import java.util.Optional;
 import java.util.UUID;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@Import(TestcontainersConfiguration.class)
 public class JoinLobbyTests {
 
     @Autowired
@@ -55,13 +52,10 @@ public class JoinLobbyTests {
                 .claim("preferred_username", "test-user"));
     }
 
-    private void createTestUser() {
+    private UserId createTestUserAndReturnId() {
         User user = User.createFromKeycloak("keycloak-id", "test-user");
         userRepository.save(user);
-    }
-
-    private LobbyId createTestLobby() {
-        return createTestLobby(2, true);
+        return user.getId();
     }
 
     private LobbyId createTestLobby(int maxPlayers, boolean markOpen) {
@@ -69,7 +63,7 @@ public class JoinLobbyTests {
                 "password",
                 maxPlayers,
                 GameId.create(),
-                UserId.create()
+                UserId.create()     // host
         );
 
         if (!markOpen) {
@@ -77,37 +71,38 @@ public class JoinLobbyTests {
         }
 
         lobbyRepository.save(lobby);
-
         return lobby.getId();
     }
 
     @Test
-    void joinLobby_shouldReturnOk_whenStateIsValid() throws Exception {
+    void joinLobby_shouldReturnOk_andLobbyShouldContainUser_whenStateIsValid() throws Exception {
         // Arrange
-        createTestUser();
-
-        LobbyId lobbyId = createTestLobby();
-
+        UserId userId = createTestUserAndReturnId();
+        LobbyId lobbyId = createTestLobby(2, true);
         JoinLobbyDto dto = new JoinLobbyDto("password");
 
-        // Act & Assert
+        // Act
         mockMvc.perform(post("/api/lobbies/{id}/join", lobbyId.id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
+
+        Optional<Lobby> opt = lobbyRepository.findById(lobbyId);
+        Lobby updatedLobby = opt.orElseThrow(
+                () -> new AssertionError("Lobby not found after join, id=" + lobbyId)
+        );
+
+        assertThat(updatedLobby.getPlayers())
+                .contains(userId);
     }
 
     @Test
     void joinLobby_shouldReturnConflict_whenLobbyNotOpen() throws Exception {
-        // Arrange
-        createTestUser();
-
+        createTestUserAndReturnId();
         LobbyId lobbyId = createTestLobby(2, false);
-
         JoinLobbyDto dto = new JoinLobbyDto("password");
 
-        // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/join", lobbyId.id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,14 +112,10 @@ public class JoinLobbyTests {
 
     @Test
     void joinLobby_shouldReturnConflict_whenLobbyFull() throws Exception {
-        // Arrange
-        createTestUser();
-
+        createTestUserAndReturnId();
         LobbyId lobbyId = createTestLobby(1, true);
-
         JoinLobbyDto dto = new JoinLobbyDto("password");
 
-        // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/join", lobbyId.id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -134,14 +125,10 @@ public class JoinLobbyTests {
 
     @Test
     void joinLobby_shouldReturnBadRequest_whenWrongPassword() throws Exception {
-        // Arrange
-        createTestUser();
+        createTestUserAndReturnId();
+        LobbyId lobbyId = createTestLobby(2, true);
+        JoinLobbyDto dto = new JoinLobbyDto("wrong-password");
 
-        LobbyId lobbyId = createTestLobby();
-
-        JoinLobbyDto dto = new JoinLobbyDto("pass");
-
-        // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/join", lobbyId.id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -151,12 +138,9 @@ public class JoinLobbyTests {
 
     @Test
     void joinLobby_shouldReturnNotFound_whenLobbyDoesNotExist() throws Exception {
-        // Arrange
-        createTestUser();
-
+        createTestUserAndReturnId();
         JoinLobbyDto dto = new JoinLobbyDto("password");
 
-        // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/join", UUID.randomUUID())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -164,30 +148,11 @@ public class JoinLobbyTests {
                 .andExpect(status().isNotFound());
     }
 
-    // TODO: Change user auto-registration before enabling
-    /*@Test
-    void joinLobby_shouldReturnNotFound_whenUserNorRegistered() throws Exception {
-        // Arrange
-        LobbyId lobbyId = createTestLobby();
-
-        JoinLobbyDto dto = new JoinLobbyDto("password");
-
-        // Act & Assert
-        mockMvc.perform(post("/api/lobbies/{id}/join", lobbyId.id())
-                        .with(validJwt())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isNotFound());
-    }*/
-
     @Test
     void joinLobby_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
-        // Arrange
-        LobbyId lobbyId = createTestLobby();
-
+        LobbyId lobbyId = createTestLobby(2, true);
         JoinLobbyDto dto = new JoinLobbyDto("password");
 
-        // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/join", lobbyId.id())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))

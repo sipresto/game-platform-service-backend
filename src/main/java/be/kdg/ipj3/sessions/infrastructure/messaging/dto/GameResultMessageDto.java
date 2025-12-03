@@ -33,6 +33,6 @@ public record GameResultMessageDto(UUID gameId,
         SessionResult result = SessionResult.valueOf(finalStatus);
 
         return new Session(game, players, difficulty, winner, result);
-    };
+    }
 }
 

@@ -14,9 +14,10 @@ public class User {
     private final UserId id;
     private final String keycloakId;
     private String username;
-    private List<GameId> ownedGames;
+    private final List<GameId> ownedGames;
     private Profile profile;
     private Visibility visibility;
+    private final List<UserId> friends;
 
     public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, Profile profile) {
         this.id = id;
@@ -24,6 +25,8 @@ public class User {
         this.username = username;
         this.ownedGames = ownedGames;
         this.profile = profile;
+        this.friends = new ArrayList<>();
+        this.visibility = Visibility.PUBLIC;
     }
 
     public User(UserId id, String keycloakId, String username, Profile profile) {
@@ -33,6 +36,7 @@ public class User {
         this.ownedGames = new ArrayList<>();
         this.profile = profile;
         this.visibility = Visibility.PUBLIC;
+        this.friends = new ArrayList<>();
     }
 
     public static User createFromKeycloak(String keycloakId, String keycloakUsername) {
@@ -87,5 +91,18 @@ public class User {
 
     public Visibility getVisibility() {
         return visibility;
+    }
+
+    public List<UserId> getFriends() {
+        return friends;
+    }
+
+    public void addFriend(UserId userId) {
+        if (!friends.contains(userId)) {
+            friends.add(userId);
+        }
+        else {
+            throw new IllegalArgumentException("You are already befriended with this user");
+        }
     }
 }

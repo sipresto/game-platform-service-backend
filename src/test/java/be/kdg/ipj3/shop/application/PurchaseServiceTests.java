@@ -41,8 +41,8 @@ class PurchaseServiceTests {
 
         // Assert
         assertThat(result).isNotNull();
-        assertThat(result.getBuyer()).isEqualTo(userId);
-        assertThat(result.getGame()).isEqualTo(gameId);
+        assertThat(result.buyer()).isEqualTo(userId);
+        assertThat(result.game()).isEqualTo(gameId);
 
         verify(purchaseRepository).save(any(Purchase.class));
     }

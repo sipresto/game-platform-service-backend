@@ -16,4 +16,8 @@ public interface IUserRepository {
     List<GameId> findOwnedGamesByKeycloakId(String keycloakId);
 
     void deleteAll();
+
+    List<User> findAllPublicUsers();
+
+    List<User> findFriends(UserId userId);
 }
