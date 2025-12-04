@@ -6,38 +6,19 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 @AggregateRoot
-public class Statistic {
-    @Identity
-    private final UserId player;
-    @Identity
-    private final GameId game;
-    private final int gamesWon;
-    private final int gamesLost;
-
-    public Statistic(UserId player, GameId game, int gamesWon, int gamesLost) {
-        this.player = player;
-        this.game = game;
-        this.gamesWon = gamesWon;
-        this.gamesLost = gamesLost;
-    }
+public record Statistic(@Identity UserId player, @Identity GameId game, int gamesWon, int gamesLost) {
 
     public Statistic(UserId player, GameId game) {
         this(player, game, 0, 0);
     }
 
-    public UserId getPlayer() {
+    @Override
+    public UserId player() {
         return player;
     }
 
-    public GameId getGame() {
+    @Override
+    public GameId game() {
         return game;
-    }
-
-    public int getGamesWon() {
-        return gamesWon;
-    }
-
-    public int getGamesLost() {
-        return gamesLost;
     }
 }

@@ -15,12 +15,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
-public class UpdateProfileTests {
+class UpdateProfileTests {
 
     @Mock
     private IUserRepository userRepository;
@@ -34,7 +34,8 @@ public class UpdateProfileTests {
         String keycloakId = "test-keycloak-id";
         String displayName = "Updated Display Name";
         String bio = "Updated bio";
-        User user = new User(new UserId(UUID.randomUUID()), keycloakId, "oldusername", new Profile("Old Display", "Old bio"));
+        User user = new User(new UserId(UUID.randomUUID()), keycloakId, "oldusername",
+                new Profile("Old Display", "Old bio"));
 
         given(userRepository.findByKeycloakId(keycloakId)).willReturn(Optional.of(user));
 
@@ -54,12 +55,12 @@ public class UpdateProfileTests {
     void updateProfile_shouldThrowNotFoundException_whenUserDoesNotExist() {
         // Arrange
         String keycloakId = "non-existent-keycloak-id";
-
         given(userRepository.findByKeycloakId(keycloakId)).willReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> userService.updateProfile(keycloakId, "Display Name", "Bio"))
-                .isInstanceOf(NotFoundException.class)
+        assertThatThrownBy(() ->
+                userService.updateProfile(keycloakId, "Display Name", "Bio")
+        ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(keycloakId);
 
         then(userRepository).should().findByKeycloakId(keycloakId);
@@ -68,17 +69,17 @@ public class UpdateProfileTests {
 
     @Test
     void updateProfile_shouldThrowIllegalArgumentException_whenKeycloakIdIsNull() {
-        // Act & Assert
-        assertThatThrownBy(() -> userService.updateProfile(null, "Display Name", "Bio"))
-                .isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() ->
+                userService.updateProfile(null, "Display Name", "Bio")
+        ).isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Keycloak id cannot be null or blank");
     }
 
     @Test
     void updateProfile_shouldThrowIllegalArgumentException_whenKeycloakIdIsBlank() {
-        // Act & Assert
-        assertThatThrownBy(() -> userService.updateProfile("", "Display Name", "Bio"))
-                .isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() ->
+                userService.updateProfile("", "Display Name", "Bio")
+        ).isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Keycloak id cannot be null or blank");
     }
 }

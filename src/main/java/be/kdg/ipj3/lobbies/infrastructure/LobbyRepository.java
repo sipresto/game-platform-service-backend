@@ -49,6 +49,11 @@ public class LobbyRepository implements ILobbyRepository {
     }
 
     @Override
+    public List<Lobby> findAll() {
+        return jpaLobbyRepository.findAll().stream().map(JpaLobbyEntity::toDomain).toList();
+    }
+
+    @Override
     public void deleteAll() {
         jpaLobbyRepository.deleteAll();
     }

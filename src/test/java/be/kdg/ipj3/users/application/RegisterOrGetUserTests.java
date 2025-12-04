@@ -6,9 +6,7 @@ import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -16,12 +14,10 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class RegisterOrGetUserTests {
+class RegisterOrGetUserTests {
 
     @Mock
     private IUserRepository userRepository;
@@ -34,7 +30,12 @@ public class RegisterOrGetUserTests {
         // Arrange
         String keycloakId = "test-keycloak-id";
         String keycloakUsername = "testuser";
-        User existingUser = new User(new UserId(UUID.randomUUID()), keycloakId, keycloakUsername, new Profile("Existing User", "Bio"));
+        User existingUser = new User(
+                new UserId(UUID.randomUUID()),
+                keycloakId,
+                keycloakUsername,
+                new Profile("Existing User", "Bio")
+        );
 
         given(userRepository.findByKeycloakId(keycloakId)).willReturn(Optional.of(existingUser));
 
@@ -42,7 +43,7 @@ public class RegisterOrGetUserTests {
         User result = userService.registerOrGetUser(keycloakId, keycloakUsername);
 
         // Assert
-        assertThat(result).isEqualTo(existingUser);
+        assertThat(result).isSameAs(existingUser);  // same instance
         then(userRepository).should().findByKeycloakId(keycloakId);
         then(userRepository).shouldHaveNoMoreInteractions();
     }
@@ -76,7 +77,6 @@ public class RegisterOrGetUserTests {
 
     @Test
     void registerOrGetUser_shouldThrowIllegalArgumentException_whenKeycloakIdIsNull() {
-        // Act & Assert
         assertThatThrownBy(() -> userService.registerOrGetUser(null, "testuser"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Keycloak id cannot be null or blank");
@@ -84,7 +84,6 @@ public class RegisterOrGetUserTests {
 
     @Test
     void registerOrGetUser_shouldThrowIllegalArgumentException_whenKeycloakIdIsBlank() {
-        // Act & Assert
         assertThatThrownBy(() -> userService.registerOrGetUser("", "testuser"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Keycloak id cannot be null or blank");

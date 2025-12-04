@@ -4,6 +4,7 @@ import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.domain.IUserRepository;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.Visibility;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
 import org.springframework.stereotype.Repository;
@@ -46,5 +47,17 @@ public class UserRepository implements IUserRepository {
     @Override
     public void deleteAll() {
         jpaUserRepository.deleteAll();
+    }
+
+    @Override
+    public List<User> findAllPublicUsers() {
+        var publicUsers = jpaUserRepository.findAllByVisibility(Visibility.PUBLIC);
+        return publicUsers.stream().map(JpaUserEntity::toDomain).toList();
+    }
+
+    @Override
+    public List<User> findFriends(UserId userId) {
+        var friends = jpaUserRepository.findFriends(userId.id());
+        return friends.stream().map(JpaUserEntity::toDomain).toList();
     }
 }

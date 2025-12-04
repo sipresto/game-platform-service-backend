@@ -34,7 +34,15 @@ public class JpaUserEntity {
             joinColumns = @JoinColumn(name = "user_id")
     )
     @Column(name = "game_id")
-    private List<UUID> ownedGames = new ArrayList<>();
+    private final List<UUID> ownedGames = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "user_friends",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "friend_id")
+    private final List<UUID> friends = new ArrayList<>();
 
     private JpaProfile profile;
 
@@ -50,22 +58,34 @@ public class JpaUserEntity {
     }
 
     public static JpaUserEntity fromDomain(User user) {
-        JpaUserEntity jpaUserEntity = new JpaUserEntity(user.getId().id(), user.getKeycloakId(),
-                user.getUsername(), JpaProfile.fromDomain(user.getProfile()), user.getVisibility());
+        JpaUserEntity jpaUserEntity = new JpaUserEntity(
+                user.getId().id(),
+                user.getKeycloakId(),
+                user.getUsername(),
+                JpaProfile.fromDomain(user.getProfile()),
+                user.getVisibility()
+        );
 
         user.getOwnedGames().stream()
                 .map(GameId::id)
                 .forEach(jpaUserEntity::addGame);
+
+        user.getFriends().stream()
+                .map(UserId::id)
+                .forEach(jpaUserEntity::addFriend);
 
         return jpaUserEntity;
     }
 
     public User toDomain() {
         User user = new User(new UserId(id), keycloakId, username, profile.toDomain());
-
         ownedGames.stream()
                 .map(GameId::new)
                 .forEach(user::addGame);
+
+        friends.stream()
+                .map(UserId::new)
+                .forEach(user::addFriend);
 
         user.updateVisibility(this.visibility);
         return user;
@@ -73,6 +93,14 @@ public class JpaUserEntity {
 
     private void addGame(UUID gameId) {
         this.ownedGames.add(gameId);
+    }
+
+    /**
+     *  This is only to be used for testing!
+     *  This was made in sprint 2 when friend logic was not present yet.
+     */
+    private void addFriend(UUID friendId) {
+        this.friends.add(friendId);
     }
 
     public UUID getId() {
@@ -91,7 +119,15 @@ public class JpaUserEntity {
         return ownedGames;
     }
 
+    public List<UUID> getFriends() {
+        return friends;
+    }
+
     public JpaProfile getProfile() {
         return profile;
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
     }
 }
