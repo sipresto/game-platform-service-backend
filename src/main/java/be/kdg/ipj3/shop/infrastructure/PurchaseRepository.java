@@ -6,6 +6,8 @@ import be.kdg.ipj3.shop.infrastructure.jpa.JpaPurchaseEntity;
 import be.kdg.ipj3.shop.infrastructure.jpa.JpaPurchaseRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public class PurchaseRepository implements IPurchaseRepository {
     private final JpaPurchaseRepository jpaPurchaseRepository;
@@ -17,6 +19,13 @@ public class PurchaseRepository implements IPurchaseRepository {
     @Override
     public Purchase save(Purchase purchase) {
         return jpaPurchaseRepository.save(JpaPurchaseEntity.fromDomain(purchase)).toDomain();
+    }
+
+
+    @Override
+    public Optional<Purchase> findByPaymentId(String paymentId) {
+        return jpaPurchaseRepository.findByPaymentId(paymentId)
+                .map(JpaPurchaseEntity::toDomain);
     }
 
     @Override

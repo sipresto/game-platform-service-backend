@@ -2,6 +2,7 @@ package be.kdg.ipj3.shop.infrastructure.jpa;
 
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.shop.domain.PaymentStatus;
 import be.kdg.ipj3.shop.domain.Purchase;
 import be.kdg.ipj3.shop.domain.PurchaseId;
 import jakarta.persistence.Column;
@@ -27,14 +28,21 @@ public class JpaPurchaseEntity {
 
     @Column(nullable = false)
     private Instant purchasedAt;
+    @Column(nullable = false)
+    private String paymentId;
+
+    @Column(nullable = false)
+    private String status;
 
     protected JpaPurchaseEntity() {} // for JPA
 
-    public JpaPurchaseEntity(UUID id, UUID buyer, UUID game, Instant purchasedAt) {
+    public JpaPurchaseEntity(UUID id, UUID buyer, UUID game, Instant purchasedAt, String paymentId, String status) {
         this.id = id;
         this.buyer = buyer;
         this.game = game;
         this.purchasedAt = purchasedAt;
+        this.paymentId = paymentId;
+        this.status = status;
     }
 
     public static JpaPurchaseEntity fromDomain(Purchase purchase) {
@@ -42,12 +50,21 @@ public class JpaPurchaseEntity {
                 purchase.id().id(),
                 purchase.buyer().id(),
                 purchase.game().id(),
-                purchase.purchasedAt()
+                purchase.purchasedAt(),
+                purchase.paymentId(),
+                purchase.status().name()
         );
     }
 
     public Purchase toDomain() {
-        return new Purchase(new PurchaseId(this.id), new UserId(this.buyer), new GameId(this.game), this.purchasedAt);
+        return new Purchase(
+                new PurchaseId(this.id),
+                new UserId(this.buyer),
+                new GameId(this.game),
+                this.purchasedAt,
+                this.paymentId,
+                PaymentStatus.valueOf(this.status)
+        );
     }
 
     public UUID getId() {

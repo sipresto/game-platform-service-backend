@@ -10,11 +10,9 @@ import be.kdg.ipj3.users.domain.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -30,39 +28,51 @@ public class PurchaseController {
         this.gameService = gameService;
     }
 
-    // TODO: Not auto-register users, but verify if they are registered, using commented code below
     private UserId resolveUserId(Jwt token) {
         String keycloakId = token.getSubject();
         String keycloakUsername = token.getClaim("preferred_username");
-
         User user = userService.registerOrGetUser(keycloakId, keycloakUsername);
-
         return user.getId();
     }
 
-    /*private UserId resolveUserId(Jwt token) {
-        return userService
-                .findByKeycloakId(token.getSubject())
-                .map(User::getId)
-                .orElseThrow(() -> new UserNotFoundException(token.getSubject()));
-    }*/
-
     @PostMapping("/{gameIdParam}")
-    public ResponseEntity<PurchaseDto> buyGame(
+    public ResponseEntity<Map<String, String>> buyGame(
             @PathVariable UUID gameIdParam,
             @AuthenticationPrincipal Jwt token
     ) {
         UserId userId = resolveUserId(token);
-
         GameId gameId = new GameId(gameIdParam);
 
         if (!gameService.existsById(gameId)) {
             return ResponseEntity.badRequest().build();
         }
 
-        userService.addGame(userId, gameId);
-        Purchase purchase = purchaseService.buy(userId, gameId);
+        // Create payment and get checkout URL
+        String checkoutUrl = purchaseService.initiatePurchase(userId, gameId);
 
-        return ResponseEntity.ok(PurchaseDto.fromDomain(purchase));
+        // Return checkout URL to frontend
+        return ResponseEntity.ok(Map.of("checkoutUrl", checkoutUrl));
+    }
+
+    @PostMapping("/webhook")
+    public ResponseEntity<Void> handleWebhook(@RequestParam("id") String paymentId) {
+        // Mollie calls this endpoint when payment status changes
+        purchaseService.handleWebhook(paymentId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/success")
+    public ResponseEntity<String> handleSuccess(@RequestParam("id") String paymentId) {
+        // User is redirected here after payment
+        // Check if payment is completed and show appropriate message
+        Purchase purchase = purchaseService.findByPaymentId(paymentId)
+                .orElseThrow(() -> new RuntimeException("Purchase not found"));
+
+        if (purchase.status().name().equals("PAID")) {
+            userService.addGame(purchase.buyer(), purchase.game());
+            return ResponseEntity.ok("Payment successful! Game added to your library.");
+        }
+
+        return ResponseEntity.ok("Payment pending. You will receive the game once payment is confirmed.");
     }
 }

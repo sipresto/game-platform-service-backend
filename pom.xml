@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.7</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
     <groupId>be.kdg.ipj3</groupId>
     <artifactId>game-platform-service-backend</artifactId>
@@ -35,10 +35,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.mollie</groupId>
+            <groupId>be.woutschoovaerts</groupId>
             <artifactId>mollie</artifactId>
-            <version>0.23.6</version>
+            <version>4.4.0</version>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
