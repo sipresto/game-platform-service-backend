@@ -76,6 +76,7 @@ public class FindOwnedGamesByKeycloakIdIntegrationTests {
                 "desc",
                 new Money(Currency.getInstance("EUR"), BigDecimal.valueOf(5)),
                 "https://test.com",
+                "rule",
                 List.of(),
                 List.of()
         );

@@ -23,6 +23,7 @@ public class JpaGameEntity {
     private String description;
     private BigDecimal price;
     private String serviceUrl;
+    private String rules;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -39,12 +40,13 @@ public class JpaGameEntity {
 
     protected JpaGameEntity() {} // for JPA
 
-    public JpaGameEntity(GameId id, String name, String description, Money price, String serviceUrl, List<Achievement> achievements, List<Category> categories) {
+    public JpaGameEntity(GameId id, String name, String description, Money price, String serviceUrl, String rules, List<Achievement> achievements, List<Category> categories) {
         this.id = id.id();
         this.name = name;
         this.description = description;
         this.price = price.amount();
         this.serviceUrl = serviceUrl;
+        this.rules = rules;
         this.achievements = new ArrayList<>();
         achievements.forEach(a -> this.achievements.add(JpaAchievementEntity.fromDomain(a)));
         this.categories = Set.copyOf(categories);
@@ -57,6 +59,7 @@ public class JpaGameEntity {
                 game.getDescription(),
                 game.getPrice(),
                 game.getServiceUrl(),
+                game.getRules(),
                 game.getAchievements(),
                 game.getCategories()
         );
@@ -76,6 +79,7 @@ public class JpaGameEntity {
                 this.description,
                 Money.of(this.price),
                 this.serviceUrl,
+                this.rules,
                 achievements,
                 categories
         );
@@ -99,6 +103,10 @@ public class JpaGameEntity {
 
     public String getServiceUrl() {
         return serviceUrl;
+    }
+
+    public String getRules() {
+        return rules;
     }
 
     public Set<Category> getCategories() { return categories; }

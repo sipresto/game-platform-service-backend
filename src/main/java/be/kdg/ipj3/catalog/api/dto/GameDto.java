@@ -7,13 +7,14 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-public record GameDto(UUID gameId, String name, String description, BigDecimal price, List<Category> categories) {
+public record GameDto(UUID gameId, String name, String description, BigDecimal price, String rules, List<Category> categories) {
     public static GameDto from(Game game) {
         return new GameDto(
                 game.getId().id(),
                 game.getName(),
                 game.getDescription(),
                 game.getPrice().amount(),
+                game.getRules(),
                 game.getCategories()
         );
     }

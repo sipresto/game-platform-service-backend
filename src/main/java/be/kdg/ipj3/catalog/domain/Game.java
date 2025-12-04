@@ -16,21 +16,23 @@ public class Game {
     private final String description;
     private final Money price;
     private final String serviceUrl;
+    private final String rules;
     private final List<Category> categories;
     private final List<Achievement> achievements = new ArrayList<>();
 
-    public Game(GameId id, String name, String description, Money price, String serviceUrl, List<Achievement> achievements, List<Category> categories) {
+    public Game(GameId id, String name, String description, Money price, String serviceUrl, String rules, List<Achievement> achievements, List<Category> categories) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.serviceUrl = serviceUrl;
+        this.rules = rules;
         this.achievements.addAll(achievements);
         this.categories = categories;
     }
 
-    public Game(String name, String description, Money price, String serviceUrl, List<Category> categories) {
-        this(GameId.create(), name, description, price, serviceUrl, List.of(), categories);
+    public Game(String name, String description, Money price, String serviceUrl, String rules, List<Category> categories) {
+        this(GameId.create(), name, description, price, serviceUrl, rules, List.of(), categories);
     }
 
     public GameId getId() {
@@ -51,6 +53,10 @@ public class Game {
 
     public String getServiceUrl() {
         return serviceUrl;
+    }
+
+    public String getRules() {
+        return rules;
     }
 
     public List<Achievement> getAchievements() {
