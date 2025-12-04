@@ -14,9 +14,6 @@ public class TriggerEvaluator {
             case DRAW_PLAYER -> context.isDraw() && !context.isAgainstAI();
             case DRAW_AI -> context.isDraw() && context.isAgainstAI();
             case DRAW_ANY -> context.isDraw();
-            case LOSS_PLAYER -> context.isLoser() && !context.isAgainstAI();
-            case LOSS_AI -> context.isLoser() && context.isAgainstAI();
-            case LOSS_ANY -> context.isLoser();
             case WIN_OR_DRAW_ANY -> context.isWinner() || context.isDraw();
             case PLAY_ANY -> true;
             case CUSTOM -> true;

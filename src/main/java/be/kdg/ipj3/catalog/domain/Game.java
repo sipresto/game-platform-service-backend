@@ -64,8 +64,8 @@ public class Game {
     }
 
     public void addAchievement(String name, String description, int requiredValue, int points,
-                               CountingStrategy countingStrategy, CountTrigger countTrigger, String customRuleKey) {
-        achievements.add(new Achievement(name, description, requiredValue, points, countingStrategy, countTrigger, customRuleKey));
+                               CountingStrategy countingStrategy, CountTrigger countTrigger, String ruleKey) {
+        achievements.add(new Achievement(name, description, requiredValue, points, countingStrategy, countTrigger, ruleKey));
     }
 
     public boolean hasCategory(Category category) {

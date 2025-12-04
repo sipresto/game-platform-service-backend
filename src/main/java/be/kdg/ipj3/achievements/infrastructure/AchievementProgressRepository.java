@@ -29,4 +29,9 @@ public class AchievementProgressRepository implements IAchievementProgressReposi
     public void save(AchievementProgress progress) {
         jpaAchievementProgressRepository.save(JpaAchievementProgressEntity.fromDomain(progress));
     }
+
+    @Override
+    public void deleteAll() {
+        jpaAchievementProgressRepository.deleteAll();
+    }
 }

@@ -7,9 +7,6 @@ public enum CountTrigger {
     DRAW_PLAYER,
     DRAW_AI,
     DRAW_ANY,
-    LOSS_PLAYER,
-    LOSS_AI,
-    LOSS_ANY,
     WIN_OR_DRAW_ANY,
     PLAY_ANY,
     CUSTOM

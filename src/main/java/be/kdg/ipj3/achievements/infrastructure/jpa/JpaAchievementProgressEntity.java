@@ -46,7 +46,7 @@ public class JpaAchievementProgressEntity {
                 progress.getId().achievementId().id(),
                 progress.getCurrentProgress(),
                 progress.getCompletedAt(),
-                toJson(progress.getMetadata())
+                progress.getMetadata().isEmpty() ? null : toJson(progress.getMetadata())
         );
     }
 
@@ -72,7 +72,9 @@ public class JpaAchievementProgressEntity {
 
     @SuppressWarnings("unchecked")
     private static Map<String, Object> fromJson(String json) {
-        if (json == null || json.isBlank()) return new HashMap<>();
+        if (json == null || json.isBlank()) {
+            return new HashMap<>();
+        }
         try {
             return MAPPER.readValue(json, Map.class);
         } catch (Exception e) {
