@@ -2,22 +2,25 @@ package be.kdg.ipj3.catalog.domain;
 
 import be.kdg.ipj3.shared.domain.AchievementEvaluationRule;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class AchievementRules {
 
     // Tic Tac Toe: Win once as X and once as O
     public static final AchievementEvaluationRule WIN_AS_BOTH_SIDES = (context, progress) -> {
         @SuppressWarnings("unchecked")
-        Set<String> sidesWon = (Set<String>) progress.getMetadata()
-                .getOrDefault("sidesWon", new HashSet<String>());
-        int sidesWonCount = sidesWon.size();
+        Set<String> sidesWon = new HashSet<>(
+                (Collection<String>) progress.getMetadata().getOrDefault("sidesWon", Collections.emptySet())
+        );
 
-        sidesWon.add(context.getGameData("playerSide", String.class).orElse(null));
+        Optional<String> sideOpt = context.getGameData("playerSide", String.class);
+        if (sideOpt.isEmpty()) {
+            return AchievementEvaluationRule.EvaluationResult.skip();
+        }
+        String side = sideOpt.get();
+        boolean added = sidesWon.add(side);
 
-        if (sidesWonCount != sidesWon.size()) {
+        if (added) {
             return AchievementEvaluationRule.EvaluationResult.countWithMetadata(1, Map.of("sidesWon", sidesWon));
         }
 
