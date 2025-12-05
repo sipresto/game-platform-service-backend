@@ -27,4 +27,7 @@ public class StripeService {
         chargeParams.put("source", chargeRequest.stripeToken());
         return Charge.create(chargeParams);
     }
+    public Charge retrieve(String chargeId) throws StripeException {
+        return Charge.retrieve(chargeId);
+    }
 }

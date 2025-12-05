@@ -27,7 +27,10 @@ public class PaymentController {
     }
 
     @PostMapping("/charge/{gameId}")
-    public ResponseEntity<?> chargeGame(@PathVariable UUID gameId, @RequestBody Map<String, String> body) {
+    public ResponseEntity<?> chargeGame(
+            @PathVariable UUID gameId,
+            @RequestBody Map<String, String> body
+    ) {
         String stripeToken = body.get("stripeToken");
 
         try {
