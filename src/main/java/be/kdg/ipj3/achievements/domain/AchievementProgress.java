@@ -6,28 +6,22 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 
 @AggregateRoot
 public class AchievementProgress {
     @Identity
     private final AchievementProgressId id;
-    private final int currentProgress;
+    private final Integer currentProgress;
     private final Instant completedAt;
-    private final Map<String, Object> metadata;
 
-    public AchievementProgress(UserId player, AchievementId achievement,
-                               int currentProgress, Instant completedAt,
-                               Map<String, Object> metadata) {
+    public AchievementProgress(UserId player, AchievementId achievement, Integer currentProgress, Instant completedAt) {
         this.id = new AchievementProgressId(player, achievement);
         this.currentProgress = currentProgress;
         this.completedAt = completedAt;
-        this.metadata = metadata != null ? new HashMap<>(metadata) : new HashMap<>();
     }
 
     public AchievementProgress(UserId player, AchievementId achievement) {
-        this(player, achievement, 0, null, new HashMap<>());
+        this(player, achievement, null, null);
     }
 
     public AchievementProgressId getId() {
@@ -42,7 +36,7 @@ public class AchievementProgress {
         return id.achievementId();
     }
 
-    public int getCurrentProgress() {
+    public Integer getCurrentProgress() {
         return currentProgress;
     }
 
@@ -50,21 +44,19 @@ public class AchievementProgress {
         return completedAt;
     }
 
-    public Map<String, Object> getMetadata() {
-        return metadata;
-    }
-
     public AchievementProgress incrementProgress(int amount, int requiredValue) {
         if (isCompleted()) {
             return this;
         }
 
-        int newProgress = this.currentProgress + amount;
+        int current = (this.currentProgress != null) ? this.currentProgress : 0;
+        int newProgress = current + amount;
+
         Instant completedTime = (newProgress >= requiredValue && completedAt == null)
                 ? Instant.now()
                 : this.completedAt;
 
-        return new AchievementProgress(id.userId(), id.achievementId(), newProgress, completedTime, metadata);
+        return new AchievementProgress(id.userId(), id.achievementId(), newProgress, completedTime);
     }
 
     public AchievementProgress resetProgress() {
@@ -75,8 +67,11 @@ public class AchievementProgress {
         return completedAt != null;
     }
 
-    public AchievementProgress incrementProgressWithMetadata(int amount, int requiredValue, Map<String, Object> metadata) {
-        this.metadata.putAll(metadata);
-        return incrementProgress(amount, requiredValue);
+    public AchievementProgress markCompleted(Instant completedAt) {
+        if (isCompleted()) {
+            return this;
+        }
+
+        return new AchievementProgress(this.id.userId(), this.id.achievementId(), null, completedAt);
     }
 }

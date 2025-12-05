@@ -16,7 +16,6 @@ public class TriggerEvaluator {
             case DRAW_ANY -> context.isDraw();
             case WIN_OR_DRAW_ANY -> context.isWinner() || context.isDraw();
             case PLAY_ANY -> true;
-            case CUSTOM -> true;
         };
     }
 }

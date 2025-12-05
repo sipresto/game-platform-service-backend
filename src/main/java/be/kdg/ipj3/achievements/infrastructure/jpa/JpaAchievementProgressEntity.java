@@ -3,15 +3,11 @@ package be.kdg.ipj3.achievements.infrastructure.jpa;
 import be.kdg.ipj3.achievements.domain.AchievementProgress;
 import be.kdg.ipj3.shared.domain.AchievementId;
 import be.kdg.ipj3.shared.domain.UserId;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -21,23 +17,17 @@ public class JpaAchievementProgressEntity {
     @EmbeddedId
     private JpaAchievementProgressId id;
 
-    @Column(nullable = false)
-    private int currentProgress;
+    private Integer currentProgress;
 
     private Instant completedAt;
-
-    @Column(columnDefinition = "TEXT") // or JSONB on Postgres
-    private String metadataJson;
 
     protected JpaAchievementProgressEntity() {
     } // for JPA
 
-    public JpaAchievementProgressEntity(UUID userId, UUID achievementId, int currentProgress,
-                                        Instant completedAt, String metadataJson) {
+    public JpaAchievementProgressEntity(UUID userId, UUID achievementId, Integer currentProgress, Instant completedAt) {
         this.id = new JpaAchievementProgressId(userId, achievementId);
         this.currentProgress = currentProgress;
         this.completedAt = completedAt;
-        this.metadataJson = metadataJson;
     }
 
     public static JpaAchievementProgressEntity fromDomain(AchievementProgress progress) {
@@ -45,8 +35,7 @@ public class JpaAchievementProgressEntity {
                 progress.getId().userId().id(),
                 progress.getId().achievementId().id(),
                 progress.getCurrentProgress(),
-                progress.getCompletedAt(),
-                progress.getMetadata().isEmpty() ? null : toJson(progress.getMetadata())
+                progress.getCompletedAt()
         );
     }
 
@@ -55,31 +44,8 @@ public class JpaAchievementProgressEntity {
                 new UserId(this.id.getUserId()),
                 new AchievementId(this.id.getAchievementId()),
                 this.currentProgress,
-                this.completedAt,
-                fromJson(this.metadataJson)
+                this.completedAt
         );
-    }
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    private static String toJson(Map<String, Object> map) {
-        try {
-            return MAPPER.writeValueAsString(map);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize metadata", e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> fromJson(String json) {
-        if (json == null || json.isBlank()) {
-            return new HashMap<>();
-        }
-        try {
-            return MAPPER.readValue(json, Map.class);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to deserialize metadata", e);
-        }
     }
 
     public UUID getUserId() {
@@ -90,15 +56,11 @@ public class JpaAchievementProgressEntity {
         return id.getAchievementId();
     }
 
-    public int getCurrentProgress() {
+    public Integer getCurrentProgress() {
         return currentProgress;
     }
 
     public Instant getCompletedAt() {
         return completedAt;
-    }
-
-    public String getMetadataJson() {
-        return metadataJson;
     }
 }

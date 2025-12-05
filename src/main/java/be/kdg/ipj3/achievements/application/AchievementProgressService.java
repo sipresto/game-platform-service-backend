@@ -3,14 +3,19 @@ package be.kdg.ipj3.achievements.application;
 import be.kdg.ipj3.achievements.domain.AchievementProgress;
 import be.kdg.ipj3.achievements.domain.GameContext;
 import be.kdg.ipj3.achievements.domain.IAchievementProgressRepository;
+import be.kdg.ipj3.achievements.domain.TriggerEvaluator;
 import be.kdg.ipj3.achievements.domain.strategies.CountingStrategyHandler;
 import be.kdg.ipj3.catalog.application.GameService;
 import be.kdg.ipj3.catalog.domain.Achievement;
+import be.kdg.ipj3.shared.domain.AchievementId;
 import be.kdg.ipj3.shared.domain.CountingStrategy;
-import be.kdg.ipj3.achievements.domain.TriggerEvaluator;
+import be.kdg.ipj3.shared.domain.NotFoundException;
+import be.kdg.ipj3.shared.domain.UserId;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AchievementProgressService {
@@ -27,15 +32,17 @@ public class AchievementProgressService {
         this.gameService = gameService;
     }
 
-    public void evaluateAchievements(GameContext context) {
+    public void evaluateAchievementsAfterGame(GameContext context) {
         List<Achievement> gameAchievements = gameService.findAchievementsByGameId(context.game());
 
         for (Achievement achievement : gameAchievements) {
-            AchievementProgress progress = progressRepository
-                    .findByUserIdAndAchievementId(context.player(), achievement.getId())
-                    .orElse(new AchievementProgress(context.player(), achievement.getId()));
+            AchievementProgress progress = getProgress(context.player(), achievement.getId());
 
             if (progress.isCompleted()) {
+                continue;
+            }
+
+            if (!achievement.isCountedAfterGame()) {
                 continue;
             }
 
@@ -56,5 +63,26 @@ public class AchievementProgressService {
                 progressRepository.save(updatedProgress);
             }
         }
+    }
+
+    public void completeAchievement(UserId userId, UUID gameSesssionId, String code, Instant timestamp) {
+        // TODO: haal gameId uit lobby via gameSessionId -> zoek met die gameId en code de achievementId
+        Achievement achievement = gameService.findAchievementByCode(code)
+                .orElseThrow(() -> new NotFoundException("Achievement [" + code + "] not found"));
+        AchievementProgress progress = getProgress(userId, achievement.getId());
+
+        if (!progress.isCompleted()) {
+            AchievementProgress updatedProgress = progress.markCompleted(timestamp);
+
+            if (updatedProgress != progress) {
+                progressRepository.save(updatedProgress);
+            }
+        }
+    }
+
+    private AchievementProgress getProgress(UserId userId, AchievementId achievementId) {
+        return progressRepository
+                .findByUserIdAndAchievementId(userId, achievementId)
+                .orElse(new AchievementProgress(userId, achievementId));
     }
 }

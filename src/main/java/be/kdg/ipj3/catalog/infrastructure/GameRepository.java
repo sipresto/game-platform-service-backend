@@ -82,4 +82,9 @@ public class GameRepository implements IGameRepository {
                 .map(JpaAchievementEntity::toDomain)
                 .toList();
     }
+
+    @Override
+    public Optional<Achievement> findAchievementByCode(String code) {
+        return jpaGameRepository.findAchievementByCode(code).map(JpaAchievementEntity::toDomain);
+    }
 }

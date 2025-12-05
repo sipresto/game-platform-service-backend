@@ -1,16 +1,17 @@
 package be.kdg.ipj3.catalog.application;
 
+import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.catalog.domain.Achievement;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.IGameRepository;
-import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GameService {
@@ -61,5 +62,9 @@ public class GameService {
 
     public List<Achievement> findAchievementsByGameId(GameId game) {
         return gameRepository.findAchievementsByGameId(game);
+    }
+
+    public Optional<Achievement> findAchievementByCode(String code) {
+        return gameRepository.findAchievementByCode(code);
     }
 }

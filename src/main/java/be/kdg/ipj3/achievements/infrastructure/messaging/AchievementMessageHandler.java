@@ -3,6 +3,7 @@ package be.kdg.ipj3.achievements.infrastructure.messaging;
 import be.kdg.ipj3.achievements.application.AchievementProgressService;
 import be.kdg.ipj3.achievements.domain.GameContext;
 import be.kdg.ipj3.achievements.infrastructure.messaging.config.RabbitMQTopologyAchievements;
+import be.kdg.ipj3.achievements.infrastructure.messaging.dto.AchievementCompletedDto;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.shared.infrastructure.messaging.dto.GameResultMessageDto;
@@ -23,18 +24,20 @@ public class AchievementMessageHandler {
     @RabbitListener(queues = RabbitMQTopologyAchievements.ACHIEVEMENT_GAME_RESULTS_QUEUE)
     void onGameResultMessageReceived(GameResultMessageDto dto) {
         for (UUID player : dto.players()) {
-            progressService.evaluateAchievements(new GameContext(
+            progressService.evaluateAchievementsAfterGame(new GameContext(
                     new GameId(dto.gameId()),
                     new UserId(player),
                     dto.winnerId() != null
                             ? new UserId(dto.winnerId())
                             : null,
                     dto.sessionResult(),
-                    dto.difficulty(),
-                    dto.metadata() != null
-                            ? dto.metadata().get(player.toString())
-                            : null
+                    dto.difficulty()
             ));
         }
+    }
+
+    @RabbitListener(queues = RabbitMQTopologyAchievements.ACHIEVEMENT_COMPLETED_QUEUE)
+    void onAchievementCompletedMessageReceived(AchievementCompletedDto dto) {
+        progressService.completeAchievement(new UserId(dto.userId()), dto.gameId(), dto.code(), dto.timestamp());
     }
 }

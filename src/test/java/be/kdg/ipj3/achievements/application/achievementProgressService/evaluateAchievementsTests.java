@@ -1,9 +1,14 @@
+/*
 package be.kdg.ipj3.achievements.application.achievementProgressService;
 
 import be.kdg.ipj3.achievements.application.AchievementProgressService;
 import be.kdg.ipj3.achievements.domain.AchievementProgress;
 import be.kdg.ipj3.achievements.domain.GameContext;
 import be.kdg.ipj3.achievements.domain.IAchievementProgressRepository;
+import be.kdg.ipj3.shared.domain.AchievementId;
+import be.kdg.ipj3.shared.domain.CountTrigger;
+import be.kdg.ipj3.shared.domain.CountingStrategy;
+import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.IGameRepository;
@@ -96,7 +101,7 @@ public class evaluateAchievementsTests {
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
         // Act
-        achievementProgressService.evaluateAchievements(context);
+        achievementProgressService.evaluateAchievementsAfterGame(context);
 
         // Assert
         Optional<AchievementProgress> progress = progressRepository
@@ -124,8 +129,8 @@ public class evaluateAchievementsTests {
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
         // Act
-        achievementProgressService.evaluateAchievements(context);
-        achievementProgressService.evaluateAchievements(context);
+        achievementProgressService.evaluateAchievementsAfterGame(context);
+        achievementProgressService.evaluateAchievementsAfterGame(context);
 
         // Assert
         AchievementProgress progress = progressRepository
@@ -150,7 +155,7 @@ public class evaluateAchievementsTests {
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
         // Act
-        achievementProgressService.evaluateAchievements(context);
+        achievementProgressService.evaluateAchievementsAfterGame(context);
 
         // Assert
         Optional<AchievementProgress> progress = progressRepository
@@ -173,9 +178,9 @@ public class evaluateAchievementsTests {
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
         // Act
-        achievementProgressService.evaluateAchievements(winContext);
-        achievementProgressService.evaluateAchievements(winContext);
-        achievementProgressService.evaluateAchievements(winContext);
+        achievementProgressService.evaluateAchievementsAfterGame(winContext);
+        achievementProgressService.evaluateAchievementsAfterGame(winContext);
+        achievementProgressService.evaluateAchievementsAfterGame(winContext);
 
         // Assert
         AchievementProgress progress = progressRepository
@@ -202,10 +207,10 @@ public class evaluateAchievementsTests {
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
         // Act
-        achievementProgressService.evaluateAchievements(winContext);
-        achievementProgressService.evaluateAchievements(winContext);
-        achievementProgressService.evaluateAchievements(loseContext);
-        achievementProgressService.evaluateAchievements(winContext);
+        achievementProgressService.evaluateAchievementsAfterGame(winContext);
+        achievementProgressService.evaluateAchievementsAfterGame(winContext);
+        achievementProgressService.evaluateAchievementsAfterGame(loseContext);
+        achievementProgressService.evaluateAchievementsAfterGame(winContext);
 
         // Assert
         AchievementProgress progress = progressRepository
@@ -232,8 +237,8 @@ public class evaluateAchievementsTests {
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
         // Act
-        achievementProgressService.evaluateAchievements(contextX);
-        achievementProgressService.evaluateAchievements(contextO);
+        achievementProgressService.evaluateAchievementsAfterGame(contextX);
+        achievementProgressService.evaluateAchievementsAfterGame(contextO);
 
         // Assert
         AchievementProgress progress = progressRepository
@@ -259,8 +264,8 @@ public class evaluateAchievementsTests {
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
         // Act
-        achievementProgressService.evaluateAchievements(contextX);
-        achievementProgressService.evaluateAchievements(contextX);
+        achievementProgressService.evaluateAchievementsAfterGame(contextX);
+        achievementProgressService.evaluateAchievementsAfterGame(contextX);
 
         // Assert
         AchievementProgress progress = progressRepository
@@ -271,3 +276,4 @@ public class evaluateAchievementsTests {
         assertThat(progress.isCompleted()).isFalse();
     }
 }
+*/

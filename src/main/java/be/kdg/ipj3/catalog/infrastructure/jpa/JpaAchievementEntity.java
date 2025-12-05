@@ -19,38 +19,36 @@ public class JpaAchievementEntity {
     private String name;
 
     @Column(nullable = false)
-    private String description;
+    private String code;
 
     @Column(nullable = false)
-    private int requiredValue;
+    private String description;
+
+    private Integer requiredValue;
 
     @Column(nullable = false)
     private int points;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private CountingStrategy countingStrategy;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private CountTrigger countTrigger;
-
-    private String ruleKey;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id", nullable = false)
     private JpaGameEntity game;
 
-    public JpaAchievementEntity(UUID id, String name, String description, int requiredValue, int points,
-                                CountingStrategy countingStrategy, CountTrigger countTrigger, String ruleKey) {
+    public JpaAchievementEntity(UUID id, String name, String code, String description, Integer requiredValue,
+                                int points, CountingStrategy countingStrategy, CountTrigger countTrigger) {
         this.id = id;
         this.name = name;
+        this.code = code;
         this.description = description;
         this.requiredValue = requiredValue;
         this.points = points;
         this.countingStrategy = countingStrategy;
         this.countTrigger = countTrigger;
-        this.ruleKey = ruleKey;
     }
 
     protected JpaAchievementEntity() {
@@ -60,12 +58,12 @@ public class JpaAchievementEntity {
         return new JpaAchievementEntity(
                 achievement.getId().id(),
                 achievement.getName(),
+                achievement.getCode(),
                 achievement.getDescription(),
                 achievement.getRequiredValue(),
                 achievement.getPoints(),
                 achievement.getCountingStrategy(),
-                achievement.getCountTrigger(),
-                achievement.getRuleKey()
+                achievement.getCountTrigger()
         );
     }
 
@@ -73,12 +71,12 @@ public class JpaAchievementEntity {
         return new Achievement(
                 new AchievementId(this.id),
                 this.name,
+                this.code,
                 this.description,
                 this.requiredValue,
                 this.points,
                 this.countingStrategy,
-                this.countTrigger,
-                this.ruleKey
+                this.countTrigger
         );
     }
 

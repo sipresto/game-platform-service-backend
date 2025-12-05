@@ -99,7 +99,7 @@ public class LobbyController {
     @PostMapping("/{id}/start")
     public ResponseEntity<GameUrlDto> startGame(
             @PathVariable UUID id,
-            @Valid @RequestBody GameStartDto dto,
+            @RequestBody GameStartDto dto,
             @AuthenticationPrincipal Jwt token
     ) {
         UserId hostId = resolveUserId(token);

@@ -26,4 +26,6 @@ public interface IGameRepository {
     void deleteAll();
 
     List<Achievement> findAchievementsByGameId(GameId id);
+
+    Optional<Achievement> findAchievementByCode(String code);
 }

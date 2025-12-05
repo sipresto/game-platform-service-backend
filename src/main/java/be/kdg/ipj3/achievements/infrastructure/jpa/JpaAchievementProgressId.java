@@ -14,7 +14,8 @@ public class JpaAchievementProgressId {
     @Column(nullable = false)
     private UUID achievementId;
 
-    protected JpaAchievementProgressId() {} // for JPA
+    protected JpaAchievementProgressId() {
+    } // for JPA
 
     public JpaAchievementProgressId(UUID userId, UUID achievementId) {
         this.userId = userId;

@@ -63,9 +63,9 @@ public class Game {
         return List.copyOf(categories);
     }
 
-    public void addAchievement(String name, String description, int requiredValue, int points,
-                               CountingStrategy countingStrategy, CountTrigger countTrigger, String ruleKey) {
-        achievements.add(new Achievement(name, description, requiredValue, points, countingStrategy, countTrigger, ruleKey));
+    public void addAchievement(String name, String code, String description, int requiredValue, int points,
+                               CountingStrategy countingStrategy, CountTrigger countTrigger) {
+        achievements.add(new Achievement(name, code, description, requiredValue, points, countingStrategy, countTrigger));
     }
 
     public boolean hasCategory(Category category) {

@@ -8,6 +8,5 @@ public enum CountTrigger {
     DRAW_AI,
     DRAW_ANY,
     WIN_OR_DRAW_ANY,
-    PLAY_ANY,
-    CUSTOM
+    PLAY_ANY
 }
