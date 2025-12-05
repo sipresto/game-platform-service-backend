@@ -61,7 +61,7 @@ public class PurchaseController {
 
 
         if (!gameService.existsById(gameId)) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
 
         UserId userId = resolveUserId(token);
