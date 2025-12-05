@@ -1,17 +1,6 @@
 name: kdg-ipj3-team20-dev
 
 services:
-  # ---------------------
-  # REVERSE PROXY (DEV)
-  # ---------------------
-  reverse_proxy:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx-dev.conf:/etc/nginx/nginx.conf:ro
-    networks:
-      - dev
 
   # ---------------------
   # DATABASE (POSTGRES)
