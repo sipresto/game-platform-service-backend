@@ -6,6 +6,4 @@ public interface IPurchaseRepository {
     Purchase save(Purchase purchase);
 
     void deleteAll();
-
-    Optional<Purchase> findByPaymentId(String paymentId);
 }

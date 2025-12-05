@@ -23,12 +23,6 @@ public class PurchaseRepository implements IPurchaseRepository {
 
 
     @Override
-    public Optional<Purchase> findByPaymentId(String paymentId) {
-        return jpaPurchaseRepository.findByPaymentId(paymentId)
-                .map(JpaPurchaseEntity::toDomain);
-    }
-
-    @Override
     public void deleteAll() {
         jpaPurchaseRepository.deleteAll();
     }

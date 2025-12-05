@@ -6,5 +6,4 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface JpaPurchaseRepository extends JpaRepository<JpaPurchaseEntity, UUID> {
-    Optional<JpaPurchaseEntity> findByPaymentId(String paymentId);
 }
