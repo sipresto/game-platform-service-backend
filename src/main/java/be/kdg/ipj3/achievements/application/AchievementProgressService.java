@@ -11,6 +11,7 @@ import be.kdg.ipj3.shared.domain.AchievementId;
 import be.kdg.ipj3.shared.domain.CountingStrategy;
 import be.kdg.ipj3.shared.domain.NotFoundException;
 import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.users.application.UserService;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -23,13 +24,15 @@ public class AchievementProgressService {
     private final List<CountingStrategyHandler> strategyHandlers;
     private final IAchievementProgressRepository progressRepository;
     private final GameService gameService;
+    private final UserService userService;
 
     public AchievementProgressService(TriggerEvaluator triggerEvaluator, List<CountingStrategyHandler> strategyHandlers,
-                                      IAchievementProgressRepository progressRepository, GameService gameService) {
+                                      IAchievementProgressRepository progressRepository, GameService gameService, UserService userService) {
         this.triggerEvaluator = triggerEvaluator;
         this.strategyHandlers = strategyHandlers;
         this.progressRepository = progressRepository;
         this.gameService = gameService;
+        this.userService = userService;
     }
 
     public void evaluateAchievementsAfterGame(GameContext context) {
@@ -67,16 +70,27 @@ public class AchievementProgressService {
 
     public void completeAchievement(UserId userId, UUID gameSesssionId, String code, Instant timestamp) {
         // TODO: haal gameId uit lobby via gameSessionId -> zoek met die gameId en code de achievementId
-        Achievement achievement = gameService.findAchievementByCode(code)
-                .orElseThrow(() -> new NotFoundException("Achievement [" + code + "] not found"));
+        Achievement achievement = gameService.findAchievementByCode(code).orElse(null);
+        if (achievement == null) {
+            return;
+        }
+
+        try {
+            userService.findById(userId);
+        } catch (NotFoundException e) {
+            return;
+        }
+
         AchievementProgress progress = getProgress(userId, achievement.getId());
 
-        if (!progress.isCompleted()) {
-            AchievementProgress updatedProgress = progress.markCompleted(timestamp);
+        if (progress.isCompleted()) {
+            return;
+        }
 
-            if (updatedProgress != progress) {
-                progressRepository.save(updatedProgress);
-            }
+        AchievementProgress updatedProgress = progress.markCompleted(timestamp);
+
+        if (updatedProgress != progress) {
+            progressRepository.save(updatedProgress);
         }
     }
 

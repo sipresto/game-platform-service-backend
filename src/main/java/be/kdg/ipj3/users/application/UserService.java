@@ -39,7 +39,7 @@ public class UserService {
                 });
     }
 
-    public User getUser(UserId id) {
+    public User findById(UserId id) {
         return userRepository.findById(id)
                 .orElseThrow(id::notFound);
     }

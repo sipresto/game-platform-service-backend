@@ -1,14 +1,9 @@
-/*
 package be.kdg.ipj3.achievements.application.achievementProgressService;
 
 import be.kdg.ipj3.achievements.application.AchievementProgressService;
 import be.kdg.ipj3.achievements.domain.AchievementProgress;
 import be.kdg.ipj3.achievements.domain.GameContext;
 import be.kdg.ipj3.achievements.domain.IAchievementProgressRepository;
-import be.kdg.ipj3.shared.domain.AchievementId;
-import be.kdg.ipj3.shared.domain.CountTrigger;
-import be.kdg.ipj3.shared.domain.CountingStrategy;
-import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.IGameRepository;
@@ -24,14 +19,13 @@ import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
-public class evaluateAchievementsTests {
+public class EvaluateAchievementsAfterGameTests {
 
     @Autowired
     private AchievementProgressService achievementProgressService;
@@ -61,42 +55,39 @@ public class evaluateAchievementsTests {
         return game;
     }
 
-    private void createTestAchievement(Game game, int requiredValue, int points, CountingStrategy countingStrategy,
-                                       CountTrigger countTrigger, String ruleKey) {
+    private void createTestAchievement(Game game, int requiredValue, CountingStrategy countingStrategy,
+                                       CountTrigger countTrigger) {
         game.addAchievement(
                 "Test Achievement",
+                "TEST",
                 "Test Description",
                 requiredValue,
-                points,
+                10,
                 countingStrategy,
-                countTrigger,
-                ruleKey
+                countTrigger
         );
         gameRepository.save(game);
     }
 
-    private GameContext createTestGameContext(GameId gameId, UserId userId, UserId winnerId, SessionResult sessionResult,
-                                              Difficulty difficulty, Map<String, Object> metadata) {
+    private GameContext createTestGameContext(GameId gameId, UserId userId, UserId winnerId,
+                                              SessionResult sessionResult, Difficulty difficulty) {
         return new GameContext(
                 gameId,
                 userId,
                 winnerId,
                 sessionResult,
-                difficulty,
-                metadata
+                difficulty
         );
     }
 
     @Test
-    void evaluateAchievements_shouldCreateProgressAndMarkAsCompleted_whenAchievementTriggered() {
+    void evaluateAchievementsAfterGame_shouldCreateProgressAndMarkAsCompleted_whenAchievementTriggered() {
         // Arrange
         Game game = createTestGame();
-        createTestAchievement(game, 1, 10, CountingStrategy.INCREMENT,
-                CountTrigger.WIN_ANY, null);
+        createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_ANY);
 
         UserId userId = UserId.create();
-        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN,
-                null, Map.of("playerSide", "X"));
+        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -116,15 +107,13 @@ public class evaluateAchievementsTests {
     }
 
     @Test
-    void evaluateAchievements_shouldNotUpdateProgress_whenAlreadyCompleted() {
+    void evaluateAchievementsAfterGame_shouldNotUpdateProgress_whenAlreadyCompleted() {
         // Arrange
         Game game = createTestGame();
-        createTestAchievement(game, 1, 10, CountingStrategy.INCREMENT,
-                CountTrigger.WIN_PLAYER, null);
+        createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_PLAYER);
 
         UserId userId = UserId.create();
-        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN,
-                null, Map.of("playerSide", "X"));
+        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -142,15 +131,13 @@ public class evaluateAchievementsTests {
     }
 
     @Test
-    void evaluateAchievements_shouldNotTrigger_whenTriggerConditionNotMet() {
+    void evaluateAchievementsAfterGame_shouldNotTrigger_whenTriggerConditionNotMet() {
         // Arrange
         Game game = createTestGame();
-        createTestAchievement(game, 1, 10, CountingStrategy.INCREMENT,
-                CountTrigger.WIN_AI, null);
+        createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_AI);
 
         UserId userId = UserId.create();
-        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN,
-                null, Map.of("playerSide", "X"));
+        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -165,15 +152,13 @@ public class evaluateAchievementsTests {
     }
 
     @Test
-    void evaluateAchievements_shouldIncrementStreak_whenStreakContinues() {
+    void evaluateAchievementsAfterGame_shouldIncrementStreak_whenStreakContinues() {
         // Arrange
         Game game = createTestGame();
-        createTestAchievement(game, 3, 10, CountingStrategy.STREAK,
-                CountTrigger.WIN_OR_DRAW_ANY, null);
+        createTestAchievement(game, 3, CountingStrategy.STREAK, CountTrigger.WIN_OR_DRAW_ANY);
 
         UserId userId = UserId.create();
-        GameContext winContext = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN,
-                null, Map.of("playerSide", "X"));
+        GameContext winContext = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -192,17 +177,14 @@ public class evaluateAchievementsTests {
     }
 
     @Test
-    void evaluateAchievements_shouldResetStreak_whenStreakBroken() {
+    void evaluateAchievementsAfterGame_shouldResetStreak_whenStreakBroken() {
         // Arrange
         Game game = createTestGame();
-        createTestAchievement(game, 3, 10, CountingStrategy.STREAK,
-                CountTrigger.WIN_OR_DRAW_ANY, null);
+        createTestAchievement(game, 3, CountingStrategy.STREAK, CountTrigger.WIN_OR_DRAW_ANY);
 
         UserId userId = UserId.create();
-        GameContext winContext = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN,
-                null, Map.of("playerSide", "X"));
-        GameContext loseContext = createTestGameContext(game.getId(), userId, UserId.create(), SessionResult.PLAYER_WIN,
-                null, Map.of("playerSide", "X"));
+        GameContext winContext = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN, null);
+        GameContext loseContext = createTestGameContext(game.getId(), userId, UserId.create(), SessionResult.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -220,60 +202,4 @@ public class evaluateAchievementsTests {
         assertThat(progress.getCurrentProgress()).isEqualTo(1);
         assertThat(progress.isCompleted()).isFalse();
     }
-
-    @Test
-    void evaluateAchievements_shouldHandleConditionStrategy_whenCustomRuleMatches() {
-        // Arrange
-        Game game = createTestGame();
-        createTestAchievement(game, 2, 10, CountingStrategy.CONDITION,
-                CountTrigger.WIN_ANY, "WIN_AS_BOTH_SIDES");
-
-        UserId userId = UserId.create();
-        GameContext contextX = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN,
-                null, Map.of("playerSide", "X"));
-        GameContext contextO = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN,
-                null, Map.of("playerSide", "O"));
-
-        AchievementId achievementId = game.getAchievements().getFirst().getId();
-
-        // Act
-        achievementProgressService.evaluateAchievementsAfterGame(contextX);
-        achievementProgressService.evaluateAchievementsAfterGame(contextO);
-
-        // Assert
-        AchievementProgress progress = progressRepository
-                .findByUserIdAndAchievementId(userId, achievementId)
-                .orElseThrow();
-
-        assertThat(progress.getCurrentProgress()).isEqualTo(2);
-        assertThat(progress.isCompleted()).isTrue();
-        assertThat(progress.getMetadata().get("sidesWon")).isNotNull();
-    }
-
-    @Test
-    void evaluateAchievements_shouldNotCountTwice_whenConditionAlreadyMet() {
-        // Arrange
-        Game game = createTestGame();
-        createTestAchievement(game, 2, 10, CountingStrategy.CONDITION,
-                CountTrigger.WIN_ANY, "WIN_AS_BOTH_SIDES");
-
-        UserId userId = UserId.create();
-        GameContext contextX = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN,
-                null, Map.of("playerSide", "X"));
-
-        AchievementId achievementId = game.getAchievements().getFirst().getId();
-
-        // Act
-        achievementProgressService.evaluateAchievementsAfterGame(contextX);
-        achievementProgressService.evaluateAchievementsAfterGame(contextX);
-
-        // Assert
-        AchievementProgress progress = progressRepository
-                .findByUserIdAndAchievementId(userId, achievementId)
-                .orElseThrow();
-
-        assertThat(progress.getCurrentProgress()).isEqualTo(1);
-        assertThat(progress.isCompleted()).isFalse();
-    }
 }
-*/

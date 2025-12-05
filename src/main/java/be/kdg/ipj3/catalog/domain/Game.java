@@ -63,7 +63,7 @@ public class Game {
         return List.copyOf(categories);
     }
 
-    public void addAchievement(String name, String code, String description, int requiredValue, int points,
+    public void addAchievement(String name, String code, String description, Integer requiredValue, int points,
                                CountingStrategy countingStrategy, CountTrigger countTrigger) {
         achievements.add(new Achievement(name, code, description, requiredValue, points, countingStrategy, countTrigger));
     }
