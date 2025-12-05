@@ -6,6 +6,7 @@ import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class JpaGameEntity {
     private String description;
     private BigDecimal price;
     private String serviceUrl;
+    @Size(max = 2000)
     private String rules;
 
     @ElementCollection(fetch = FetchType.EAGER)

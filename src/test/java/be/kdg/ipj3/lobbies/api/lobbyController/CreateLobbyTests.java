@@ -72,6 +72,7 @@ public class CreateLobbyTests {
                 "Description",
                 Money.of(new java.math.BigDecimal("19.99")),
                 "https://test.com/service",
+                "A rule",
                 java.util.List.of(Category.NATIVE)
         );
         gameRepository.save(game);

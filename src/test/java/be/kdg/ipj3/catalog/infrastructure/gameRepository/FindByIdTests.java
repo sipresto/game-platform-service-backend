@@ -37,6 +37,7 @@ public class FindByIdTests {
                 "Test Description",
                 Money.of(BigDecimal.valueOf(9.99)),
                 "http://test.com/service",
+                "A rule",
                 List.of(),
                 List.of(Category.BOARDGAME)
         );

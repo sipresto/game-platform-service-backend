@@ -46,6 +46,7 @@ public class GetGameByIdTests {
                 "Test Description",
                 Money.of(BigDecimal.valueOf(49.99)),
                 "http://test.com/service",
+                "A rule",
                 List.of(Category.CARDGAME, Category.NATIVE, Category.STRATEGY)
         );
 

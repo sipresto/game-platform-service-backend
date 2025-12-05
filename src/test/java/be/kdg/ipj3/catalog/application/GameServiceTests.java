@@ -32,8 +32,8 @@ class GameServiceTests {
     @Test
     void findAllGames_shouldReturnListOfGames_whenGamesExist() {
         // Arrange
-        Game game1 = new Game("Test Game", "Test Description", Money.of(BigDecimal.valueOf(49.99)), "http://test.com/service", List.of(Category.CARDGAME));
-        Game game2 = new Game("Test Game 2", "Test Description 2", Money.of(BigDecimal.valueOf(39.99)), "http://test.com/service2", List.of(Category.CARDGAME));
+        Game game1 = new Game("Test Game", "Test Description", Money.of(BigDecimal.valueOf(49.99)), "http://test.com/service", "A rule", List.of(Category.CARDGAME));
+        Game game2 = new Game("Test Game 2", "Test Description 2", Money.of(BigDecimal.valueOf(39.99)), "http://test.com/service2", "A rule", List.of(Category.CARDGAME));
         List<Game> expectedGames = List.of(game1, game2);
 
         given(gameRepository.findAllGames()).willReturn(expectedGames);

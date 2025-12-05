@@ -17,10 +17,11 @@ class GameTests {
         String description = "Test Description";
         Money price = Money.of(BigDecimal.valueOf(49.99));
         String serviceUrl = "http://test.com/service";
+        String rule = "A rule";
         List<Category> categories = List.of(Category.CARDGAME);
 
         // Act
-        Game game = new Game(name, description, price, serviceUrl, categories);
+        Game game = new Game(name, description, price, serviceUrl, rule, categories);
 
         // Assert
         assertNotNull(game.getId());

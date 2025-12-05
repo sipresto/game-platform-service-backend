@@ -71,6 +71,7 @@ public class GetOpenLobbiesForGameTests {
                 "Description",
                 Money.of(BigDecimal.valueOf(19.99)),
                 "https://test.com/service",
+                "A rule",
                 List.of(Category.NATIVE)
         );
         gameRepository.save(game);

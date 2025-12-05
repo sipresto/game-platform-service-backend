@@ -50,6 +50,7 @@ public class GetAllGamesByFilterTests {
                 "Filtered Description",
                 Money.of(BigDecimal.valueOf(20.00)),
                 "http://test.com/service",
+                "A rule",
                 List.of(Category.CARDGAME)
         );
         gameRepository.save(game);
