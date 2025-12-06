@@ -1,5 +1,7 @@
 package be.kdg.ipj3.catalog.domain;
 
+import be.kdg.ipj3.shared.domain.CountTrigger;
+import be.kdg.ipj3.shared.domain.CountingStrategy;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import org.jmolecules.ddd.annotation.AggregateRoot;
@@ -26,7 +28,7 @@ public class Game {
         this.price = price;
         this.serviceUrl = serviceUrl;
         this.achievements.addAll(achievements);
-        this.categories = categories;
+        this.categories = List.copyOf(categories);
     }
 
     public Game(String name, String description, Money price, String serviceUrl, List<Category> categories) {
@@ -54,22 +56,19 @@ public class Game {
     }
 
     public List<Achievement> getAchievements() {
-        return achievements;
+        return List.copyOf(achievements);
     }
 
     public List<Category> getCategories() {
-        return categories;
+        return List.copyOf(categories);
     }
 
-    public void addAchievement(Achievement achievement) {
-        achievements.add(achievement);
+    public void addAchievement(String name, String code, String description, Integer requiredValue, int points,
+                               CountingStrategy countingStrategy, CountTrigger countTrigger) {
+        achievements.add(new Achievement(name, code, description, requiredValue, points, countingStrategy, countTrigger));
     }
 
     public boolean hasCategory(Category category) {
         return categories.contains(category);
-    }
-
-    public boolean hasAchievements() {
-        return !achievements.isEmpty();
     }
 }

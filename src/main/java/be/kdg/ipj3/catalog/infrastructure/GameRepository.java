@@ -1,8 +1,10 @@
 package be.kdg.ipj3.catalog.infrastructure;
 
+import be.kdg.ipj3.catalog.domain.Achievement;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.IGameRepository;
+import be.kdg.ipj3.catalog.infrastructure.jpa.JpaAchievementEntity;
 import be.kdg.ipj3.catalog.infrastructure.jpa.JpaGameEntity;
 import be.kdg.ipj3.catalog.infrastructure.jpa.JpaGameRepository;
 import be.kdg.ipj3.shared.domain.GameId;
@@ -72,5 +74,17 @@ public class GameRepository implements IGameRepository {
     @Override
     public void deleteAll() {
         jpaGameRepository.deleteAll();
+    }
+
+    @Override
+    public List<Achievement> findAchievementsByGameId(GameId id) {
+        return jpaGameRepository.findAchievementsByGameId(id.id()).stream()
+                .map(JpaAchievementEntity::toDomain)
+                .toList();
+    }
+
+    @Override
+    public Optional<Achievement> findAchievementByCode(String code) {
+        return jpaGameRepository.findAchievementByCode(code).map(JpaAchievementEntity::toDomain);
     }
 }

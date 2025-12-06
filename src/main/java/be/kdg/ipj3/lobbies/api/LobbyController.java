@@ -6,7 +6,6 @@ import be.kdg.ipj3.lobbies.application.LobbyService;
 import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
 import be.kdg.ipj3.lobbies.domain.lobby.LobbyId;
 import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.NotFoundException;
 import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.User;
@@ -100,7 +99,7 @@ public class LobbyController {
     @PostMapping("/{id}/start")
     public ResponseEntity<GameUrlDto> startGame(
             @PathVariable UUID id,
-            @Valid @RequestBody GameStartDto dto,
+            @RequestBody GameStartDto dto,
             @AuthenticationPrincipal Jwt token
     ) {
         UserId hostId = resolveUserId(token);

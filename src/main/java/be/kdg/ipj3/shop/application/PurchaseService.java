@@ -14,8 +14,8 @@ public class PurchaseService {
         this.purchaseRepository = purchaseRepository;
     }
 
-    public Purchase buy(UserId userId, GameId gameId) {
-        Purchase purchase = new Purchase(userId, gameId);
+    public Purchase buy(UserId userId, GameId gameId, String chargeId) {
+        Purchase purchase = new Purchase(userId, gameId,chargeId);
         return purchaseRepository.save(purchase);
     }
 }

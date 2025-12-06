@@ -37,3 +37,4 @@ build/
 */*/idp_mysql_data_prod
 */*/postgresql
 */*/rabbitmq
+/src/main/resources/.env
