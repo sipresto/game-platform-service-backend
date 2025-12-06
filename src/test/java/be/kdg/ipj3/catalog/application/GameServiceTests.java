@@ -2,10 +2,10 @@ package be.kdg.ipj3.catalog.application;
 
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.domain.IGameRepository;
-import be.kdg.ipj3.shared.domain.GameId;
+import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.shared.domain.NotFoundException;
+import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,7 +24,7 @@ import static org.mockito.BDDMockito.then;
 class GameServiceTests {
 
     @Mock
-    private IGameRepository gameRepository;
+    private GameRepository gameRepository;
 
     @InjectMocks
     private GameService gameService;

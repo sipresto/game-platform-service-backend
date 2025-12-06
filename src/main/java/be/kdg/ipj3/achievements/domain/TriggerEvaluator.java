@@ -1,6 +1,6 @@
 package be.kdg.ipj3.achievements.domain;
 
-import be.kdg.ipj3.shared.domain.CountTrigger;
+import be.kdg.ipj3.catalog.shared.CountTrigger;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,11 +1,11 @@
 package be.kdg.ipj3.lobbies.infrastructure.lobbyRepository;
 
-import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
-import be.kdg.ipj3.lobbies.domain.lobby.LobbyId;
-import be.kdg.ipj3.lobbies.domain.lobby.LobbyStatus;
-import be.kdg.ipj3.lobbies.infrastructure.LobbyRepository;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.lobbies.domain.Lobby;
+import be.kdg.ipj3.lobbies.domain.LobbyId;
+import be.kdg.ipj3.lobbies.domain.LobbyStatus;
+import be.kdg.ipj3.lobbies.infrastructure.LobbyRepositoryImpl;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -17,14 +17,14 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
-@Import(LobbyRepository.class)
+@Import(LobbyRepositoryImpl.class)
 @TestPropertySource(properties = {
         "spring.sql.init.mode=never"
 })
 public class FindByStatusAndGameIdTests {
 
     @Autowired
-    LobbyRepository lobbyRepository;
+    LobbyRepositoryImpl lobbyRepositoryImpl;
 
     private void createTestLobby(GameId gameId, LobbyStatus lobbyStatus) {
         UserId hostId = UserId.create();
@@ -39,7 +39,7 @@ public class FindByStatusAndGameIdTests {
                 lobbyStatus,
                 ""
         );
-        lobbyRepository.save(lobby);
+        lobbyRepositoryImpl.save(lobby);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class FindByStatusAndGameIdTests {
         createTestLobby(gameId2, LobbyStatus.OPEN);
 
         // Act
-        List<Lobby> result = lobbyRepository.findByStatusAndGameId(LobbyStatus.OPEN, gameId1);
+        List<Lobby> result = lobbyRepositoryImpl.findByStatusAndGameId(LobbyStatus.OPEN, gameId1);
 
         // Assert
         assertThat(result).isNotNull();
@@ -74,7 +74,7 @@ public class FindByStatusAndGameIdTests {
         createTestLobby(gameId1, LobbyStatus.CLOSED);
 
         // Act
-        List<Lobby> result = lobbyRepository.findByStatusAndGameId(LobbyStatus.OPEN, gameId2);
+        List<Lobby> result = lobbyRepositoryImpl.findByStatusAndGameId(LobbyStatus.OPEN, gameId2);
 
         // Assert
         assertThat(result).isNotNull();

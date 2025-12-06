@@ -1,12 +1,12 @@
 package be.kdg.ipj3.lobbies.infrastructure.lobbyRepository;
 
-import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
-import be.kdg.ipj3.lobbies.domain.lobby.LobbyId;
-import be.kdg.ipj3.lobbies.domain.lobby.LobbyStatus;
-import be.kdg.ipj3.lobbies.infrastructure.LobbyRepository;
+import be.kdg.ipj3.lobbies.domain.Lobby;
+import be.kdg.ipj3.lobbies.domain.LobbyId;
+import be.kdg.ipj3.lobbies.domain.LobbyStatus;
+import be.kdg.ipj3.lobbies.infrastructure.LobbyRepositoryImpl;
 import be.kdg.ipj3.lobbies.infrastructure.jpa.JpaLobbyEntity;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -19,14 +19,14 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
-@Import(LobbyRepository.class)
+@Import(LobbyRepositoryImpl.class)
 @TestPropertySource(properties = {
         "spring.sql.init.mode=never"
 })
 public class SaveTests {
 
     @Autowired
-    LobbyRepository lobbyRepository;
+    LobbyRepositoryImpl lobbyRepositoryImpl;
 
     @Autowired
     TestEntityManager entityManager;
@@ -51,7 +51,7 @@ public class SaveTests {
         );
 
         // Act
-        lobbyRepository.save(newLobby);
+        lobbyRepositoryImpl.save(newLobby);
 
         // Assert
         JpaLobbyEntity foundLobby = entityManager.find(JpaLobbyEntity.class, lobbyId.id());
@@ -83,7 +83,7 @@ public class SaveTests {
                 LobbyStatus.OPEN,
                 null
         );
-        lobbyRepository.save(originalLobby);
+        lobbyRepositoryImpl.save(originalLobby);
 
         Lobby updatedLobby = new Lobby(
                 lobbyId,
@@ -97,7 +97,7 @@ public class SaveTests {
         );
 
         // Act
-        lobbyRepository.save(updatedLobby);
+        lobbyRepositoryImpl.save(updatedLobby);
 
         // Assert
         JpaLobbyEntity foundLobby = entityManager.find(JpaLobbyEntity.class, lobbyId.id());

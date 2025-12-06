@@ -1,9 +1,9 @@
 package be.kdg.ipj3.lobbies.api.lobbyController;
 
-import be.kdg.ipj3.lobbies.domain.lobby.ILobbyRepository;
-import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.lobbies.domain.LobbyRepository;
+import be.kdg.ipj3.lobbies.domain.Lobby;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class GetAllOpenLobbiesTests {
     private MockMvc mockMvc;
 
     @Autowired
-    private ILobbyRepository lobbyRepository;
+    private LobbyRepository lobbyRepository;
 
     @BeforeEach
     void setUp() {

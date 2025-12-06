@@ -2,12 +2,13 @@ package be.kdg.ipj3.shop.api.purchaseController;
 
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.domain.IGameRepository;
-import be.kdg.ipj3.shared.domain.GameId;
+import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.shop.domain.IPurchaseRepository;
-import be.kdg.ipj3.users.domain.IUserRepository;
+import be.kdg.ipj3.shop.infrastructure.stripe.StripeService;
+import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.User;
 import com.stripe.model.Charge;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +22,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
-import be.kdg.ipj3.shop.infrastructure.stripe.StripeService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -47,10 +47,10 @@ class BuyGameTests {
     private IPurchaseRepository purchaseRepository;
 
     @Autowired
-    private IUserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    private IGameRepository gameRepository;
+    private GameRepository gameRepository;
 
     @MockitoBean
     private StripeService stripeService;

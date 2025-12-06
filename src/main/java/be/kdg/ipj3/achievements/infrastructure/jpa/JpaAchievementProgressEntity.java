@@ -1,8 +1,8 @@
 package be.kdg.ipj3.achievements.infrastructure.jpa;
 
 import be.kdg.ipj3.achievements.domain.AchievementProgress;
-import be.kdg.ipj3.shared.domain.AchievementId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.catalog.shared.AchievementId;
+import be.kdg.ipj3.users.shared.UserId;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

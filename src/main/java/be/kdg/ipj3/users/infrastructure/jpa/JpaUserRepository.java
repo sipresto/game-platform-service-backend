@@ -13,17 +13,27 @@ public interface JpaUserRepository extends JpaRepository<JpaUserEntity, UUID> {
 
     Optional<JpaUserEntity> findByKeycloakId(String keycloakId);
 
-    @Query("SELECT g FROM JpaUserEntity u JOIN u.ownedGames g WHERE u.keycloakId = :keycloakId")
-    List<UUID> findOwnedGamesByKeycloakId(String keycloakId);
+    @Query("""
+            SELECT g
+            FROM JpaUserEntity u
+            JOIN u.ownedGames g
+            WHERE u.id = :id
+            """
+    )
+    List<UUID> findOwnedGamesById(UUID id);
 
     List<JpaUserEntity> findAllByVisibility(Visibility visibility);
 
     @Query("""
-       SELECT ue\s
-       FROM JpaUserEntity ue\s
-       WHERE ue.id IN (
-           SELECT f FROM JpaUserEntity u JOIN u.friends f WHERE u.id = :userId
-       )
-   \s""")
+            SELECT ue
+            FROM JpaUserEntity ue
+            WHERE ue.id IN (
+                SELECT f
+                FROM JpaUserEntity u
+                JOIN u.friends f
+                WHERE u.id = :userId
+            )
+            """
+    )
     List<JpaUserEntity> findFriends(@Param("userId") UUID userId);
 }

@@ -5,7 +5,7 @@ import org.jmolecules.ddd.annotation.ValueObject;
 import java.util.Objects;
 
 @ValueObject
-public record Profile (String displayName, String bio) {
+public record Profile(String displayName, String bio) {
     public Profile {
         Objects.requireNonNull(displayName);
     }

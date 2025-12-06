@@ -1,9 +1,9 @@
 package be.kdg.ipj3.sessions.api.dto;
 
-import be.kdg.ipj3.lobbies.domain.lobby.Difficulty;
-import be.kdg.ipj3.sessions.domain.session.Session;
-import be.kdg.ipj3.sessions.domain.session.SessionResult;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.lobbies.domain.Difficulty;
+import be.kdg.ipj3.sessions.domain.Session;
+import be.kdg.ipj3.sessions.domain.SessionResult;
+import be.kdg.ipj3.users.shared.UserId;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;

@@ -20,6 +20,7 @@ public class StripeService {
     public void init() {
         Stripe.apiKey = secretKey;
     }
+
     public Charge charge(ChargeRequest chargeRequest) throws StripeException {
         Map<String, Object> chargeParams = new HashMap<>();
         chargeParams.put("amount", chargeRequest.amount());
@@ -28,6 +29,7 @@ public class StripeService {
         chargeParams.put("source", chargeRequest.stripeToken());
         return Charge.create(chargeParams);
     }
+
     public Charge retrieve(String chargeId) throws StripeException {
         return Charge.retrieve(chargeId);
     }

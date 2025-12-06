@@ -5,7 +5,12 @@
 POST {{keycloakUrl}}
 Content-Type: application/x-www-form-urlencoded
 
-client_id={{clientId}}&client_secret={{clientSecret}}&username=Johnny&password=Test123&grant_type=password&scope=openid
+client_id = {{clientId}} &
+client_secret = {{clientSecret}} &
+username = Johnny &
+password = Test123 &
+grant_type = password &
+scope = openid
 
 > {%
     client.global.set("token", response.body.access_token);

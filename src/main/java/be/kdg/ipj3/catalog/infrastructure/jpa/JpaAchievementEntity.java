@@ -1,9 +1,9 @@
 package be.kdg.ipj3.catalog.infrastructure.jpa;
 
 import be.kdg.ipj3.catalog.domain.Achievement;
-import be.kdg.ipj3.shared.domain.CountTrigger;
-import be.kdg.ipj3.shared.domain.AchievementId;
-import be.kdg.ipj3.shared.domain.CountingStrategy;
+import be.kdg.ipj3.catalog.shared.AchievementId;
+import be.kdg.ipj3.catalog.shared.CountTrigger;
+import be.kdg.ipj3.catalog.shared.CountingStrategy;
 import jakarta.persistence.*;
 
 import java.util.UUID;

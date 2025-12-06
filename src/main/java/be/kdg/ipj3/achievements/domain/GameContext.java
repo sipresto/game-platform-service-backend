@@ -1,9 +1,9 @@
 package be.kdg.ipj3.achievements.domain;
 
-import be.kdg.ipj3.lobbies.domain.lobby.Difficulty;
-import be.kdg.ipj3.sessions.domain.session.SessionResult;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.lobbies.domain.Difficulty;
+import be.kdg.ipj3.sessions.domain.SessionResult;
+import be.kdg.ipj3.users.shared.UserId;
 
 public record GameContext(GameId game, UserId player, UserId winner, SessionResult result, Difficulty difficulty) {
 

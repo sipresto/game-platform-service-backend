@@ -1,11 +1,11 @@
 package be.kdg.ipj3.lobbies.infrastructure.lobbyRepository;
 
-import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
-import be.kdg.ipj3.lobbies.domain.lobby.LobbyId;
-import be.kdg.ipj3.lobbies.domain.lobby.LobbyStatus;
-import be.kdg.ipj3.lobbies.infrastructure.LobbyRepository;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.lobbies.domain.Lobby;
+import be.kdg.ipj3.lobbies.domain.LobbyId;
+import be.kdg.ipj3.lobbies.domain.LobbyStatus;
+import be.kdg.ipj3.lobbies.infrastructure.LobbyRepositoryImpl;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -18,14 +18,14 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
-@Import(LobbyRepository.class)
+@Import(LobbyRepositoryImpl.class)
 @TestPropertySource(properties = {
         "spring.sql.init.mode=never"
 })
 public class FindByIdTests {
 
     @Autowired
-    LobbyRepository lobbyRepository;
+    LobbyRepositoryImpl lobbyRepositoryImpl;
 
     @Test
     void findById_shouldReturnLobby_whenLobbyExists() {
@@ -45,10 +45,10 @@ public class FindByIdTests {
                 LobbyStatus.OPEN,
                 null
         );
-        lobbyRepository.save(lobby);
+        lobbyRepositoryImpl.save(lobby);
 
         // Act
-        Optional<Lobby> result = lobbyRepository.findById(lobbyId);
+        Optional<Lobby> result = lobbyRepositoryImpl.findById(lobbyId);
 
         // Assert
         assertThat(result).isPresent();
@@ -69,7 +69,7 @@ public class FindByIdTests {
         LobbyId nonExistentId = LobbyId.create();
 
         // Act
-        Optional<Lobby> result = lobbyRepository.findById(nonExistentId);
+        Optional<Lobby> result = lobbyRepositoryImpl.findById(nonExistentId);
 
         // Assert
         assertThat(result).isEmpty();

@@ -1,9 +1,9 @@
 package be.kdg.ipj3.users.application;
 
-import be.kdg.ipj3.users.domain.IUserRepository;
+import be.kdg.ipj3.users.shared.UserId;
+import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
-import be.kdg.ipj3.shared.domain.UserId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 class GetAllPublicUsersTests {
 
     @Mock
-    private IUserRepository userRepository;
+    private UserRepository userRepository;
 
     @InjectMocks
     private UserService userService;
@@ -34,7 +34,7 @@ class GetAllPublicUsersTests {
         given(userRepository.findAllPublicUsers()).willReturn(List.of(user1, user2));
 
         // Act
-        List<User> result = userService.getAllPublicUsers();
+        List<User> result = userService.findAllPublicUsers();
 
         // Assert
         assertThat(result).containsExactly(user1, user2);
@@ -47,7 +47,7 @@ class GetAllPublicUsersTests {
         given(userRepository.findAllPublicUsers()).willReturn(List.of());
 
         // Act
-        List<User> result = userService.getAllPublicUsers();
+        List<User> result = userService.findAllPublicUsers();
 
         // Assert
         assertThat(result).isEmpty();

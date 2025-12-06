@@ -1,7 +1,7 @@
 package be.kdg.ipj3.users.application;
 
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.users.domain.IUserRepository;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.domain.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,7 +19,7 @@ import static org.mockito.BDDMockito.then;
 class FindOwnedGamesByKeycloakIdTests {
 
     @Mock
-    private IUserRepository userRepository;
+    private UserRepository userRepository;
 
     @InjectMocks
     private UserService userService;

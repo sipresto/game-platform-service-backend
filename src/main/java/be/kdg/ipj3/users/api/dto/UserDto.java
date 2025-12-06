@@ -19,7 +19,7 @@ public record UserDto(
         @Valid List<SmallGameDto> games,
         @Valid @NotNull ProfileDto profile,
         @NotNull Visibility visibility
-        ) {
+) {
     public static UserDto fromDomain(User user) {
         return new UserDto(
                 user.getId().id(),

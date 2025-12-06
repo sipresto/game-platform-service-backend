@@ -1,22 +1,22 @@
 package be.kdg.ipj3.sessions.application;
 
-import be.kdg.ipj3.sessions.domain.session.ISessionRepository;
-import be.kdg.ipj3.sessions.domain.session.Session;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.sessions.domain.Session;
+import be.kdg.ipj3.sessions.domain.SessionRepository;
+import be.kdg.ipj3.users.shared.UserId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class SessionService {
-    private final ISessionRepository sessionRepository;
+    private final SessionRepository sessionRepository;
 
-    public SessionService(ISessionRepository sessionRepository) {
+    public SessionService(SessionRepository sessionRepository) {
         this.sessionRepository = sessionRepository;
     }
 
-    @Transactional(readOnly = true)
     public List<Session> findSessionsByUserId(UserId userId) {
         return sessionRepository.findSessionsByUserId(userId);
     }

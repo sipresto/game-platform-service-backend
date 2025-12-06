@@ -3,13 +3,18 @@ package be.kdg.ipj3.achievements.application.achievementProgressService;
 import be.kdg.ipj3.achievements.application.AchievementProgressService;
 import be.kdg.ipj3.achievements.domain.AchievementProgress;
 import be.kdg.ipj3.achievements.domain.GameContext;
-import be.kdg.ipj3.achievements.domain.IAchievementProgressRepository;
+import be.kdg.ipj3.achievements.domain.AchievementProgressRepository;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.domain.IGameRepository;
-import be.kdg.ipj3.lobbies.domain.lobby.Difficulty;
-import be.kdg.ipj3.sessions.domain.session.SessionResult;
+import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.catalog.shared.AchievementId;
+import be.kdg.ipj3.catalog.shared.CountTrigger;
+import be.kdg.ipj3.catalog.shared.CountingStrategy;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.lobbies.domain.Difficulty;
+import be.kdg.ipj3.sessions.domain.SessionResult;
 import be.kdg.ipj3.shared.domain.*;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +38,10 @@ public class EvaluateAchievementsAfterGameTests {
     private AchievementProgressService achievementProgressService;
 
     @Autowired
-    private IAchievementProgressRepository progressRepository;
+    private AchievementProgressRepository progressRepository;
 
     @Autowired
-    private IGameRepository gameRepository;
+    private GameRepository gameRepository;
 
     @BeforeEach
     void setUp() {

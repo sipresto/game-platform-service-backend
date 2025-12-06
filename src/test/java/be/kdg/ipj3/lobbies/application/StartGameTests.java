@@ -1,33 +1,37 @@
 package be.kdg.ipj3.lobbies.application;
 
-import be.kdg.ipj3.lobbies.api.dto.GameStartRequestDto;
 import be.kdg.ipj3.lobbies.api.dto.GameCreatedResponseDto;
-import be.kdg.ipj3.lobbies.domain.exception.GameServiceUnavailableException;
-import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
-import be.kdg.ipj3.lobbies.domain.lobby.LobbyId;
-import be.kdg.ipj3.lobbies.domain.lobby.LobbyStatus;
-import be.kdg.ipj3.lobbies.domain.lobby.ILobbyRepository;
+import be.kdg.ipj3.lobbies.api.dto.GameStartRequestDto;
+import be.kdg.ipj3.lobbies.domain.exceptions.GameServiceUnavailableException;
+import be.kdg.ipj3.lobbies.domain.LobbyRepository;
+import be.kdg.ipj3.lobbies.domain.Lobby;
+import be.kdg.ipj3.lobbies.domain.LobbyId;
+import be.kdg.ipj3.lobbies.domain.LobbyStatus;
 import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class StartGameTests {
 
     @Mock
-    private ILobbyRepository lobbyRepository;
+    private LobbyRepository lobbyRepository;
 
     @Mock
     private GameClient gameClient;

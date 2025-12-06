@@ -14,5 +14,6 @@ public record ApiError(
             String field,
             String rejectedValue,
             String reason
-    ) {}
+    ) {
+    }
 }

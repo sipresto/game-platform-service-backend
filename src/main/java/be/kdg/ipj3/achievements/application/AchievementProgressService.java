@@ -1,56 +1,57 @@
 package be.kdg.ipj3.achievements.application;
 
 import be.kdg.ipj3.achievements.domain.AchievementProgress;
+import be.kdg.ipj3.achievements.domain.AchievementProgressRepository;
 import be.kdg.ipj3.achievements.domain.GameContext;
-import be.kdg.ipj3.achievements.domain.IAchievementProgressRepository;
 import be.kdg.ipj3.achievements.domain.TriggerEvaluator;
 import be.kdg.ipj3.achievements.domain.strategies.CountingStrategyHandler;
-import be.kdg.ipj3.catalog.application.GameService;
 import be.kdg.ipj3.catalog.domain.Achievement;
-import be.kdg.ipj3.shared.domain.AchievementId;
-import be.kdg.ipj3.shared.domain.CountingStrategy;
-import be.kdg.ipj3.shared.domain.NotFoundException;
-import be.kdg.ipj3.shared.domain.UserId;
-import be.kdg.ipj3.users.application.UserService;
+import be.kdg.ipj3.catalog.shared.AchievementId;
+import be.kdg.ipj3.catalog.shared.CountingStrategy;
+import be.kdg.ipj3.catalog.shared.GamesApi;
+import be.kdg.ipj3.users.shared.UserId;
+import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class AchievementProgressService {
     private final TriggerEvaluator triggerEvaluator;
     private final List<CountingStrategyHandler> strategyHandlers;
-    private final IAchievementProgressRepository progressRepository;
-    private final GameService gameService;
-    private final UserService userService;
+    private final AchievementProgressRepository progressRepository;
+    private final GamesApi gamesApi;
+    private final UsersApi usersApi;
 
     public AchievementProgressService(TriggerEvaluator triggerEvaluator, List<CountingStrategyHandler> strategyHandlers,
-                                      IAchievementProgressRepository progressRepository, GameService gameService, UserService userService) {
+                                      AchievementProgressRepository progressRepository, GamesApi gamesApi, UsersApi usersApi) {
         this.triggerEvaluator = triggerEvaluator;
         this.strategyHandlers = strategyHandlers;
         this.progressRepository = progressRepository;
-        this.gameService = gameService;
-        this.userService = userService;
+        this.gamesApi = gamesApi;
+        this.usersApi = usersApi;
     }
 
     public void evaluateAchievementsAfterGame(GameContext context) {
-        List<Achievement> gameAchievements = gameService.findAchievementsByGameId(context.game());
+        List<Achievement> gameAchievements = gamesApi.findAchievementsByGameId(context.game().id());
+
+        if (!usersApi.existsById(context.player())) {
+            return;
+        }
 
         for (Achievement achievement : gameAchievements) {
             AchievementProgress progress = getProgress(context.player(), achievement.getId());
 
-            if (progress.isCompleted()) {
-                continue;
-            }
-
-            if (!achievement.isCountedAfterGame()) {
+            if (progress.isCompleted() || !achievement.isCountedAfterGame()) {
                 continue;
             }
 
             if (!triggerEvaluator.shouldTrigger(achievement.getCountTrigger(), context) &&
-                    achievement.getCountingStrategy() != CountingStrategy.STREAK) {
+                achievement.getCountingStrategy() != CountingStrategy.STREAK) {
                 continue;
             }
 
@@ -70,14 +71,8 @@ public class AchievementProgressService {
 
     public void completeAchievement(UserId userId, UUID gameSesssionId, String code, Instant timestamp) {
         // TODO: haal gameId uit lobby via gameSessionId -> zoek met die gameId en code de achievementId
-        Achievement achievement = gameService.findAchievementByCode(code).orElse(null);
-        if (achievement == null) {
-            return;
-        }
-
-        try {
-            userService.findById(userId);
-        } catch (NotFoundException e) {
+        Achievement achievement = gamesApi.findAchievementByCode(code).orElse(null);
+        if (achievement == null || !usersApi.existsById(userId)) {
             return;
         }
 

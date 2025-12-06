@@ -1,14 +1,15 @@
 package be.kdg.ipj3.lobbies.api.dto;
 
-import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
+import be.kdg.ipj3.lobbies.domain.Lobby;
 
 import java.util.UUID;
 
-public record LobbyListDto(UUID id,
-                           int currentPlayerCount,
-                           boolean isPrivate
+public record LobbyListDto(
+        UUID id,
+        int currentPlayerCount,
+        boolean isPrivate
 ) {
-    public static LobbyListDto from(Lobby lobby) {
+    public static LobbyListDto fromDomain(Lobby lobby) {
         return new LobbyListDto(
                 lobby.getId().id(),
                 lobby.getPlayers().size(),

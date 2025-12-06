@@ -1,7 +1,7 @@
 package be.kdg.ipj3.shop.application;
 
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.shop.domain.Purchase;
 import be.kdg.ipj3.shop.infrastructure.PurchaseRepository;
 import org.junit.jupiter.api.Test;
@@ -34,11 +34,11 @@ class PurchaseServiceTests {
         GameId gameId = new GameId(UUID.randomUUID());
         String chargeId = "TestId";
 
-        Purchase savedPurchase = new Purchase(userId, gameId,chargeId);
+        Purchase savedPurchase = new Purchase(userId, gameId, chargeId);
         given(purchaseRepository.save(any(Purchase.class))).willReturn(savedPurchase);
 
         // Act
-        Purchase result = purchaseService.buy(userId, gameId,chargeId);
+        Purchase result = purchaseService.buy(userId, gameId, chargeId);
 
         // Assert
         assertThat(result).isNotNull();

@@ -1,8 +1,8 @@
 package be.kdg.ipj3.catalog.domain;
 
-import be.kdg.ipj3.shared.domain.CountTrigger;
-import be.kdg.ipj3.shared.domain.CountingStrategy;
-import be.kdg.ipj3.shared.domain.GameId;
+import be.kdg.ipj3.catalog.shared.CountTrigger;
+import be.kdg.ipj3.catalog.shared.CountingStrategy;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;

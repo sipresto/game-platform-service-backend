@@ -1,11 +1,11 @@
 package be.kdg.ipj3.sessions.infrastructure.sessionRepository;
 
-import be.kdg.ipj3.lobbies.domain.lobby.Difficulty;
-import be.kdg.ipj3.sessions.domain.session.Session;
-import be.kdg.ipj3.sessions.domain.session.SessionResult;
-import be.kdg.ipj3.sessions.infrastructure.SessionRepository;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.lobbies.domain.Difficulty;
+import be.kdg.ipj3.sessions.domain.Session;
+import be.kdg.ipj3.sessions.domain.SessionResult;
+import be.kdg.ipj3.sessions.infrastructure.SessionRepositoryImpl;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -17,14 +17,14 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
-@Import(SessionRepository.class)
+@Import(SessionRepositoryImpl.class)
 @TestPropertySource(properties = {
         "spring.sql.init.mode=never"
 })
 public class FindSessionsByUserIdTests {
 
     @Autowired
-    SessionRepository sessionRepository;
+    SessionRepositoryImpl sessionRepository;
 
     private void createTestSession(UserId userId) {
         Session session = new Session(

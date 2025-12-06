@@ -3,7 +3,7 @@ package be.kdg.ipj3.catalog.api.gameController;
 import be.kdg.ipj3.catalog.api.dto.GameFilterRequestDto;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.domain.IGameRepository;
+import be.kdg.ipj3.catalog.domain.GameRepository;
 import be.kdg.ipj3.shared.domain.Money;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +37,7 @@ public class GetAllGamesByFilterTests {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private IGameRepository gameRepository;
+    private GameRepository gameRepository;
 
     @BeforeEach
     void setUp() {

@@ -1,9 +1,9 @@
 package be.kdg.ipj3.users.api;
 
+import be.kdg.ipj3.users.domain.Visibility;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
-import be.kdg.ipj3.users.domain.Visibility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

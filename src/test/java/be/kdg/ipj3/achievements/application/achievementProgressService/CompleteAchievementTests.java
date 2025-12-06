@@ -2,14 +2,14 @@ package be.kdg.ipj3.achievements.application.achievementProgressService;
 
 import be.kdg.ipj3.achievements.application.AchievementProgressService;
 import be.kdg.ipj3.achievements.domain.AchievementProgress;
-import be.kdg.ipj3.achievements.domain.IAchievementProgressRepository;
+import be.kdg.ipj3.achievements.domain.AchievementProgressRepository;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.domain.IGameRepository;
-import be.kdg.ipj3.shared.domain.AchievementId;
+import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.catalog.shared.AchievementId;
 import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.shared.domain.UserId;
-import be.kdg.ipj3.users.domain.IUserRepository;
+import be.kdg.ipj3.users.shared.UserId;
+import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,13 +38,13 @@ public class CompleteAchievementTests {
     private AchievementProgressService achievementProgressService;
 
     @Autowired
-    private IAchievementProgressRepository progressRepository;
+    private AchievementProgressRepository progressRepository;
 
     @Autowired
-    private IGameRepository gameRepository;
+    private GameRepository gameRepository;
 
     @Autowired
-    private IUserRepository userRepository;
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {

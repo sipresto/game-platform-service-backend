@@ -1,7 +1,7 @@
 package be.kdg.ipj3.shared.api;
 
-import be.kdg.ipj3.shared.domain.NotFoundException;
-import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
+import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
+import be.kdg.ipj3.shared.domain.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;

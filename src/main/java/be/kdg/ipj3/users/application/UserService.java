@@ -1,12 +1,13 @@
 package be.kdg.ipj3.users.application;
 
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.NotFoundException;
-import be.kdg.ipj3.shared.domain.UserId;
-import be.kdg.ipj3.users.domain.IUserRepository;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.shared.UserId;
+import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,15 +16,15 @@ import java.util.List;
 
 @Service
 @Transactional
-public class UserService {
-    private final IUserRepository userRepository;
+public class UserService implements UsersApi {
+    private final UserRepository userRepository;
 
-    public UserService(IUserRepository userRepository) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     /**
-     * Register or get existing user from Keycloak JWT
+     * Register or get existing user fromDomain Keycloak JWT
      * This is called automatically on first login
      */
     public User registerOrGetUser(String keycloakId, String keycloakUsername) {
@@ -50,7 +51,7 @@ public class UserService {
         }
 
         User user = userRepository.findByKeycloakId(keycloakId)
-                        .orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
+                .orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
 
         user.updateProfile(new Profile(displayName, newBio));
         userRepository.save(user);
@@ -63,26 +64,32 @@ public class UserService {
     }
 
     public List<GameId> findOwnedGamesByKeycloakId(String keycloakId) {
-        return userRepository.findOwnedGamesByKeycloakId(keycloakId);
+        User user = findByKeycloakId(keycloakId);
+        return userRepository.findOwnedGamesById(keycloakId);
     }
 
     public User findByKeycloakId(String keycloakId) {
-        return userRepository.findByKeycloakId(keycloakId).orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
+        return userRepository.findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
     }
 
-    public void updatePrivacySettingsByKeycloakId(Visibility visibility, User user){
+    public void updatePrivacySettingsByKeycloakId(Visibility visibility, User user) {
         user.updateVisibility(visibility);
         userRepository.save(user);
     }
 
-    public List<User> getAllPublicUsers(){
+    public List<User> findAllPublicUsers() {
         return userRepository.findAllPublicUsers();
     }
 
-    public List<User> getFriendsAndSelf(User user){
+    public List<User> findFriendsAndSelf(User user) {
         List<User> usersReturn = new ArrayList<>();
         usersReturn.add(user);
         usersReturn.addAll(userRepository.findFriends(user.getId()));
         return usersReturn;
+    }
+
+    public boolean existsById(UserId id) {
+        return userRepository.existsById(id);
     }
 }

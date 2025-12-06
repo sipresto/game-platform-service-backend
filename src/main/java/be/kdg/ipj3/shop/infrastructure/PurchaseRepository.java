@@ -6,8 +6,6 @@ import be.kdg.ipj3.shop.infrastructure.jpa.JpaPurchaseEntity;
 import be.kdg.ipj3.shop.infrastructure.jpa.JpaPurchaseRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 @Repository
 public class PurchaseRepository implements IPurchaseRepository {
     private final JpaPurchaseRepository jpaPurchaseRepository;

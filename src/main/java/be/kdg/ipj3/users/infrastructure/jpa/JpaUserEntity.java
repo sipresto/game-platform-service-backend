@@ -1,9 +1,9 @@
 package be.kdg.ipj3.users.infrastructure.jpa;
 
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.shared.UserId;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -96,8 +96,8 @@ public class JpaUserEntity {
     }
 
     /**
-     *  This is only to be used for testing!
-     *  This was made in sprint 2 when friend logic was not present yet.
+     * This is only to be used for testing!
+     * This was made in sprint 2 when friend logic was not present yet.
      */
     private void addFriend(UUID friendId) {
         this.friends.add(friendId);

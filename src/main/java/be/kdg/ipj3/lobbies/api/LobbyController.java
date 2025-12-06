@@ -1,14 +1,8 @@
 package be.kdg.ipj3.lobbies.api;
 
-import be.kdg.ipj3.catalog.application.GameService;
 import be.kdg.ipj3.lobbies.api.dto.*;
 import be.kdg.ipj3.lobbies.application.LobbyService;
-import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
-import be.kdg.ipj3.lobbies.domain.lobby.LobbyId;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
-import be.kdg.ipj3.users.application.UserService;
-import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.lobbies.domain.Lobby;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,19 +16,11 @@ import java.util.UUID;
 @RequestMapping("/api/lobbies")
 public class LobbyController {
     private final LobbyService lobbyService;
-    private final GameService gameService;
-    private final UserService userService;
 
-    public LobbyController(LobbyService lobbyService, GameService gameService, UserService userService) {
+
+    public LobbyController(LobbyService lobbyService) {
         this.lobbyService = lobbyService;
-        this.gameService = gameService;
-        this.userService = userService;
-    }
 
-    private UserId resolveUserId(Jwt token) {
-        String keycloakId = token.getSubject();
-        User user = userService.findByKeycloakId(keycloakId);
-        return user.getId();
     }
 
     @GetMapping
@@ -42,7 +28,7 @@ public class LobbyController {
         List<Lobby> lobbies = lobbyService.findAllOpenLobbies();
 
         List<LobbyListDto> dtos = lobbies.stream()
-                .map(LobbyListDto::from)
+                .map(LobbyListDto::fromDomain)
                 .toList();
 
         return ResponseEntity.ok(dtos);
@@ -53,23 +39,19 @@ public class LobbyController {
             @Valid @RequestBody CreateLobbyDto dto,
             @AuthenticationPrincipal Jwt token
     ) {
-        UserId hostId = resolveUserId(token);
 
-        if (!gameService.existsById(new GameId(dto.gameId()))) {
-            return ResponseEntity.badRequest().build();
-        }
+        String keycloakId = token.getSubject();
 
         Lobby createdLobby = lobbyService.createLobby(
+                keycloakId,
                 dto.password(),
                 dto.maxPlayers(),
-                new GameId(dto.gameId()),
-                hostId
+                dto.gameId()
         );
-        var lobbyId = new LobbyCreatedResponseDto(createdLobby.getId().id());
 
+        var lobbyId = new LobbyCreatedResponseDto(createdLobby.getId().id());
         return ResponseEntity.ok(lobbyId);
     }
-
 
     @PostMapping("/{id}/join")
     public ResponseEntity<Void> joinLobby(
@@ -77,10 +59,9 @@ public class LobbyController {
             @RequestBody JoinLobbyDto dto,
             @AuthenticationPrincipal Jwt token
     ) {
-        UserId playerId = resolveUserId(token);
-        LobbyId lobbyId = new LobbyId(id);
+        String keycloakId = token.getSubject();
 
-        lobbyService.joinLobby(lobbyId, playerId, dto.password());
+        lobbyService.joinLobby(id, keycloakId, dto.password());
         return ResponseEntity.ok().build();
     }
 
@@ -89,10 +70,9 @@ public class LobbyController {
             @PathVariable UUID id,
             @AuthenticationPrincipal Jwt token
     ) {
-        UserId playerId = resolveUserId(token);
-        LobbyId lobbyId = new LobbyId(id);
+        String keycloakId = token.getSubject();
 
-        lobbyService.leaveLobby(lobbyId, playerId);
+        lobbyService.leaveLobby(id, keycloakId);
         return ResponseEntity.ok().build();
     }
 
@@ -102,11 +82,10 @@ public class LobbyController {
             @RequestBody GameStartDto dto,
             @AuthenticationPrincipal Jwt token
     ) {
-        UserId hostId = resolveUserId(token);
-        // TODO: Logic should change when GameStartDto gets reworked
-        String serviceUrl = gameService.findServiceByGameId(new GameId(dto.gameId()));
+        String keycloakId = token.getSubject();
 
-        String gameUrl = lobbyService.startGame(serviceUrl, new LobbyId(id), hostId, dto.difficulty());
+        String gameUrl = lobbyService.startGame(id, keycloakId, dto.difficulty());
+
         return ResponseEntity.ok(new GameUrlDto(gameUrl));
     }
 
@@ -115,16 +94,13 @@ public class LobbyController {
     public ResponseEntity<List<LobbyListDto>> getOpenLobbiesForGame(
             @PathVariable UUID gameId
     ) {
-        if (!gameService.existsById(new GameId(gameId))) {
-            return ResponseEntity.badRequest().build();
-        }
 
-        var openLobbies = lobbyService.findOpenLobbiesForGame(new GameId(gameId));
+        var openLobbies = lobbyService.findOpenLobbiesForGame(gameId);
 
-        var dtos = openLobbies.stream()
-                .map(LobbyListDto::from)
+        var dto = openLobbies.stream()
+                .map(LobbyListDto::fromDomain)
                 .toList();
 
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(dto);
     }
 }

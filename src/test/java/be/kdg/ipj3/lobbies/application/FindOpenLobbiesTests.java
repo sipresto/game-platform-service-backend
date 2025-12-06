@@ -1,10 +1,10 @@
 package be.kdg.ipj3.lobbies.application;
 
-import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
-import be.kdg.ipj3.lobbies.domain.lobby.LobbyStatus;
-import be.kdg.ipj3.lobbies.domain.lobby.ILobbyRepository;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.lobbies.domain.LobbyRepository;
+import be.kdg.ipj3.lobbies.domain.Lobby;
+import be.kdg.ipj3.lobbies.domain.LobbyStatus;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,7 +21,7 @@ import static org.mockito.BDDMockito.given;
 class FindOpenLobbiesTests {
 
     @Mock
-    private ILobbyRepository lobbyRepository;
+    private LobbyRepository lobbyRepository;
 
     @InjectMocks
     private LobbyService lobbyService;

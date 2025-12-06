@@ -6,7 +6,7 @@ import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class JpaProfile {
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String displayName;
 
     private String bio;

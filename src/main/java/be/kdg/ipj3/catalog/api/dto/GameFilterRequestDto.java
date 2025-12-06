@@ -5,5 +5,9 @@ import be.kdg.ipj3.shared.domain.Money;
 
 import java.util.List;
 
-public record GameFilterRequestDto(Money minPrice, Money maxPrice, List<Category> categories) {
+public record GameFilterRequestDto(
+        Money minPrice,
+        Money maxPrice,
+        List<Category> categories
+) {
 }
