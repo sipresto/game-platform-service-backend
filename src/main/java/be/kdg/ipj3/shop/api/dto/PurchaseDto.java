@@ -1,4 +1,4 @@
-package be.kdg.ipj3.shop.api;
+package be.kdg.ipj3.shop.api.dto;
 
 import be.kdg.ipj3.shop.domain.Purchase;
 

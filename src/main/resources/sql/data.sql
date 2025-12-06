@@ -23,6 +23,27 @@ INSERT INTO game_categories (game_id, category)
 VALUES ('c3c1d2b0-82fa-43a7-b326-0eb96136ecbc', 'NATIVE'),
        ('c3c1d2b0-82fa-43a7-b326-0eb96136ecbc', 'BOARDGAME');
 
+INSERT INTO achievements(achievement_id, name, code, description, required_value, points,
+                         counting_strategy, count_trigger, game_id)
+VALUES ('937a2c83-aa8d-46c8-8bdb-6fdec5cf5cd6', 'Tic', 'TIC', 'Win your 1st game',
+        1, 10, 'INCREMENT', 'WIN_ANY', 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc'),
+       ('6c3d6f0a-af60-4874-98dc-168c4bf1a887', 'Tac', 'TAC', 'Win 5 games',
+        5, 20, 'INCREMENT', 'WIN_ANY', 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc'),
+       ('db0dcb50-ac90-485a-bd44-5e89737b2206', 'Toe', 'TOE', 'Win 10 games',
+        10, 30, 'INCREMENT', 'WIN_ANY', 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc'),
+       ('82bdcebc-8c5a-4a79-9ce4-5b35b59772f9', 'Getting warmed up', 'WARMED_UP', 'Play 10 games',
+        10, 15, 'INCREMENT', 'PLAY_ANY', 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc'),
+       ('899451fd-cd48-4d49-8fc3-b60212e756cf', 'Unbeatable', 'UNBEATABLE', 'Win or draw 10 games in a row',
+        10, 50, 'STREAK', 'WIN_OR_DRAW_ANY', 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc'),
+       ('8edc7479-2dc3-49d0-9aed-7c1a837e0446', 'Beat a bot', 'BEAT_BOT', 'Get a win against the AI',
+        1, 20, 'INCREMENT', 'WIN_AI', 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc'),
+       ('ee0e5c46-4862-4266-931e-3d30832781f6', 'Pummel a player', 'PUMMEL_PLAYER', 'Get a win against another player',
+        1, 20, 'INCREMENT', 'WIN_PLAYER', 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc'),
+       ('40d7026f-8f5f-4cda-8dbe-2fb76a08047a', 'X-celent', 'X_CELENT', 'Win one game as X',
+        NULL, 10, NULL, NULL, 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc'),
+       ('6e692b16-b6e9-4bce-a6ce-d6544f1ad87c', 'O-mazing', 'O_MAZING', 'Win one game as O',
+        NULL, 10, NULL, NULL, 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc');
+
 INSERT INTO users(user_id, keycloak_id, username, display_name)
 VALUES ('cf0138b7-3272-4d1c-a34d-de88a47fe94c', 'c9d8cc34-6087-4a6f-a6c2-e208fbbc6ed2', 'xanderv', 'XanderV'),
        ('d80e5017-3f16-4659-9c25-f206213c5221', '8c022ef4-e461-44ca-bd6b-5a76729f39c6', 'jurgenp', 'JurgenP'),

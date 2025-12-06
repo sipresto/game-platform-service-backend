@@ -21,24 +21,26 @@ public class JpaLobbyEntity {
 
     private String password;
 
-    @Column(name = "max_players", nullable = false)
+    @Column(nullable = false)
     private int maxPlayers;
 
-    @Column(name = "game_id", nullable = false)
+    @Column(nullable = false)
     private UUID gameId;
 
-    @Column(name = "host_id", nullable = false)
+    @Column(nullable = false)
     private UUID hostId;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "lobby_players", joinColumns = @JoinColumn(name = "lobby_id"))
+    @CollectionTable(
+            name = "lobby_players",
+            joinColumns = @JoinColumn(name = "lobby_id")
+    )
     @Column(name = "player_id")
     private List<UUID> players;
 
     @Column(nullable = false)
     private String status;
 
-    @Column(name = "active_game_url")
     private String activeGameUrl;
 
 

@@ -2,12 +2,10 @@ package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.catalog.infrastructure.jpa.JpaGameEntity;
 import be.kdg.ipj3.catalog.infrastructure.jpa.JpaGameRepository;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.Money;
+import be.kdg.ipj3.users.domain.Visibility;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
-import be.kdg.ipj3.users.domain.Visibility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +17,6 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,10 +68,10 @@ public class FindOwnedGamesByKeycloakIdIntegrationTests {
 
     private void createGame(UUID id, String name) {
         JpaGameEntity game = new JpaGameEntity(
-                new GameId(id),
+                id,
                 name,
                 "desc",
-                new Money(Currency.getInstance("EUR"), BigDecimal.valueOf(5)),
+                BigDecimal.valueOf(5),
                 "https://test.com",
                 "rule",
                 List.of(),

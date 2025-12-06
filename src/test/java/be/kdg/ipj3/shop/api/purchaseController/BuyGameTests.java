@@ -9,6 +9,7 @@ import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.shop.domain.IPurchaseRepository;
 import be.kdg.ipj3.users.domain.IUserRepository;
 import be.kdg.ipj3.users.domain.User;
+import com.stripe.model.Charge;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +17,17 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
+import be.kdg.ipj3.shop.infrastructure.stripe.StripeService;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -45,11 +50,19 @@ class BuyGameTests {
     @Autowired
     private IGameRepository gameRepository;
 
+    @MockitoBean
+    private StripeService stripeService;
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         purchaseRepository.deleteAll();
         userRepository.deleteAll();
         gameRepository.deleteAll();
+
+        Charge mockCharge = new Charge();
+        mockCharge.setPaid(true);
+        mockCharge.setStatus("succeeded");
+        when(stripeService.retrieve(anyString())).thenReturn(mockCharge);
     }
 
     private JwtRequestPostProcessor validJwt() {
@@ -84,48 +97,58 @@ class BuyGameTests {
     void buyGame_shouldReturnOk_whenGameExists() throws Exception {
         // Arrange
         UserId userId = createTestUser();
-
         GameId gameId = createTestGame();
+        String requestBody = "{\"chargeId\": \"ch_test_12345\"}";
 
         // Act & Assert
         mockMvc.perform(post("/api/purchases/" + gameId.id())
                         .with(validJwt())
-                        .contentType("application/json"))
+                        .contentType("application/json")
+                        .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.buyer").value(userId.id().toString()))
                 .andExpect(jsonPath("$.game").value(gameId.id().toString()));
     }
 
     @Test
-    void buyGame_shouldReturnNotFound_whenGameDoesNotExist() throws Exception {
+    void buyGame_shouldReturnBadRequest_whenGameDoesNotExist() throws Exception {
         // Arrange
         createTestUser();
+        String requestBody = "{\"chargeId\": \"ch_test_12345\"}";
 
         // Act & Assert
         mockMvc.perform(post("/api/purchases/" + UUID.randomUUID())
-                        .with(validJwt()))
+                        .with(validJwt())
+                        .contentType("application/json")
+                        .content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
-    // TODO: Change user auto-registration before enabling
-    /*@Test
-    void buyGame_shouldReturnNotFound_whenUserNotRegistered() throws Exception {
+    @Test
+    void buyGame_shouldReturnBadRequest_whenChargeIdMissing() throws Exception {
         // Arrange
+        createTestUser();
         GameId gameId = createTestGame();
+        String requestBody = "{}";
 
         // Act & Assert
         mockMvc.perform(post("/api/purchases/" + gameId.id())
-                        .with(validJwt()))
-                .andExpect(status().isUnauthorized());
-    }*/
+                        .with(validJwt())
+                        .contentType("application/json")
+                        .content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
 
     @Test
     void buyGame_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
         // Arrange
         GameId gameId = createTestGame();
+        String requestBody = "{\"chargeId\": \"ch_test_12345\"}";
 
         // Act & Assert
-        mockMvc.perform(post("/api/purchases/" + gameId.id()))
+        mockMvc.perform(post("/api/purchases/" + gameId.id())
+                        .contentType("application/json")
+                        .content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
 }
