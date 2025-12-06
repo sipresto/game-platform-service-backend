@@ -57,6 +57,7 @@ public class CompleteAchievementTests {
                 "Test Description",
                 Money.of(BigDecimal.valueOf(49.99)),
                 "http://test.com/service",
+                "Rules",
                 List.of(Category.NATIVE)
         );
         gameRepository.save(game);

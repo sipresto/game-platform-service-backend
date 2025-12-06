@@ -48,6 +48,7 @@ public class EvaluateAchievementsAfterGameTests {
                 "Test Description",
                 Money.of(BigDecimal.valueOf(49.99)),
                 "http://test.com/service",
+                "rules",
                 List.of(Category.NATIVE)
         );
         gameRepository.save(game);

@@ -50,9 +50,6 @@ public class JpaGameEntity {
     )
     private List<JpaAchievementEntity> achievements = new ArrayList<>();
 
-    protected JpaGameEntity() {
-    } // for JPA
-
     protected JpaGameEntity() {} // for JPA
 
 
@@ -126,7 +123,7 @@ public class JpaGameEntity {
         return rules;
     }
 
-    public Set<Category> getCategories() { return categories; }
+    public List<Category> getCategories() { return categories; }
 
     public List<JpaAchievementEntity> getAchievements() {
         return achievements;
