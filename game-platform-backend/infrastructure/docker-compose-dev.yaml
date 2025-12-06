@@ -49,24 +49,30 @@ services:
       MYSQL_USER: "keycloak"
       MYSQL_PASSWORD: "password"
     volumes:
-      - ./idp_mysql_data:/var/lib/mysql
+      - ./idp_mysql_data_dev:/var/lib/mysql
     ports:
       - "3407:3306"
     networks:
       - dev
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ppassword"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   # ---------------------
   # KEYCLOAK (IDP / SSO)
   # ---------------------
   idp_keycloak:
     image: quay.io/keycloak/keycloak:26.3
-    command: start-dev --http-relative-path=/auth
+    command: start-dev --http-relative-path=/auth --import-realm
     environment:
       KEYCLOAK_ADMIN: "admin"
       KEYCLOAK_ADMIN_PASSWORD: "admin"
       KC_DB: "mysql"
       KC_DB_URL_HOST: "idp_mysql"
       KC_DB_URL_DATABASE: "keycloak"
+      KC_DB_URL_PORT: "3306"
       KC_DB_USERNAME: "keycloak"
       KC_DB_PASSWORD: "password"
       KC_PROXY: "edge"
@@ -77,6 +83,11 @@ services:
       - "8280:8080"
     networks:
       - dev
+    depends_on:
+      idp_mysql:
+        condition: service_healthy
+    volumes:
+      - ./keycloak-data/dev/import:/opt/keycloak/data/import:ro
 
   # ---------------------
   # AI PLAYER SERVICE

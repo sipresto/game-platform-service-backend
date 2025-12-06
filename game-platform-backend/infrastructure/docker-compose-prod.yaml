@@ -1,6 +1,96 @@
+version: '3.9'
 name: kdg-ipj3-team20-prod
 
 services:
+
+  # ---------------------
+  # DATABASE (POSTGRES)
+  # ---------------------
+  app_postgres:
+    image: postgres:17.6-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: "platform"
+      POSTGRES_PASSWORD: "platformSecretPassword"
+      POSTGRES_DB: "platformdb"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5544:5432"
+    networks:
+      - prod
+    volumes:
+      - ./postgresql/data:/var/lib/postgresql/data
+      - ./init-scripts/sql:/docker-entrypoint-initdb.d/
+
+  # ---------------------
+  # RABBITMQ (EVENTING)
+  # ---------------------
+  app_rabbitmq:
+    image: rabbitmq:3.13.7-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: "user"
+      RABBITMQ_DEFAULT_PASS: "password"
+    ports:
+      - "5772:5672"
+      - "15683:15672"
+    networks:
+      - prod
+    volumes:
+      - ./rabbitmq/data:/var/lib/rabbitmq
+      - ./rabbitmq/log:/var/log/rabbitmq
+
+  # ---------------------
+  # KEYCLOAK DATABASE (MYSQL)
+  # ---------------------
+  idp_mysql:
+    image: mysql:9.0.1
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "keycloak"
+      MYSQL_USER: "keycloak"
+      MYSQL_PASSWORD: "password"
+    volumes:
+      - ./idp_mysql_data_prod:/var/lib/mysql
+    ports:
+      - "3407:3306"
+    networks:
+      - prod
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  # ---------------------
+  # KEYCLOAK (IDP / SSO)
+  # ---------------------
+  idp_keycloak:
+    image: quay.io/keycloak/keycloak:26.3
+    command: start-dev --http-relative-path=/auth --import-realm
+    environment:
+      KEYCLOAK_ADMIN: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "admin"
+      KC_DB: "mysql"
+      KC_DB_URL_HOST: "idp_mysql"
+      KC_DB_URL_DATABASE: "keycloak"
+      KC_DB_USERNAME: "keycloak"
+      KC_DB_PASSWORD: "password"
+      KC_PROXY: "edge"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HOSTNAME_URL: "http://localhost/auth"
+      KC_LOG_LEVEL: "info"
+    ports:
+      - "8280:8080"
+    networks:
+      - prod
+    depends_on:
+      idp_mysql:
+        condition: service_healthy
+    volumes:
+      - ./keycloak-data/prod/import:/opt/keycloak/data/import:ro
+
   # ---------------------
   # PLATFORM BACKEND
   # ---------------------
@@ -21,7 +111,7 @@ services:
     restart: "no"
 
   # ---------------------
-  # TIC TAC TOE GAME BACKEND
+  # TIC TAC TOE BACKEND
   # ---------------------
   tictactoe_backend:
     build:
@@ -96,93 +186,6 @@ services:
       - tictactoe_frontend
       - idp_keycloak
     restart: always
-
-  # ---------------------
-  # DATABASE (POSTGRES)
-  # ---------------------
-  app_postgres:
-    image: postgres:17.6-alpine
-    restart: always
-    environment:
-      POSTGRES_USER: "platform"
-      POSTGRES_PASSWORD: "platformSecretPassword"
-      POSTGRES_DB: "platformdb"
-      PGDATA: /var/lib/postgresql/data/pgdata
-    ports:
-      - "5544:5432"
-    networks:
-      - prod
-    volumes:
-      - ./postgresql/data:/var/lib/postgresql/data
-      - ./init-scripts/sql:/docker-entrypoint-initdb.d/
-
-  # ---------------------
-  # RABBITMQ (EVENTING)
-  # ---------------------
-  app_rabbitmq:
-    image: rabbitmq:3.13.7-management-alpine
-    environment:
-      RABBITMQ_DEFAULT_USER: "user"
-      RABBITMQ_DEFAULT_PASS: "password"
-    ports:
-      - "5772:5672"
-      - "15683:15672"
-    networks:
-      - prod
-    volumes:
-      - ./rabbitmq/data:/var/lib/rabbitmq
-      - ./rabbitmq/log:/var/log/rabbitmq
-
-  # ---------------------
-  # KEYCLOAK DATABASE (MYSQL)
-  # ---------------------
-  idp_mysql:
-    image: mysql:9.0.1
-    environment:
-      MYSQL_ROOT_PASSWORD: "root"
-      MYSQL_DATABASE: "keycloak"
-      MYSQL_USER: "keycloak"
-      MYSQL_PASSWORD: "password"
-    volumes:
-      - ./idp_mysql_data:/var/lib/mysql
-    ports:
-      - "3407:3306"
-    networks:
-      - prod
-
-  # ---------------------
-  # KEYCLOAK (IDP / SSO)
-  # ---------------------
-  idp_keycloak:
-    image: quay.io/keycloak/keycloak:26.3
-    command:
-      - start-dev
-      - --http-relative-path=/auth
-      - --import-realm
-    environment:
-      KEYCLOAK_ADMIN: "admin"
-      KEYCLOAK_ADMIN_PASSWORD: "admin"
-      KC_DB: "mysql"
-      KC_DB_URL_HOST: "idp_mysql"
-      KC_DB_URL_DATABASE: "keycloak"
-      KC_DB_USERNAME: "keycloak"
-      KC_DB_PASSWORD: "password"
-
-      KC_PROXY: "edge"
-      KC_HOSTNAME_STRICT: "false"
-      KC_HOSTNAME_STRICT_HTTPS: "false"
-      KC_HOSTNAME_URL: "http://localhost/auth"
-
-      KC_LOG_LEVEL: "info"
-    ports:
-      - "8280:8080"
-    networks:
-      - prod
-    depends_on:
-      - idp_mysql
-    volumes:
-      - ./keycloak-data/import:/opt/keycloak/data/import:ro
-      - ./keycloak-data/data:/opt/keycloak/data
 
 networks:
   prod:

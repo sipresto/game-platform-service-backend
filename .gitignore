@@ -33,6 +33,7 @@ build/
 .vscode/
 
 ### Docker ###
-*/*/idp_mysql_data
+*/*/idp_mysql_data_dev
+*/*/idp_mysql_data_prod
 */*/postgresql
 */*/rabbitmq
