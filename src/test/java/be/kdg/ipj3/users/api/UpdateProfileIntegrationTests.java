@@ -11,10 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -26,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
+@TestPropertySource("classpath:application-test.properties")
 public class UpdateProfileIntegrationTests {
 
     @Autowired
@@ -74,7 +78,6 @@ public class UpdateProfileIntegrationTests {
                         .content(objectMapper.writeValueAsString(profileDto)))
                 .andExpect(status().isOk());
 
-        // --- extra: verify DB state
         Optional<JpaUserEntity> opt = userRepository.findByKeycloakId(keycloakId);
         JpaUserEntity updated = opt.orElseThrow(
                 () -> new AssertionError("User not found in database after profile update")
