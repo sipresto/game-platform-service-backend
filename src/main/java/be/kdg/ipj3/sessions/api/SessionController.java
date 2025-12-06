@@ -2,7 +2,6 @@ package be.kdg.ipj3.sessions.api;
 
 import be.kdg.ipj3.sessions.api.dto.SessionDto;
 import be.kdg.ipj3.sessions.application.SessionService;
-import be.kdg.ipj3.shared.domain.NotFoundException;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.User;
 import org.springframework.http.ResponseEntity;

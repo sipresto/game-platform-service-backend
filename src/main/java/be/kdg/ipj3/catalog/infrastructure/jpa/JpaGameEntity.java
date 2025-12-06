@@ -10,7 +10,6 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -19,9 +18,16 @@ public class JpaGameEntity {
     @Id
     @Column(name = "game_id")
     private UUID id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String description;
+
     private BigDecimal price;
+
+    @Column(nullable = false)
     private String serviceUrl;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -31,40 +37,46 @@ public class JpaGameEntity {
     )
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
-    private Set<Category> categories;
+    private List<Category> categories;
 
-    @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
-    private List<JpaAchievementEntity> achievements;
+    @OneToMany(
+            mappedBy = "game",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private List<JpaAchievementEntity> achievements = new ArrayList<>();
 
+    protected JpaGameEntity() {
+    } // for JPA
 
-    protected JpaGameEntity() {} // for JPA
-
-    public JpaGameEntity(GameId id, String name, String description, Money price, String serviceUrl, List<Achievement> achievements, List<Category> categories) {
-        this.id = id.id();
+    public JpaGameEntity(UUID id, String name, String description, BigDecimal price, String serviceUrl, List<Category> categories) {
+        this.id = id;
         this.name = name;
         this.description = description;
-        this.price = price.amount();
+        this.price = price;
         this.serviceUrl = serviceUrl;
-        this.achievements = new ArrayList<>();
-        achievements.forEach(a -> this.achievements.add(JpaAchievementEntity.fromDomain(a)));
-        this.categories = Set.copyOf(categories);
+        this.categories = categories;
     }
 
     public static JpaGameEntity fromDomain(Game game) {
-        return new JpaGameEntity(
-                game.getId(),
+        JpaGameEntity jpaGame = new JpaGameEntity(
+                game.getId().id(),
                 game.getName(),
                 game.getDescription(),
-                game.getPrice(),
+                game.getPrice().amount(),
                 game.getServiceUrl(),
-                game.getAchievements(),
                 game.getCategories()
         );
+
+        game.getAchievements().stream()
+                .map(JpaAchievementEntity::fromDomain)
+                .forEach(jpaGame::addAchievement);
+
+        return jpaGame;
     }
 
     public Game toDomain() {
-        List<Category> categories = new ArrayList<>(this.categories);
-
         List<Achievement> achievements = new ArrayList<>();
         if (this.achievements != null) {
             this.achievements.forEach(achievement -> achievements.add(achievement.toDomain()));
@@ -77,7 +89,7 @@ public class JpaGameEntity {
                 Money.of(this.price),
                 this.serviceUrl,
                 achievements,
-                categories
+                new ArrayList<>(this.categories)
         );
     }
 
@@ -101,9 +113,16 @@ public class JpaGameEntity {
         return serviceUrl;
     }
 
-    public Set<Category> getCategories() { return categories; }
+    public List<Category> getCategories() {
+        return categories;
+    }
 
     public List<JpaAchievementEntity> getAchievements() {
         return achievements;
+    }
+
+    private void addAchievement(JpaAchievementEntity achievement) {
+        this.achievements.add(achievement);
+        achievement.setGame(this);
     }
 }
