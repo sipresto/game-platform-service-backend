@@ -41,6 +41,7 @@ public class SaveTests {
                 "Test Description",
                 Money.of(BigDecimal.valueOf(4.99)),
                 "http://test.com/service",
+                "A rule",
                 List.of(),
                 List.of(Category.BOARDGAME)
         );
@@ -68,6 +69,7 @@ public class SaveTests {
                 "Original Description",
                 Money.of(BigDecimal.valueOf(9.99)),
                 "http://test.com/service",
+                "A rule",
                 List.of(),
                 List.of(Category.BOARDGAME)
         );
@@ -79,6 +81,7 @@ public class SaveTests {
                 "Updated Description",
                 Money.of(BigDecimal.valueOf(14.99)),
                 "http://test.com/service2",
+                "A rule",
                 List.of(),
                 List.of(Category.CARDGAME)
         );

@@ -32,6 +32,7 @@ public class FindGamesByIdsTests {
                 "Description",
                 Money.of(BigDecimal.valueOf(10.99)),
                 "http://test.com/service",
+                "A rule",
                 List.of(Category.BOARDGAME)
         );
         gameRepository.save(game);

@@ -6,6 +6,7 @@ import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.shared.domain.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ public class JpaGameEntity {
 
     @Column(nullable = false)
     private String serviceUrl;
+    @Size(max = 2000)
+    private String rules;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -47,15 +50,16 @@ public class JpaGameEntity {
     )
     private List<JpaAchievementEntity> achievements = new ArrayList<>();
 
-    protected JpaGameEntity() {
-    } // for JPA
+    protected JpaGameEntity() {} // for JPA
 
-    public JpaGameEntity(UUID id, String name, String description, BigDecimal price, String serviceUrl, List<Category> categories) {
+
+    public JpaGameEntity(UUID id, String name, String description, BigDecimal price, String serviceUrl, String rules, List<Category> categories) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.serviceUrl = serviceUrl;
+        this.rules = rules;
         this.categories = categories;
     }
 
@@ -66,6 +70,7 @@ public class JpaGameEntity {
                 game.getDescription(),
                 game.getPrice().amount(),
                 game.getServiceUrl(),
+                game.getRules(),
                 game.getCategories()
         );
 
@@ -88,6 +93,7 @@ public class JpaGameEntity {
                 this.description,
                 Money.of(this.price),
                 this.serviceUrl,
+                this.rules,
                 achievements,
                 new ArrayList<>(this.categories)
         );
@@ -113,9 +119,11 @@ public class JpaGameEntity {
         return serviceUrl;
     }
 
-    public List<Category> getCategories() {
-        return categories;
+    public String getRules() {
+        return rules;
     }
+
+    public List<Category> getCategories() { return categories; }
 
     public List<JpaAchievementEntity> getAchievements() {
         return achievements;

@@ -73,6 +73,7 @@ public class FindOwnedGamesByKeycloakIdIntegrationTests {
                 "desc",
                 BigDecimal.valueOf(5),
                 "https://test.com",
+                "rule",
                 List.of()
         );
 

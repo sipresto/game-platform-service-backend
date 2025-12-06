@@ -46,6 +46,7 @@ public class GetAllGamesTests {
                 "Test Description",
                 Money.of(BigDecimal.valueOf(49.99)),
                 "http://test.com/service",
+                "A rule",
                 List.of(Category.CARDGAME, Category.NATIVE, Category.STRATEGY)
         );
 
@@ -54,6 +55,7 @@ public class GetAllGamesTests {
                 "Test Description 2",
                 Money.of(BigDecimal.valueOf(39.99)),
                 "http://test.com/service2",
+                "A rule",
                 List.of(Category.BOARDGAME)
         );
 

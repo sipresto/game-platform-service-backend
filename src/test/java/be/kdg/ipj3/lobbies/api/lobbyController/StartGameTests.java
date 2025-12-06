@@ -88,6 +88,7 @@ public class StartGameTests {
                 "Description",
                 Money.of(BigDecimal.valueOf(19.99)),
                 "http://test.com/service",
+                "A rule",
                 List.of(Category.NATIVE)
         );
         gameRepository.save(game);
@@ -124,7 +125,7 @@ public class StartGameTests {
         GameCreatedResponseDto response = new GameCreatedResponseDto("http://test.com/game");
         given(gameClient.startGame(any(), any())).willReturn(response);
 
-        GameStartDto dto = new GameStartDto(gameId.id(), List.of(userId.id()), Difficulty.EASY);
+        GameStartDto dto = new GameStartDto(gameId.id(), Difficulty.EASY);
 
         // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/start", lobbyId.id())
@@ -147,7 +148,7 @@ public class StartGameTests {
 
         given(gameClient.startGame(any(), any())).willThrow(new RestClientException("Service unavailable"));
 
-        GameStartDto dto = new GameStartDto(gameId.id(), List.of(userId.id()), Difficulty.EASY);
+        GameStartDto dto = new GameStartDto(gameId.id(), Difficulty.EASY);
 
         // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/start", lobbyId.id())
@@ -164,7 +165,7 @@ public class StartGameTests {
 
         GameId gameId = createTestGame();
 
-        GameStartDto dto = new GameStartDto(gameId.id(), List.of(userId.id()), Difficulty.EASY);
+        GameStartDto dto = new GameStartDto(gameId.id(), Difficulty.EASY);
 
         // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/start", UUID.randomUUID())
@@ -183,7 +184,7 @@ public class StartGameTests {
 
         LobbyId lobbyId = createTestLobby(gameId, userId, UserId.create());
 
-        GameStartDto dto = new GameStartDto(gameId.id(), List.of(userId.id()), Difficulty.EASY);
+        GameStartDto dto = new GameStartDto(gameId.id(), Difficulty.EASY);
 
         // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/start", lobbyId.id())
@@ -218,7 +219,7 @@ public class StartGameTests {
 
         LobbyId lobbyId = createTestLobby(gameId, UserId.create());
 
-        GameStartDto dto = new GameStartDto(gameId.id(), List.of(), Difficulty.EASY);
+        GameStartDto dto = new GameStartDto(gameId.id(), Difficulty.EASY);
 
         // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/start", lobbyId.id())

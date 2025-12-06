@@ -31,6 +31,7 @@ public class FilterGamesTests {
                 "Description",
                 Money.of(price),
                 "http://test.com/service",
+                "A rule",
                 categories
         );
         gameRepository.save(game);

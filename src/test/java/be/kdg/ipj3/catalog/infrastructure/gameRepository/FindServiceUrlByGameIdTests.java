@@ -33,6 +33,7 @@ public class FindServiceUrlByGameIdTests {
                 "Description",
                 Money.of(BigDecimal.valueOf(10.99)),
                 serviceUrl,
+                "A rule",
                 List.of(Category.BOARDGAME)
         );
         gameRepository.save(game);
