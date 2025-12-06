@@ -28,13 +28,17 @@ public class JpaPurchaseEntity {
     @Column(nullable = false)
     private Instant purchasedAt;
 
+    @Column(nullable = false)
+    private String chargeId;
+
     protected JpaPurchaseEntity() {} // for JPA
 
-    public JpaPurchaseEntity(UUID id, UUID buyer, UUID game, Instant purchasedAt) {
+    public JpaPurchaseEntity(UUID id, UUID buyer, UUID game, Instant purchasedAt,String chargeId) {
         this.id = id;
         this.buyer = buyer;
         this.game = game;
         this.purchasedAt = purchasedAt;
+        this.chargeId = chargeId;
     }
 
     public static JpaPurchaseEntity fromDomain(Purchase purchase) {
@@ -42,12 +46,13 @@ public class JpaPurchaseEntity {
                 purchase.id().id(),
                 purchase.buyer().id(),
                 purchase.game().id(),
-                purchase.purchasedAt()
+                purchase.purchasedAt(),
+                purchase.chargeId()
         );
     }
 
     public Purchase toDomain() {
-        return new Purchase(new PurchaseId(this.id), new UserId(this.buyer), new GameId(this.game), this.purchasedAt);
+        return new Purchase(new PurchaseId(this.id), new UserId(this.buyer), new GameId(this.game), this.purchasedAt,this.chargeId);
     }
 
     public UUID getId() {

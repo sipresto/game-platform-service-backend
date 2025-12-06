@@ -8,14 +8,22 @@ import org.jmolecules.ddd.annotation.Identity;
 import java.time.Instant;
 
 @AggregateRoot
-public record Purchase(@Identity PurchaseId id, UserId buyer, GameId game, Instant purchasedAt) {
+public record Purchase(
+        @Identity PurchaseId id,
+        UserId buyer,
+        GameId game,
+        Instant purchasedAt,
+        String chargeId
 
-    public Purchase(UserId buyer, GameId game) {
-        this(PurchaseId.create(), buyer, game, Instant.now());
+        ) {
+
+    public Purchase(UserId buyer, GameId game, String chargeId) {
+        this(PurchaseId.create(), buyer, game, Instant.now(),chargeId);
     }
 
     @Override
     public PurchaseId id() {
         return id;
     }
+
 }
