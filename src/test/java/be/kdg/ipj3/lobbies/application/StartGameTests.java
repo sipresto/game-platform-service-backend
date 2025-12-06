@@ -43,14 +43,18 @@ class StartGameTests {
     private ArgumentCaptor<Lobby> lobbyCaptor;
 
     private Lobby lobby;
+    private UUID lobbyUUID;
     private LobbyId lobbyId;
     private final GameId gameId = new GameId(UUID.randomUUID());
+    private String keycloakId;
     private UserId host;
 
     @BeforeEach
     void setUp() {
-        host = new UserId(UUID.randomUUID());
-        lobbyId = new LobbyId(UUID.randomUUID());
+        keycloakId = UUID.randomUUID().toString();
+        host = new UserId(UUID.fromString(keycloakId));
+        lobbyUUID = UUID.randomUUID();
+        lobbyId = new LobbyId(lobbyUUID);
         lobby = new Lobby(
                 lobbyId,
                 "",
@@ -77,7 +81,7 @@ class StartGameTests {
                 .willReturn(mockResponse);
 
         // Act
-        String gameUrl = lobbyService.startGame(serviceUrl, lobbyId, host, null);
+        String gameUrl = lobbyService.startGame(lobbyUUID, keycloakId, null);
 
         // Assert
         assertThat(gameUrl).isEqualTo(returnedUrl);
@@ -96,7 +100,7 @@ class StartGameTests {
 
         // Act & Assert
         assertThatThrownBy(() ->
-                lobbyService.startGame("url", lobbyId, host, null)
+                lobbyService.startGame(lobbyUUID, keycloakId, null)
         ).isInstanceOf(GameServiceUnavailableException.class)
                 .hasMessage("Game service is currently unavailable.");
     }
@@ -108,7 +112,7 @@ class StartGameTests {
 
         // Act & Assert
         assertThatThrownBy(() ->
-                lobbyService.startGame("url", lobbyId, host, null)
+                lobbyService.startGame(lobbyUUID, keycloakId, null)
         ).isInstanceOf(RuntimeException.class);
     }
 }

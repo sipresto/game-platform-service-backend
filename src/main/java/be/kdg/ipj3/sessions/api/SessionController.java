@@ -18,7 +18,7 @@ import java.util.List;
 public class SessionController {
     private final SessionService sessionService;
 
-    public SessionController(SessionService sessionService, UsersApi usersApi) {
+    public SessionController(SessionService sessionService) {
         this.sessionService = sessionService;
     }
 
@@ -27,9 +27,7 @@ public class SessionController {
     public ResponseEntity<List<SessionDto>> getSessionsByUserId(
             @PathVariable String userId
     ) {
-        User user = usersApi.findByKeycloakId(userId);
-
-        List<SessionDto> dtos = sessionService.findSessionsByUserId(user.getId()).stream()
+        List<SessionDto> dtos = sessionService.findSessionsByUserId(userId).stream()
                 .map(SessionDto::fromDomain)
                 .toList();
 

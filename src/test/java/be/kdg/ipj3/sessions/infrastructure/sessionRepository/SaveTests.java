@@ -4,7 +4,7 @@ import be.kdg.ipj3.lobbies.domain.Difficulty;
 import be.kdg.ipj3.sessions.domain.Session;
 import be.kdg.ipj3.sessions.domain.SessionId;
 import be.kdg.ipj3.sessions.domain.SessionResult;
-import be.kdg.ipj3.sessions.infrastructure.SessionRepository;
+import be.kdg.ipj3.sessions.infrastructure.SessionRepositoryImpl;
 import be.kdg.ipj3.sessions.infrastructure.jpa.JpaSessionEntity;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.users.shared.UserId;
@@ -21,14 +21,14 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
-@Import(SessionRepository.class)
+@Import(SessionRepositoryImpl.class)
 @TestPropertySource(properties = {
         "spring.sql.init.mode=never"
 })
 public class SaveTests {
 
     @Autowired
-    SessionRepository sessionRepository;
+    SessionRepositoryImpl sessionRepository;
 
     @Autowired
     TestEntityManager entityManager;

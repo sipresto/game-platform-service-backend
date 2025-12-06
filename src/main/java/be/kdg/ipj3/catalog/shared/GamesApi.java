@@ -16,7 +16,7 @@ public interface GamesApi {
 
     List<Game> findGamesByIds(List<UUID> ids);
 
-    boolean existsById(UUID id);
+    void existsById(UUID id);
 
     List<Achievement> findAchievementsByGameId(UUID game);
 

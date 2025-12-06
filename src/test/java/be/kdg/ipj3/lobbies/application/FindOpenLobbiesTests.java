@@ -1,5 +1,7 @@
 package be.kdg.ipj3.lobbies.application;
 
+import be.kdg.ipj3.catalog.domain.Game;
+import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.lobbies.domain.LobbyRepository;
 import be.kdg.ipj3.lobbies.domain.Lobby;
 import be.kdg.ipj3.lobbies.domain.LobbyStatus;
@@ -16,12 +18,16 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class FindOpenLobbiesTests {
 
     @Mock
     private LobbyRepository lobbyRepository;
+
+    @Mock
+    private GamesApi  gamesApi;
 
     @InjectMocks
     private LobbyService lobbyService;
@@ -43,6 +49,7 @@ class FindOpenLobbiesTests {
     @Test
     void findOpenLobbiesForGame_shouldReturnLobbiesOfGivenGame() {
         // Arrange
+        UUID gameUUID = UUID.randomUUID();
         GameId gameId = new GameId(UUID.randomUUID());
         Lobby l1 = new Lobby("", 4, gameId, new UserId(UUID.randomUUID()));
         Lobby l2 = new Lobby("", 2, gameId, new UserId(UUID.randomUUID()));
@@ -50,7 +57,7 @@ class FindOpenLobbiesTests {
                 .willReturn(List.of(l1, l2));
 
         // Act
-        List<Lobby> result = lobbyService.findOpenLobbiesForGame(gameId);
+        List<Lobby> result = lobbyService.findOpenLobbiesForGame(gameUUID);
 
         // Assert
         assertThat(result).containsExactly(l1, l2);

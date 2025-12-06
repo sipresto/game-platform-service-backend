@@ -2,7 +2,7 @@ package be.kdg.ipj3.catalog.infrastructure.gameRepository;
 
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.infrastructure.GameRepository;
+import be.kdg.ipj3.catalog.infrastructure.GameRepositoryImpl;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import org.junit.jupiter.api.Test;
@@ -17,14 +17,14 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
-@Import(GameRepository.class)
+@Import(GameRepositoryImpl.class)
 @TestPropertySource(properties = {
         "spring.sql.init.mode=never"
 })
 public class FindGamesByIdsTests {
 
     @Autowired
-    GameRepository gameRepository;
+    GameRepositoryImpl gameRepository;
 
     private GameId createTestGame(String name) {
         Game game = new Game(

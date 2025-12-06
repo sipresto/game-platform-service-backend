@@ -30,15 +30,17 @@ class PurchaseServiceTests {
     @Test
     void buy_ShouldCreatePurchaseAndSaveIt() {
         // Arrange
-        UserId userId = UserId.create();
-        GameId gameId = new GameId(UUID.randomUUID());
+        String keycloakId = UUID.randomUUID().toString();
+        UserId userId = new UserId(UUID.fromString(keycloakId));
+        UUID gameUUID = UUID.randomUUID();
+        GameId gameId = new GameId(gameUUID);
         String chargeId = "TestId";
 
         Purchase savedPurchase = new Purchase(userId, gameId, chargeId);
         given(purchaseRepository.save(any(Purchase.class))).willReturn(savedPurchase);
 
         // Act
-        Purchase result = purchaseService.buy(userId, gameId, chargeId);
+        Purchase result = purchaseService.buy(keycloakId, gameUUID, chargeId);
 
         // Assert
         assertThat(result).isNotNull();

@@ -1,6 +1,8 @@
 package be.kdg.ipj3.users.application;
 
+import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
@@ -13,14 +15,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
 public class UserService implements UsersApi {
     private final UserRepository userRepository;
+    private final GamesApi gamesApi;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, GamesApi gamesApi) {
         this.userRepository = userRepository;
+        this.gamesApi = gamesApi;
     }
 
     /**
@@ -63,9 +68,10 @@ public class UserService implements UsersApi {
         userRepository.save(user);
     }
 
-    public List<GameId> findOwnedGamesByKeycloakId(String keycloakId) {
+    public List<Game> findOwnedGamesByKeycloakId(String keycloakId) {
         User user = findByKeycloakId(keycloakId);
-        return userRepository.findOwnedGamesById(keycloakId);
+        List<GameId> ownedGameIds = userRepository.findOwnedGamesById(user.getId());
+        return gamesApi.findGamesByIds(ownedGameIds.stream().map(GameId::id).toList());
     }
 
     public User findByKeycloakId(String keycloakId) {

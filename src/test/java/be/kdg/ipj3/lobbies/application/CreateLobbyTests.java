@@ -29,11 +29,13 @@ class CreateLobbyTests {
         // Arrange
         String password = "secret";
         int maxPlayers = 4;
-        GameId gameId = new GameId(UUID.randomUUID());
+        UUID gameUUID = UUID.randomUUID();
+        GameId gameId = new GameId(gameUUID);
+        String keycloakId = "keycloakId";
         UserId hostId = new UserId(UUID.randomUUID());
 
         // Act
-        Lobby lobby = lobbyService.createLobby(password, maxPlayers, gameId, hostId);
+        Lobby lobby = lobbyService.createLobby(keycloakId, password, maxPlayers, gameUUID);
 
         // Assert
         assertThat(lobby.getGame()).isEqualTo(gameId);

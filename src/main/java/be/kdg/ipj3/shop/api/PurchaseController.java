@@ -24,24 +24,11 @@ import java.util.UUID;
 @RequestMapping("/api/purchases")
 public class PurchaseController {
     private final PurchaseService purchaseService;
-    private final UsersApi usersApi;
-    private final GamesApi gamesApi;
     private final StripeService stripeService;
 
-    public PurchaseController(PurchaseService purchaseService, UsersApi usersApi, GamesApi gamesApi, StripeService stripeService) {
+    public PurchaseController(PurchaseService purchaseService, StripeService stripeService) {
         this.purchaseService = purchaseService;
-        this.usersApi = usersApi;
-        this.gamesApi = gamesApi;
         this.stripeService = stripeService;
-    }
-
-    private UserId resolveUserId(Jwt token) {
-        String keycloakId = token.getSubject();
-        String keycloakUsername = token.getClaim("preferred_username");
-
-        User user = usersApi.registerOrGetUser(keycloakId, keycloakUsername);
-
-        return user.getId();
     }
 
     @PostMapping("/{gameIdParam}")
@@ -51,18 +38,10 @@ public class PurchaseController {
             @AuthenticationPrincipal Jwt token
     ) {
         String chargeId = requestBody.get("chargeId");
-        var gameId = new GameId(gameIdParam);
 
         if (chargeId == null || chargeId.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-
-
-        if (!gamesApi.existsById(gameIdParam)) {
-            return ResponseEntity.notFound().build();
-        }
-
-        UserId userId = resolveUserId(token);
 
         try {
             Charge charge = stripeService.retrieve(chargeId);
@@ -71,10 +50,7 @@ public class PurchaseController {
                 return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).build();
             }
 
-
-            usersApi.addGame(userId, gameId);
-
-            Purchase purchase = purchaseService.buy(userId, gameId, chargeId);
+            Purchase purchase = purchaseService.buy(token.getSubject(), gameIdParam, chargeId);
 
             return ResponseEntity.ok(PurchaseDto.fromDomain(purchase));
 

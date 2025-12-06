@@ -17,11 +17,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/payment")
 public class PaymentController {
-    private final GamesApi gameApi;
     private final StripeService stripeService;
 
-    public PaymentController(GamesApi gameApi, StripeService stripeService) {
-        this.gameApi = gameApi;
+    public PaymentController(StripeService stripeService) {
         this.stripeService = stripeService;
     }
 
@@ -33,18 +31,7 @@ public class PaymentController {
         String stripeToken = body.get("stripeToken");
 
         try {
-            Game game = gameApi.findGameById(gameId);
-            Money total = game.getPrice();
-            int amountInCents = total.amount().intValue() * 100;
-
-            ChargeRequest charge = new ChargeRequest(
-                    "Payment for: " + game.getName(),
-                    amountInCents,
-                    total.currency(),
-                    stripeToken
-            );
-
-            Charge stripeCharge = stripeService.charge(charge);
+            Charge stripeCharge = stripeService.charge(gameId, stripeToken);
             return ResponseEntity.ok(Map.of(
                     "id", stripeCharge.getId(),
                     "status", stripeCharge.getStatus()

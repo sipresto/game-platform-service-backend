@@ -37,13 +37,17 @@ class LeaveLobbyTests {
     private ArgumentCaptor<Lobby> lobbyCaptor;
 
     private Lobby lobby;
+    private UUID lobbyUUID;
     private LobbyId lobbyId;
+    private String keycloakId;
     private UserId player;
     private UserId host;
 
     @BeforeEach
     void setUp() {
-        lobbyId = new LobbyId(UUID.randomUUID());
+        lobbyUUID = UUID.randomUUID();
+        lobbyId = new LobbyId(lobbyUUID);
+        keycloakId = "keycloak-123";
         player = new UserId(UUID.randomUUID());
         host = new UserId(UUID.randomUUID());
         lobby = new Lobby(
@@ -65,7 +69,7 @@ class LeaveLobbyTests {
         given(lobbyRepository.findById(lobbyId)).willReturn(Optional.of(lobby));
 
         // Act
-        lobbyService.leaveLobby(lobbyId, player);
+        lobbyService.leaveLobby(lobbyUUID, keycloakId);
 
         // Assert
         then(lobbyRepository).should().save(lobbyCaptor.capture());
@@ -80,7 +84,7 @@ class LeaveLobbyTests {
         given(lobbyRepository.findById(nonExisting)).willReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> lobbyService.leaveLobby(nonExisting, player))
+        assertThatThrownBy(() -> lobbyService.leaveLobby(lobbyUUID, keycloakId))
                 .isInstanceOf(RuntimeException.class);
     }
 }

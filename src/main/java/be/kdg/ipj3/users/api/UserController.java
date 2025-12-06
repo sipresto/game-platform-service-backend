@@ -63,8 +63,7 @@ public class UserController {
     public ResponseEntity<List<LibraryGameDto>> findOwnedGamesByKeycloakId(
             @PathVariable String id
     ) {
-        List<GameId> ownedGameIds = userService.findOwnedGamesByKeycloakId(id);
-        List<LibraryGameDto> dtos = gamesApi.findGamesByIds(ownedGameIds).stream()
+        List<LibraryGameDto> dtos = userService.findOwnedGamesByKeycloakId(id).stream()
                 .map(LibraryGameDto::from)
                 .toList();
 
