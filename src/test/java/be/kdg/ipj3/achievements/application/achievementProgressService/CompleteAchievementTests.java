@@ -98,7 +98,7 @@ public class CompleteAchievementTests {
         Instant timestamp = Instant.now();
 
         // Act
-        achievementProgressService.completeAchievement(userId, UUID.randomUUID(), "TEST", timestamp);
+        achievementProgressService.completeAchievement(userId.id(), UUID.randomUUID(), "TEST", timestamp);
 
         // Assert
         Optional<AchievementProgress> progress = progressRepository
@@ -122,10 +122,10 @@ public class CompleteAchievementTests {
         Instant timestamp = Instant.now();
         Instant timestamp2 = Instant.now().plusSeconds(10);
 
-        achievementProgressService.completeAchievement(userId, UUID.randomUUID(), "TEST", timestamp);
+        achievementProgressService.completeAchievement(userId.id(), UUID.randomUUID(), "TEST", timestamp);
 
         // Act
-        achievementProgressService.completeAchievement(userId, UUID.randomUUID(), "TEST", timestamp2);
+        achievementProgressService.completeAchievement(userId.id(), UUID.randomUUID(), "TEST", timestamp2);
 
         // Assert
         Optional<AchievementProgress> progress = progressRepository
@@ -148,7 +148,7 @@ public class CompleteAchievementTests {
         Instant timestamp = Instant.now();
 
         // Act & Assert
-        achievementProgressService.completeAchievement(userId, UUID.randomUUID(), "FAKE_TEST", timestamp);
+        achievementProgressService.completeAchievement(userId.id(), UUID.randomUUID(), "FAKE_TEST", timestamp);
     }
 
     @Test
@@ -161,6 +161,6 @@ public class CompleteAchievementTests {
         Instant timestamp = Instant.now();
 
         // Act & Assert
-        achievementProgressService.completeAchievement(userId, UUID.randomUUID(), "TEST", timestamp);
+        achievementProgressService.completeAchievement(userId.id(), UUID.randomUUID(), "TEST", timestamp);
     }
 }

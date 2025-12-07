@@ -4,15 +4,17 @@ import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.users.domain.User;
 import org.springframework.modulith.NamedInterface;
 
+import java.util.UUID;
+
 @NamedInterface
 public interface UsersApi {
     User findByKeycloakId(String keycloakId);
 
     User registerOrGetUser(String keycloakId, String keycloakUsername);
 
-    void addGame(UserId id, GameId gameId);
+    void addGame(UUID id, UUID gameId);
 
-    User findById(UserId id);
+    User findById(UUID id);
 
-    boolean existsById(UserId id);
+    boolean existsById(UUID id);
 }

@@ -37,14 +37,14 @@ public class AchievementProgressService {
     }
 
     public void evaluateAchievementsAfterGame(GameContext context) {
-        List<Achievement> gameAchievements = gamesApi.findAchievementsByGameId(context.game().id());
+        List<Achievement> gameAchievements = gamesApi.findAchievementsByGameId(context.game());
 
         if (!usersApi.existsById(context.player())) {
             return;
         }
 
         for (Achievement achievement : gameAchievements) {
-            AchievementProgress progress = getProgress(context.player(), achievement.getId());
+            AchievementProgress progress = getProgress(new UserId(context.player()), achievement.getId());
 
             if (progress.isCompleted() || !achievement.isCountedAfterGame()) {
                 continue;
@@ -69,14 +69,14 @@ public class AchievementProgressService {
         }
     }
 
-    public void completeAchievement(UserId userId, UUID gameSesssionId, String code, Instant timestamp) {
+    public void completeAchievement(UUID userId, UUID gameSesssionId, String code, Instant timestamp) {
         // TODO: haal gameId uit lobby via gameSessionId -> zoek met die gameId en code de achievementId
         Achievement achievement = gamesApi.findAchievementByCode(code).orElse(null);
         if (achievement == null || !usersApi.existsById(userId)) {
             return;
         }
 
-        AchievementProgress progress = getProgress(userId, achievement.getId());
+        AchievementProgress progress = getProgress(new UserId(userId), achievement.getId());
 
         if (progress.isCompleted()) {
             return;

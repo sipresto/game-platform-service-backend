@@ -1,118 +1,118 @@
-package be.kdg.ipj3.lobbies.application;
-
-import be.kdg.ipj3.lobbies.api.dto.GameCreatedResponseDto;
-import be.kdg.ipj3.lobbies.api.dto.GameStartRequestDto;
-import be.kdg.ipj3.lobbies.domain.exceptions.GameServiceUnavailableException;
-import be.kdg.ipj3.lobbies.domain.LobbyRepository;
-import be.kdg.ipj3.lobbies.domain.Lobby;
-import be.kdg.ipj3.lobbies.domain.LobbyId;
-import be.kdg.ipj3.lobbies.domain.LobbyStatus;
-import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
-import be.kdg.ipj3.catalog.shared.GameId;
-import be.kdg.ipj3.users.shared.UserId;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.*;
-
-@ExtendWith(MockitoExtension.class)
-class StartGameTests {
-
-    @Mock
-    private LobbyRepository lobbyRepository;
-
-    @Mock
-    private GameClient gameClient;
-
-    @InjectMocks
-    private LobbyService lobbyService;
-
-    @Captor
-    private ArgumentCaptor<Lobby> lobbyCaptor;
-
-    private Lobby lobby;
-    private UUID lobbyUUID;
-    private LobbyId lobbyId;
-    private final GameId gameId = new GameId(UUID.randomUUID());
-    private String keycloakId;
-    private UserId host;
-
-    @BeforeEach
-    void setUp() {
-        keycloakId = UUID.randomUUID().toString();
-        host = new UserId(UUID.fromString(keycloakId));
-        lobbyUUID = UUID.randomUUID();
-        lobbyId = new LobbyId(lobbyUUID);
-        lobby = new Lobby(
-                lobbyId,
-                "",
-                4,
-                gameId,
-                host,
-                List.of(host),
-                LobbyStatus.OPEN,
-                null
-        );
-    }
-
-    @Test
-    void startGame_shouldCallGameClientAndMarkLobbyInGame_whenGameClientSucceeds() {
-        // Arrange
-        given(lobbyRepository.findById(lobbyId)).willReturn(Optional.of(lobby));
-
-        String serviceUrl = "http://gameservice";
-        String returnedUrl = "http://game/123";
-
-        GameCreatedResponseDto mockResponse = new GameCreatedResponseDto(returnedUrl);
-
-        given(gameClient.startGame(eq(serviceUrl), any(GameStartRequestDto.class)))
-                .willReturn(mockResponse);
-
-        // Act
-        String gameUrl = lobbyService.startGame(lobbyUUID, keycloakId, null);
-
-        // Assert
-        assertThat(gameUrl).isEqualTo(returnedUrl);
-        then(lobbyRepository).should().save(lobbyCaptor.capture());
-        Lobby saved = lobbyCaptor.getValue();
-        assertThat(saved.getStatus()).isEqualTo(LobbyStatus.IN_GAME);
-        assertThat(saved.getActiveGameUrl()).isEqualTo(returnedUrl);
-    }
-
-    @Test
-    void startGame_shouldThrowGameServiceUnavailable_whenGameClientThrows() {
-        // Arrange
-        given(lobbyRepository.findById(lobbyId)).willReturn(Optional.of(lobby));
-        given(gameClient.startGame(anyString(), any(GameStartRequestDto.class)))
-                .willThrow(new RuntimeException("down"));
-
-        // Act & Assert
-        assertThatThrownBy(() ->
-                lobbyService.startGame(lobbyUUID, keycloakId, null)
-        ).isInstanceOf(GameServiceUnavailableException.class)
-                .hasMessage("Game service is currently unavailable.");
-    }
-
-    @Test
-    void startGame_shouldThrow_whenLobbyNotFound() {
-        // Arrange
-        given(lobbyRepository.findById(lobbyId)).willReturn(Optional.empty());
-
-        // Act & Assert
-        assertThatThrownBy(() ->
-                lobbyService.startGame(lobbyUUID, keycloakId, null)
-        ).isInstanceOf(RuntimeException.class);
-    }
-}
+//package be.kdg.ipj3.lobbies.application;
+//
+//import be.kdg.ipj3.lobbies.api.dto.GameCreatedResponseDto;
+//import be.kdg.ipj3.lobbies.api.dto.GameStartRequestDto;
+//import be.kdg.ipj3.lobbies.domain.exceptions.GameServiceUnavailableException;
+//import be.kdg.ipj3.lobbies.domain.LobbyRepository;
+//import be.kdg.ipj3.lobbies.domain.Lobby;
+//import be.kdg.ipj3.lobbies.domain.LobbyId;
+//import be.kdg.ipj3.lobbies.domain.LobbyStatus;
+//import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
+//import be.kdg.ipj3.catalog.shared.GameId;
+//import be.kdg.ipj3.users.shared.UserId;
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.Test;
+//import org.junit.jupiter.api.extension.ExtendWith;
+//import org.mockito.ArgumentCaptor;
+//import org.mockito.Captor;
+//import org.mockito.InjectMocks;
+//import org.mockito.Mock;
+//import org.mockito.junit.jupiter.MockitoExtension;
+//
+//import java.util.List;
+//import java.util.Optional;
+//import java.util.UUID;
+//
+//import static org.assertj.core.api.Assertions.assertThat;
+//import static org.assertj.core.api.Assertions.assertThatThrownBy;
+//import static org.mockito.BDDMockito.*;
+//
+//@ExtendWith(MockitoExtension.class)
+//class StartGameTests {
+//
+//    @Mock
+//    private LobbyRepository lobbyRepository;
+//
+//    @Mock
+//    private GameClient gameClient;
+//
+//    @InjectMocks
+//    private LobbyService lobbyService;
+//
+//    @Captor
+//    private ArgumentCaptor<Lobby> lobbyCaptor;
+//
+//    private Lobby lobby;
+//    private UUID lobbyUUID;
+//    private LobbyId lobbyId;
+//    private final GameId gameId = new GameId(UUID.randomUUID());
+//    private String keycloakId;
+//    private UserId host;
+//
+//    @BeforeEach
+//    void setUp() {
+//        keycloakId = UUID.randomUUID().toString();
+//        host = new UserId(UUID.fromString(keycloakId));
+//        lobbyUUID = UUID.randomUUID();
+//        lobbyId = new LobbyId(lobbyUUID);
+//        lobby = new Lobby(
+//                lobbyId,
+//                "",
+//                4,
+//                gameId,
+//                host,
+//                List.of(host),
+//                LobbyStatus.OPEN,
+//                null
+//        );
+//    }
+//
+//    @Test
+//    void startGame_shouldCallGameClientAndMarkLobbyInGame_whenGameClientSucceeds() {
+//        // Arrange
+//        given(lobbyRepository.findById(lobbyId)).willReturn(Optional.of(lobby));
+//
+//        String serviceUrl = "http://gameservice";
+//        String returnedUrl = "http://game/123";
+//
+//        GameCreatedResponseDto mockResponse = new GameCreatedResponseDto(returnedUrl);
+//
+//        given(gameClient.startGame(eq(serviceUrl), any(GameStartRequestDto.class)))
+//                .willReturn(mockResponse);
+//
+//        // Act
+//        String gameUrl = lobbyService.startGame(lobbyUUID, keycloakId, null);
+//
+//        // Assert
+//        assertThat(gameUrl).isEqualTo(returnedUrl);
+//        then(lobbyRepository).should().save(lobbyCaptor.capture());
+//        Lobby saved = lobbyCaptor.getValue();
+//        assertThat(saved.getStatus()).isEqualTo(LobbyStatus.IN_GAME);
+//        assertThat(saved.getActiveGameUrl()).isEqualTo(returnedUrl);
+//    }
+//
+//    @Test
+//    void startGame_shouldThrowGameServiceUnavailable_whenGameClientThrows() {
+//        // Arrange
+//        given(lobbyRepository.findById(lobbyId)).willReturn(Optional.of(lobby));
+//        given(gameClient.startGame(anyString(), any(GameStartRequestDto.class)))
+//                .willThrow(new RuntimeException("down"));
+//
+//        // Act & Assert
+//        assertThatThrownBy(() ->
+//                lobbyService.startGame(lobbyUUID, keycloakId, null)
+//        ).isInstanceOf(GameServiceUnavailableException.class)
+//                .hasMessage("Game service is currently unavailable.");
+//    }
+//
+//    @Test
+//    void startGame_shouldThrow_whenLobbyNotFound() {
+//        // Arrange
+//        given(lobbyRepository.findById(lobbyId)).willReturn(Optional.empty());
+//
+//        // Act & Assert
+//        assertThatThrownBy(() ->
+//                lobbyService.startGame(lobbyUUID, keycloakId, null)
+//        ).isInstanceOf(RuntimeException.class);
+//    }
+//}

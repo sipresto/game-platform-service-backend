@@ -25,10 +25,10 @@ public class AchievementMessageHandler {
     void onGameResultMessageReceived(GameResultMessageDto dto) {
         for (UUID player : dto.players()) {
             progressService.evaluateAchievementsAfterGame(new GameContext(
-                    new GameId(dto.gameId()),
-                    new UserId(player),
+                    dto.gameId(),
+                    player,
                     dto.winnerId() != null
-                            ? new UserId(dto.winnerId())
+                            ? dto.winnerId()
                             : null,
                     dto.sessionResult(),
                     dto.difficulty()
@@ -38,6 +38,6 @@ public class AchievementMessageHandler {
 
     @RabbitListener(queues = RabbitMQTopologyAchievements.ACHIEVEMENT_COMPLETED_QUEUE)
     void onAchievementCompletedMessageReceived(AchievementCompletedDto dto) {
-        progressService.completeAchievement(new UserId(dto.userId()), dto.gameId(), dto.code(), dto.timestamp());
+        progressService.completeAchievement(dto.userId(), dto.gameId(), dto.code(), dto.timestamp());
     }
 }

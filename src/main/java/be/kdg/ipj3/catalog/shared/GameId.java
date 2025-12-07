@@ -19,4 +19,7 @@ public record GameId(UUID id) {
     public static GameId create() {
         return new GameId(UUID.randomUUID());
     }
+    public static NotFoundException notFound(UUID id) {
+        return new NotFoundException("Game [" + id + "] not found");
+    }
 }

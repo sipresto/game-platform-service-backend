@@ -14,6 +14,8 @@ import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.domain.Difficulty;
 import be.kdg.ipj3.sessions.domain.SessionResult;
 import be.kdg.ipj3.shared.domain.*;
+import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,7 @@ import org.testcontainers.utility.TestcontainersConfiguration;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -43,10 +46,14 @@ public class EvaluateAchievementsAfterGameTests {
     @Autowired
     private GameRepository gameRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @BeforeEach
     void setUp() {
         progressRepository.deleteAll();
         gameRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     private Game createTestGame() {
@@ -77,7 +84,7 @@ public class EvaluateAchievementsAfterGameTests {
         gameRepository.save(game);
     }
 
-    private GameContext createTestGameContext(GameId gameId, UserId userId, UserId winnerId,
+    private GameContext createTestGameContext(UUID gameId, UUID userId, UUID winnerId,
                                               SessionResult sessionResult, Difficulty difficulty) {
         return new GameContext(
                 gameId,
@@ -88,14 +95,21 @@ public class EvaluateAchievementsAfterGameTests {
         );
     }
 
+    private UserId createTestUser() {
+        User user = User.createFromKeycloak("keycloak-id", "test-user");
+        userRepository.save(user);
+
+        return user.getId();
+    }
+
     @Test
     void evaluateAchievementsAfterGame_shouldCreateProgressAndMarkAsCompleted_whenAchievementTriggered() {
         // Arrange
         Game game = createTestGame();
         createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_ANY);
 
-        UserId userId = UserId.create();
-        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN, null);
+        UserId userId = createTestUser();
+        GameContext context = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionResult.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -120,8 +134,8 @@ public class EvaluateAchievementsAfterGameTests {
         Game game = createTestGame();
         createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_PLAYER);
 
-        UserId userId = UserId.create();
-        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN, null);
+        UserId userId = createTestUser();
+        GameContext context = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionResult.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -144,8 +158,8 @@ public class EvaluateAchievementsAfterGameTests {
         Game game = createTestGame();
         createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_AI);
 
-        UserId userId = UserId.create();
-        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN, null);
+        UserId userId = createTestUser();
+        GameContext context = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionResult.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -165,8 +179,8 @@ public class EvaluateAchievementsAfterGameTests {
         Game game = createTestGame();
         createTestAchievement(game, 3, CountingStrategy.STREAK, CountTrigger.WIN_OR_DRAW_ANY);
 
-        UserId userId = UserId.create();
-        GameContext winContext = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN, null);
+        UserId userId = createTestUser();
+        GameContext winContext = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionResult.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -190,9 +204,9 @@ public class EvaluateAchievementsAfterGameTests {
         Game game = createTestGame();
         createTestAchievement(game, 3, CountingStrategy.STREAK, CountTrigger.WIN_OR_DRAW_ANY);
 
-        UserId userId = UserId.create();
-        GameContext winContext = createTestGameContext(game.getId(), userId, userId, SessionResult.PLAYER_WIN, null);
-        GameContext loseContext = createTestGameContext(game.getId(), userId, UserId.create(), SessionResult.PLAYER_WIN, null);
+        UserId userId = createTestUser();
+        GameContext winContext = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionResult.PLAYER_WIN, null);
+        GameContext loseContext = createTestGameContext(game.getId().id(), userId.id(), UUID.randomUUID(), SessionResult.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -210,4 +224,6 @@ public class EvaluateAchievementsAfterGameTests {
         assertThat(progress.getCurrentProgress()).isEqualTo(1);
         assertThat(progress.isCompleted()).isFalse();
     }
+
+    // TODO: add test for non existing user
 }

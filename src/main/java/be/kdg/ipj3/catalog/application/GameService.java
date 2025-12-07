@@ -48,11 +48,9 @@ public class GameService implements GamesApi {
         return gameRepository.findGamesByIds(ids.stream().map(GameId::new).toList());
     }
 
-    public void existsById(UUID id) {
+    public boolean existsById(UUID id) {
         var gameId = new GameId(id);
-        if (!gameRepository.existsById(gameId)) {
-            throw gameId.notFound();
-        }
+        return gameRepository.existsById(gameId);
     }
 
     public List<Achievement> findAchievementsByGameId(UUID id) {

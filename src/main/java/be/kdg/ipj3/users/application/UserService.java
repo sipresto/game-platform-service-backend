@@ -45,9 +45,10 @@ public class UserService implements UsersApi {
                 });
     }
 
-    public User findById(UserId id) {
-        return userRepository.findById(id)
-                .orElseThrow(id::notFound);
+    public User findById(UUID id) {
+        var userId = new UserId(id);
+        return userRepository.findById(userId)
+                .orElseThrow(userId::notFound);
     }
 
     public void updateProfile(String keycloakId, String displayName, String newBio) {
@@ -62,8 +63,14 @@ public class UserService implements UsersApi {
         userRepository.save(user);
     }
 
-    public void addGame(UserId id, GameId gameId) {
-        User user = userRepository.findById(id).orElseThrow(id::notFound);
+    public void addGame(UUID id, UUID gameIdParam) {
+        var userId = new UserId(id);
+        var gameId = new GameId(gameIdParam);
+        if(!gamesApi.existsById(gameIdParam)){
+            throw gameId.notFound();
+        }
+
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
         user.addGame(gameId);
         userRepository.save(user);
     }
@@ -95,7 +102,7 @@ public class UserService implements UsersApi {
         return usersReturn;
     }
 
-    public boolean existsById(UserId id) {
-        return userRepository.existsById(id);
+    public boolean existsById(UUID id) {
+        return userRepository.existsById(new UserId(id));
     }
 }
