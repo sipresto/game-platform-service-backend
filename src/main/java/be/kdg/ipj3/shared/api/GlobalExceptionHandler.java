@@ -1,7 +1,6 @@
 package be.kdg.ipj3.shared.api;
 
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
-import be.kdg.ipj3.shared.domain.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -63,18 +62,6 @@ public class GlobalExceptionHandler {
                 Instant.now()
         );
         return ResponseEntity.badRequest().body(body);
-    }
-
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiError> handleResourceNotFound(ResourceNotFoundException ex) {
-        ApiError body = new ApiError(
-                HttpStatus.NOT_FOUND.value(),
-                "Not Found",
-                ex.getMessage(),
-                List.of(),
-                Instant.now()
-        );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
     @ExceptionHandler(NotFoundException.class)
