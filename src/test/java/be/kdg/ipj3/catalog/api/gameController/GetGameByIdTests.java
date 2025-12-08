@@ -2,8 +2,8 @@ package be.kdg.ipj3.catalog.api.gameController;
 
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.domain.IGameRepository;
-import be.kdg.ipj3.shared.domain.GameId;
+import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class GetGameByIdTests {
     private MockMvc mockMvc;
 
     @Autowired
-    private IGameRepository gameRepository;
+    private GameRepository gameRepository;
 
     @BeforeEach
     void setUp() {

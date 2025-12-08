@@ -1,6 +1,6 @@
 package be.kdg.ipj3.social.domain.chat;
 
-import be.kdg.ipj3.shared.domain.NotFoundException;
+import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 import java.util.Objects;

@@ -1,11 +1,11 @@
 package be.kdg.ipj3.lobbies.api.lobbyController;
 
-import be.kdg.ipj3.lobbies.domain.lobby.ILobbyRepository;
-import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
-import be.kdg.ipj3.lobbies.domain.lobby.LobbyId;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
-import be.kdg.ipj3.users.domain.IUserRepository;
+import be.kdg.ipj3.lobbies.domain.LobbyRepository;
+import be.kdg.ipj3.lobbies.domain.Lobby;
+import be.kdg.ipj3.lobbies.domain.LobbyId;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.shared.UserId;
+import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,10 +33,10 @@ public class LeaveLobbyTests {
     private MockMvc mockMvc;
 
     @Autowired
-    private ILobbyRepository lobbyRepository;
+    private LobbyRepository lobbyRepository;
 
     @Autowired
-    private IUserRepository userRepository;
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {

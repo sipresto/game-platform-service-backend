@@ -2,10 +2,10 @@ package be.kdg.ipj3.catalog.application;
 
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.domain.IGameRepository;
-import be.kdg.ipj3.shared.domain.GameId;
+import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.shared.domain.NotFoundException;
+import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -24,7 +25,7 @@ import static org.mockito.BDDMockito.then;
 class GameServiceTests {
 
     @Mock
-    private IGameRepository gameRepository;
+    private GameRepository gameRepository;
 
     @InjectMocks
     private GameService gameService;
@@ -65,10 +66,10 @@ class GameServiceTests {
     @Test
     void findServiceByGameId_shouldReturnUrl_whenGameExists() {
         // Arrange
-        GameId gameId = GameId.create();
+        UUID gameId = UUID.randomUUID();
         String expectedUrl = "http://test.com/service";
 
-        given(gameRepository.findServiceUrlByGameId(gameId)).willReturn(Optional.of(expectedUrl));
+        given(gameRepository.findServiceUrlByGameId(new GameId(gameId))).willReturn(Optional.of(expectedUrl));
 
         // Act
         String serviceUrl = gameService.findServiceByGameId(gameId);
@@ -76,18 +77,18 @@ class GameServiceTests {
         // Assert
         assertNotNull(serviceUrl);
         assertEquals(expectedUrl, serviceUrl);
-        then(gameRepository).should().findServiceUrlByGameId(gameId);
+        then(gameRepository).should().findServiceUrlByGameId(new GameId(gameId));
     }
 
     @Test
     void findServiceByGameId_shouldThrowNotFoundException_whenGameDoesNotExist() {
         // Arrange
-        GameId gameId = GameId.create();
+        UUID gameId = UUID.randomUUID();
 
-        given(gameRepository.findServiceUrlByGameId(gameId)).willReturn(Optional.empty());
+        given(gameRepository.findServiceUrlByGameId(new GameId(gameId))).willReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(NotFoundException.class, () -> gameService.findServiceByGameId(gameId));
-        then(gameRepository).should().findServiceUrlByGameId(gameId);
+        then(gameRepository).should().findServiceUrlByGameId(new GameId(gameId));
     }
 }

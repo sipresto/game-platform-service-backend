@@ -1,6 +1,6 @@
 package be.kdg.ipj3.notifications.domain;
 
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.users.shared.UserId;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 

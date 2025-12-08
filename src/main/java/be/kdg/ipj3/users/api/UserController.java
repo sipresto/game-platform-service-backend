@@ -1,9 +1,5 @@
 package be.kdg.ipj3.users.api;
 
-import be.kdg.ipj3.catalog.application.GameService;
-import be.kdg.ipj3.shared.api.dto.LibraryGameDto;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.ResourceNotFoundException;
 import be.kdg.ipj3.users.api.dto.UserDto;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.User;
@@ -21,14 +17,9 @@ import java.util.Map;
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
-    private final GameService gameService;
 
-    public UserController(
-            UserService userService,
-            GameService gameService
-    ) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.gameService = gameService;
     }
 
     /**
@@ -63,25 +54,6 @@ public class UserController {
     }
 
     /**
-     * Get the owned games of a user.
-     */
-    @GetMapping("/user/{id}/games")
-    public ResponseEntity<List<LibraryGameDto>> findOwnedGamesByKeycloakId(
-            @PathVariable String id
-    ) {
-        List<GameId> ownedGameIds = userService.findOwnedGamesByKeycloakId(id);
-        List<LibraryGameDto> dtos = gameService.findGamesByIds(ownedGameIds).stream()
-                .map(LibraryGameDto::from)
-                .toList();
-
-        if (dtos.isEmpty()) {
-            throw new ResourceNotFoundException("No games found");
-        }
-
-        return ResponseEntity.ok(dtos);
-    }
-
-    /**
      * Updates the visibility settings of the user
      */
     @PutMapping("/user/privacy")
@@ -99,8 +71,8 @@ public class UserController {
      * Unsecured endpoint that gets all users whose accounts are public
      */
     @GetMapping("/users")
-    public ResponseEntity<List<UserDto>> findAllPublicUsers(){
-        var publicUsers = userService.getAllPublicUsers().stream().map(UserDto::fromDomain).toList();
+    public ResponseEntity<List<UserDto>> findAllPublicUsers() {
+        var publicUsers = userService.findAllPublicUsers().stream().map(UserDto::fromDomain).toList();
         return ResponseEntity.ok(publicUsers);
     }
 
@@ -108,9 +80,9 @@ public class UserController {
      * Gets friends of a user
      */
     @GetMapping("/friends")
-    public ResponseEntity<List<UserDto>> findFriendsForUser(@AuthenticationPrincipal Jwt jwt){
+    public ResponseEntity<List<UserDto>> findFriendsForUser(@AuthenticationPrincipal Jwt jwt) {
         var user = userService.findByKeycloakId(jwt.getSubject());
-        var friends = userService.getFriendsAndSelf(user).stream().map(UserDto::fromDomain).toList();
+        var friends = userService.findFriendsAndSelf(user).stream().map(UserDto::fromDomain).toList();
         return ResponseEntity.ok(friends);
     }
 }

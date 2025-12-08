@@ -10,7 +10,10 @@ POST {{baseUrl}}/games/filter
 Content-Type: application/json
 
 {
-  "categories": ["BOARDGAME", "NATIVE"]
+  "categories": [
+    "BOARDGAME",
+    "NATIVE"
+  ]
 }
 
 ### POST games by filter - Price range (under 2.00)
@@ -33,7 +36,9 @@ POST {{baseUrl}}/games/filter
 Content-Type: application/json
 
 {
-  "categories": ["BOARDGAME"],
+  "categories": [
+    "BOARDGAME"
+  ],
   "maxPrice": {
     "currency": "EUR",
     "amount": 5.00
@@ -45,7 +50,9 @@ POST {{baseUrl}}/games/filter
 Content-Type: application/json
 
 {
-  "categories": ["STRATEGY"]
+  "categories": [
+    "STRATEGY"
+  ]
 }
 
 ### GET user with owned games

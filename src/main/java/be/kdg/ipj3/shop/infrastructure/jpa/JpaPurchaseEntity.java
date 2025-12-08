@@ -1,9 +1,9 @@
 package be.kdg.ipj3.shop.infrastructure.jpa;
 
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shop.domain.Purchase;
 import be.kdg.ipj3.shop.domain.PurchaseId;
+import be.kdg.ipj3.users.shared.UserId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -31,9 +31,10 @@ public class JpaPurchaseEntity {
     @Column(nullable = false)
     private String chargeId;
 
-    protected JpaPurchaseEntity() {} // for JPA
+    protected JpaPurchaseEntity() {
+    } // for JPA
 
-    public JpaPurchaseEntity(UUID id, UUID buyer, UUID game, Instant purchasedAt,String chargeId) {
+    public JpaPurchaseEntity(UUID id, UUID buyer, UUID game, Instant purchasedAt, String chargeId) {
         this.id = id;
         this.buyer = buyer;
         this.game = game;
@@ -52,7 +53,7 @@ public class JpaPurchaseEntity {
     }
 
     public Purchase toDomain() {
-        return new Purchase(new PurchaseId(this.id), new UserId(this.buyer), new GameId(this.game), this.purchasedAt,this.chargeId);
+        return new Purchase(new PurchaseId(this.id), new UserId(this.buyer), new GameId(this.game), this.purchasedAt, this.chargeId);
     }
 
     public UUID getId() {

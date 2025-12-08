@@ -1,26 +1,31 @@
 package be.kdg.ipj3.catalog.application;
 
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.catalog.domain.Achievement;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.domain.IGameRepository;
+import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.catalog.shared.AchievementDto;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.catalog.shared.GamePurchaseDto;
+import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.shared.domain.Money;
-import org.springframework.beans.factory.annotation.Qualifier;
+import be.kdg.ipj3.users.shared.UserId;
+import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
-public class GameService {
-    private final IGameRepository gameRepository;
+@Transactional
+public class GameService implements GamesApi {
+    private final GameRepository gameRepository;
+    private final UsersApi usersApi;
 
-    public GameService(
-            @Qualifier("gameRepository") final IGameRepository gameRepository
-    ) {
+    public GameService(GameRepository gameRepository, UsersApi usersApi) {
         this.gameRepository = gameRepository;
+        this.usersApi = usersApi;
     }
 
     @Transactional(readOnly = true)
@@ -29,9 +34,10 @@ public class GameService {
     }
 
     @Transactional(readOnly = true)
-    public String findServiceByGameId(GameId id) {
-        return gameRepository.findServiceUrlByGameId(id)
-                .orElseThrow(id::notFound);
+    public String findServiceByGameId(UUID id) {
+        var gameId = new GameId(id);
+        return gameRepository.findServiceUrlByGameId(gameId)
+                .orElseThrow(gameId::notFound);
     }
 
     @Transactional(readOnly = true)
@@ -41,30 +47,43 @@ public class GameService {
     }
 
     @Transactional(readOnly = true)
-    public Game findGameById(GameId gameId) {
+    public Game findGameById(UUID id) {
+        var gameId = new GameId(id);
         return gameRepository.findById(gameId)
                 .orElseThrow(gameId::notFound);
     }
 
     @Transactional(readOnly = true)
-    public List<Game> findGamesByIds(List<GameId> ids) {
-        return gameRepository.findGamesByIds(ids);
+    public boolean existsById(UUID id) {
+        var gameId = new GameId(id);
+        return gameRepository.existsById(gameId);
     }
 
-    public boolean existsById(GameId gameId) {
-        if (gameRepository.existsById(gameId)) {
-            return true;
-        }
-        else {
-            throw gameId.notFound();
-        }
+    @Transactional(readOnly = true)
+    public List<AchievementDto> findAchievementDtosByGameId(UUID id) {
+        var gameId = new GameId(id);
+        return gameRepository.findAchievementsByGameId(gameId).stream()
+                .map(AchievementDto::fromDomain)
+                .toList();
     }
 
-    public List<Achievement> findAchievementsByGameId(GameId game) {
-        return gameRepository.findAchievementsByGameId(game);
+    @Transactional(readOnly = true)
+    public Optional<AchievementDto> findAchievementDtoByCode(String code) {
+        return gameRepository.findAchievementByCode(code)
+                .map(AchievementDto::fromDomain);
     }
 
-    public Optional<Achievement> findAchievementByCode(String code) {
-        return gameRepository.findAchievementByCode(code);
+    @Transactional(readOnly = true)
+    public Optional<GamePurchaseDto> findGameDtoById(UUID id) {
+        var gameId = new GameId(id);
+        return gameRepository.findById(gameId)
+                .map(GamePurchaseDto::fromDomain);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Game> findOwnedGamesByKeycloakId(String keycloakId) {
+        UserId userId = usersApi.findIdByKeycloakId(keycloakId);
+        List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id());
+        return gameRepository.findGamesByIds(ownedGameIds);
     }
 }

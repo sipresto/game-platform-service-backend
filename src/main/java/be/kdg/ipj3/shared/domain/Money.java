@@ -34,7 +34,7 @@ public record Money(Currency currency, BigDecimal amount) {
 
     public Money subtract(final Money other) {
         Objects.requireNonNull(other, "Money to subtract cannot be null");
-        if (!currency.equals(other.currency)){
+        if (!currency.equals(other.currency)) {
             throw new IllegalArgumentException("Cannot subtract Money of different currencies");
         }
         BigDecimal result = amount.subtract(other.amount).setScale(2, RoundingMode.HALF_UP);

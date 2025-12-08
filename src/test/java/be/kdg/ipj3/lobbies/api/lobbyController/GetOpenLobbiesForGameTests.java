@@ -2,13 +2,13 @@ package be.kdg.ipj3.lobbies.api.lobbyController;
 
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.domain.IGameRepository;
-import be.kdg.ipj3.lobbies.domain.lobby.ILobbyRepository;
-import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
-import be.kdg.ipj3.shared.domain.GameId;
+import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.lobbies.domain.LobbyRepository;
+import be.kdg.ipj3.lobbies.domain.Lobby;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.shared.domain.UserId;
-import be.kdg.ipj3.users.domain.IUserRepository;
+import be.kdg.ipj3.users.shared.UserId;
+import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,13 +41,13 @@ public class GetOpenLobbiesForGameTests {
     private MockMvc mockMvc;
 
     @Autowired
-    private ILobbyRepository lobbyRepository;
+    private LobbyRepository lobbyRepository;
 
     @Autowired
-    private IUserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    private IGameRepository gameRepository;
+    private GameRepository gameRepository;
 
     @BeforeEach
     void setUp() {

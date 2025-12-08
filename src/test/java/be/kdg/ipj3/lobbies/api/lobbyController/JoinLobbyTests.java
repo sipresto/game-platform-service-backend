@@ -1,12 +1,12 @@
 package be.kdg.ipj3.lobbies.api.lobbyController;
 
 import be.kdg.ipj3.lobbies.api.dto.JoinLobbyDto;
-import be.kdg.ipj3.lobbies.domain.lobby.ILobbyRepository;
-import be.kdg.ipj3.lobbies.domain.lobby.Lobby;
-import be.kdg.ipj3.lobbies.domain.lobby.LobbyId;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
-import be.kdg.ipj3.users.domain.IUserRepository;
+import be.kdg.ipj3.lobbies.domain.LobbyRepository;
+import be.kdg.ipj3.lobbies.domain.Lobby;
+import be.kdg.ipj3.lobbies.domain.LobbyId;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.shared.UserId;
+import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,8 +18,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+
 import java.util.Optional;
 import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -37,10 +39,10 @@ public class JoinLobbyTests {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ILobbyRepository lobbyRepository;
+    private LobbyRepository lobbyRepository;
 
     @Autowired
-    private IUserRepository userRepository;
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {

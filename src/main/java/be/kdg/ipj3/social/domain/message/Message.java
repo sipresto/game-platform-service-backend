@@ -1,6 +1,6 @@
 package be.kdg.ipj3.social.domain.message;
 
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.users.shared.UserId;
 import org.jmolecules.ddd.annotation.Entity;
 import org.jmolecules.ddd.annotation.Identity;
 

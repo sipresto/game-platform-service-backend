@@ -1,11 +1,11 @@
 package be.kdg.ipj3.sessions.infrastructure.jpa;
 
-import be.kdg.ipj3.lobbies.domain.lobby.Difficulty;
-import be.kdg.ipj3.sessions.domain.session.Session;
-import be.kdg.ipj3.sessions.domain.session.SessionId;
-import be.kdg.ipj3.sessions.domain.session.SessionResult;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.lobbies.shared.Difficulty;
+import be.kdg.ipj3.sessions.domain.Session;
+import be.kdg.ipj3.sessions.domain.SessionId;
+import be.kdg.ipj3.sessions.shared.SessionResult;
+import be.kdg.ipj3.users.shared.UserId;
 import jakarta.persistence.*;
 
 import java.time.Instant;

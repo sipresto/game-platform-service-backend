@@ -1,10 +1,5 @@
 package be.kdg.ipj3.shop.api;
 
-import be.kdg.ipj3.catalog.application.GameService;
-import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.shop.infrastructure.stripe.ChargeRequest;
 import be.kdg.ipj3.shop.infrastructure.stripe.StripeService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
@@ -18,11 +13,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/payment")
 public class PaymentController {
-    private final GameService gameService;
     private final StripeService stripeService;
 
-    public PaymentController(GameService gameService, StripeService stripeService) {
-        this.gameService = gameService;
+    public PaymentController(StripeService stripeService) {
         this.stripeService = stripeService;
     }
 
@@ -34,18 +27,7 @@ public class PaymentController {
         String stripeToken = body.get("stripeToken");
 
         try {
-            Game game = gameService.findGameById(new GameId(gameId));
-            Money total = game.getPrice();
-            int amountInCents = total.amount().intValue() * 100;
-
-            ChargeRequest charge = new ChargeRequest(
-                    "Payment for: " + game.getName(),
-                    amountInCents,
-                    total.currency(),
-                    stripeToken
-            );
-
-            Charge stripeCharge = stripeService.charge(charge);
+            Charge stripeCharge = stripeService.charge(gameId, stripeToken);
             return ResponseEntity.ok(Map.of(
                     "id", stripeCharge.getId(),
                     "status", stripeCharge.getStatus()

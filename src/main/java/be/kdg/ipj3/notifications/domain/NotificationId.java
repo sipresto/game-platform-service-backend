@@ -1,6 +1,6 @@
 package be.kdg.ipj3.notifications.domain;
 
-import be.kdg.ipj3.shared.domain.NotFoundException;
+import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import org.jmolecules.ddd.annotation.ValueObject;
 
 import java.util.Objects;
@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @ValueObject
 public record NotificationId(UUID id) {
-    public NotificationId{
+    public NotificationId {
         Objects.requireNonNull(id, "Notification id cannot be null!");
     }
 

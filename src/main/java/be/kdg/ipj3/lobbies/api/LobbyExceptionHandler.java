@@ -1,6 +1,6 @@
 package be.kdg.ipj3.lobbies.api;
 
-import be.kdg.ipj3.lobbies.domain.exception.GameServiceUnavailableException;
+import be.kdg.ipj3.lobbies.domain.exceptions.GameServiceUnavailableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -1,12 +1,12 @@
 package be.kdg.ipj3.sessions.api.sessionController;
 
-import be.kdg.ipj3.lobbies.domain.lobby.Difficulty;
-import be.kdg.ipj3.sessions.domain.session.ISessionRepository;
-import be.kdg.ipj3.sessions.domain.session.Session;
-import be.kdg.ipj3.sessions.domain.session.SessionResult;
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
-import be.kdg.ipj3.users.domain.IUserRepository;
+import be.kdg.ipj3.lobbies.shared.Difficulty;
+import be.kdg.ipj3.sessions.domain.SessionRepository;
+import be.kdg.ipj3.sessions.domain.Session;
+import be.kdg.ipj3.sessions.shared.SessionResult;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.shared.UserId;
+import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +37,10 @@ public class GetSessionByUserIdTests {
     private MockMvc mockMvc;
 
     @Autowired
-    private ISessionRepository sessionRepository;
+    private SessionRepository sessionRepository;
 
     @Autowired
-    private IUserRepository userRepository;
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {

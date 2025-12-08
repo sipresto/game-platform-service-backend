@@ -1,7 +1,7 @@
 package be.kdg.ipj3.users.domain;
 
-import be.kdg.ipj3.shared.domain.GameId;
-import be.kdg.ipj3.shared.domain.UserId;
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ class UserTest {
         }
 
         @Test
-        @DisplayName("When creating user from Keycloak credentials Then user should be created with Keycloak username as display name")
+        @DisplayName("When creating user fromDomain Keycloak credentials Then user should be created with Keycloak username as display name")
         void createUser_fromKeycloak() {
             // Given
             String keycloakId = "keycloak-123";
@@ -58,7 +58,7 @@ class UserTest {
         }
 
         @Test
-        @DisplayName("When creating multiple users from Keycloak Then each user should have unique ID")
+        @DisplayName("When creating multiple users fromDomain Keycloak Then each user should have unique ID")
         void createMultipleUsers_fromKeycloak() {
             // Given
             String keycloakId1 = "keycloak-1";

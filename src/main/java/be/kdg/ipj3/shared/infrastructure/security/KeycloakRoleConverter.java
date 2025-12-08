@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Extracts roles from Keycloak JWT token
+ * Extracts roles fromDomain Keycloak JWT token
  * Keycloak stores realm roles in: token.realm_access.roles
  */
 public class KeycloakRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {

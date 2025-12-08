@@ -1,7 +1,7 @@
 package be.kdg.ipj3.social.domain.chat;
 
-import be.kdg.ipj3.shared.domain.UserId;
 import be.kdg.ipj3.social.domain.message.Message;
+import be.kdg.ipj3.users.shared.UserId;
 import org.jmolecules.ddd.annotation.Entity;
 import org.jmolecules.ddd.annotation.Identity;
 

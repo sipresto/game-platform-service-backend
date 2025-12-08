@@ -3,7 +3,7 @@ package be.kdg.ipj3.catalog.api;
 import be.kdg.ipj3.catalog.api.dto.GameDto;
 import be.kdg.ipj3.catalog.api.dto.GameFilterRequestDto;
 import be.kdg.ipj3.catalog.application.GameService;
-import be.kdg.ipj3.shared.domain.GameId;
+import be.kdg.ipj3.catalog.api.dto.LibraryGameDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +22,7 @@ public class GameController {
     @GetMapping
     public ResponseEntity<List<GameDto>> getAllGames() {
         List<GameDto> dtos = gameService.findAllGames().stream()
-                .map(GameDto::from)
+                .map(GameDto::fromDomain)
                 .toList();
 
         return ResponseEntity.ok(dtos);
@@ -33,7 +33,7 @@ public class GameController {
             @RequestBody GameFilterRequestDto filter
     ) {
         var dtos = gameService.filterGames(filter.minPrice(), filter.maxPrice(), filter.categories()).stream()
-                .map(GameDto::from)
+                .map(GameDto::fromDomain)
                 .toList();
 
         return ResponseEntity.ok(dtos);
@@ -43,8 +43,19 @@ public class GameController {
     public ResponseEntity<GameDto> getGameById(
             @PathVariable UUID id
     ) {
-        GameDto gameDto = GameDto.from(gameService.findGameById(new GameId(id)));
+        GameDto gameDto = GameDto.fromDomain(gameService.findGameById(id));
 
         return ResponseEntity.ok(gameDto);
+    }
+
+    @GetMapping("/user/{keycloakId}")
+    public ResponseEntity<List<LibraryGameDto>> getOwnedGamesByKeycloakId(
+            @PathVariable String keycloakId
+    ) {
+        List<LibraryGameDto> dtos = gameService.findOwnedGamesByKeycloakId(keycloakId).stream()
+                .map(LibraryGameDto::from)
+                .toList();
+
+        return ResponseEntity.ok(dtos);
     }
 }

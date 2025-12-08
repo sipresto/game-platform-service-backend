@@ -3,7 +3,7 @@ package be.kdg.ipj3.catalog.infrastructure.jpa;
 import be.kdg.ipj3.catalog.domain.Achievement;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.shared.domain.GameId;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -50,7 +50,8 @@ public class JpaGameEntity {
     )
     private List<JpaAchievementEntity> achievements = new ArrayList<>();
 
-    protected JpaGameEntity() {} // for JPA
+    protected JpaGameEntity() {
+    } // for JPA
 
 
     public JpaGameEntity(UUID id, String name, String description, BigDecimal price, String serviceUrl, String rules, List<Category> categories) {
@@ -123,7 +124,9 @@ public class JpaGameEntity {
         return rules;
     }
 
-    public List<Category> getCategories() { return categories; }
+    public List<Category> getCategories() {
+        return categories;
+    }
 
     public List<JpaAchievementEntity> getAchievements() {
         return achievements;
