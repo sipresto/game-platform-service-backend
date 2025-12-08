@@ -85,10 +85,12 @@ public class LobbyService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<Lobby> findAllOpenLobbies() {
         return lobbyRepository.findByStatus(LobbyStatus.OPEN);
     }
 
+    @Transactional(readOnly = true)
     public List<Lobby> findOpenLobbiesForGame(UUID id) {
 
         var gameId = gamesApi.findGameById(id).getId();

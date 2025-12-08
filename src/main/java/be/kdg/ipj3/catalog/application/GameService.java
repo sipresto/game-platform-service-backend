@@ -28,32 +28,38 @@ public class GameService implements GamesApi {
         this.usersApi = usersApi;
     }
 
+    @Transactional(readOnly = true)
     public List<Game> findAllGames() {
         return gameRepository.findAllGames();
     }
 
+    @Transactional(readOnly = true)
     public String findServiceByGameId(UUID id) {
         var gameId = new GameId(id);
         return gameRepository.findServiceUrlByGameId(gameId)
                 .orElseThrow(gameId::notFound);
     }
 
+    @Transactional(readOnly = true)
     public List<Game> filterGames(Money minPrice, Money maxPrice,
                                   List<Category> categories) {
         return gameRepository.filterGames(minPrice, maxPrice, categories);
     }
 
+    @Transactional(readOnly = true)
     public Game findGameById(UUID id) {
         var gameId = new GameId(id);
         return gameRepository.findById(gameId)
                 .orElseThrow(gameId::notFound);
     }
 
+    @Transactional(readOnly = true)
     public boolean existsById(UUID id) {
         var gameId = new GameId(id);
         return gameRepository.existsById(gameId);
     }
 
+    @Transactional(readOnly = true)
     public List<AchievementDto> findAchievementDtosByGameId(UUID id) {
         var gameId = new GameId(id);
         return gameRepository.findAchievementsByGameId(gameId).stream()
@@ -61,17 +67,20 @@ public class GameService implements GamesApi {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public Optional<AchievementDto> findAchievementDtoByCode(String code) {
         return gameRepository.findAchievementByCode(code)
                 .map(AchievementDto::fromDomain);
     }
 
+    @Transactional(readOnly = true)
     public Optional<GamePurchaseDto> findGameDtoById(UUID id) {
         var gameId = new GameId(id);
         return gameRepository.findById(gameId)
                 .map(GamePurchaseDto::fromDomain);
     }
 
+    @Transactional(readOnly = true)
     public List<Game> findOwnedGamesByKeycloakId(String keycloakId) {
         UserId userId = usersApi.findIdByKeycloakId(keycloakId);
         List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id());

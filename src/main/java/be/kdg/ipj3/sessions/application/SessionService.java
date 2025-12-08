@@ -20,6 +20,7 @@ public class SessionService {
         this.usersApi = usersApi;
     }
 
+    @Transactional(readOnly = true)
     public List<Session> findSessionsByUserId(String keycloakId) {
         UserId userId = usersApi.findIdByKeycloakId(keycloakId);
 

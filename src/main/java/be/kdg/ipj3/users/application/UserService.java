@@ -41,6 +41,7 @@ public class UserService implements UsersApi {
                 });
     }
 
+    @Transactional(readOnly = true)
     public User findById(UUID id) {
         var userId = new UserId(id);
         return userRepository.findById(userId)
@@ -67,10 +68,12 @@ public class UserService implements UsersApi {
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public List<GameId> findOwnedGamesById(UUID id) {
         return userRepository.findOwnedGamesById(new UserId(id));
     }
 
+    @Transactional(readOnly = true)
     public User findByKeycloakId(String keycloakId) {
         return userRepository.findByKeycloakId(keycloakId)
                 .orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
@@ -81,10 +84,12 @@ public class UserService implements UsersApi {
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public List<User> findAllPublicUsers() {
         return userRepository.findAllPublicUsers();
     }
 
+    @Transactional(readOnly = true)
     public List<User> findFriendsAndSelf(User user) {
         List<User> usersReturn = new ArrayList<>();
         usersReturn.add(user);
@@ -92,10 +97,12 @@ public class UserService implements UsersApi {
         return usersReturn;
     }
 
+    @Transactional(readOnly = true)
     public boolean existsById(UUID id) {
         return userRepository.existsById(new UserId(id));
     }
 
+    @Transactional(readOnly = true)
     public UserId findIdByKeycloakId(String keycloakId) {
         return findByKeycloakId(keycloakId).getId();
     }
