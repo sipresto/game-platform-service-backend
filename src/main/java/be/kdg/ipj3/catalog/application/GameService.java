@@ -79,9 +79,8 @@ public class GameService implements GamesApi {
     }
 
     public void addGame(UUID userId, UUID gameId) {
-        // TODO: add proper handling of missing user
-        if (existsById(gameId)) {
-            return;
+        if (!existsById(gameId)) {
+            throw GameId.notFound(gameId);
         }
 
         usersApi.addGame(userId, gameId);
