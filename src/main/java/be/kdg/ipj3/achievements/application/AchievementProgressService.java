@@ -5,7 +5,7 @@ import be.kdg.ipj3.achievements.domain.AchievementProgressRepository;
 import be.kdg.ipj3.achievements.domain.GameContext;
 import be.kdg.ipj3.achievements.domain.TriggerEvaluator;
 import be.kdg.ipj3.achievements.domain.strategies.CountingStrategyHandler;
-import be.kdg.ipj3.catalog.domain.Achievement;
+import be.kdg.ipj3.catalog.shared.AchievementDto;
 import be.kdg.ipj3.catalog.shared.AchievementId;
 import be.kdg.ipj3.catalog.shared.CountingStrategy;
 import be.kdg.ipj3.catalog.shared.GamesApi;
@@ -37,29 +37,29 @@ public class AchievementProgressService {
     }
 
     public void evaluateAchievementsAfterGame(GameContext context) {
-        List<Achievement> gameAchievements = gamesApi.findAchievementsByGameId(context.game());
+        List<AchievementDto> gameAchievements = gamesApi.findAchievementDtosByGameId(context.game());
 
         if (!usersApi.existsById(context.player())) {
             return;
         }
 
-        for (Achievement achievement : gameAchievements) {
-            AchievementProgress progress = getProgress(new UserId(context.player()), achievement.getId());
+        for (AchievementDto achievement : gameAchievements) {
+            AchievementProgress progress = getProgress(new UserId(context.player()), achievement.id());
 
             if (progress.isCompleted() || !achievement.isCountedAfterGame()) {
                 continue;
             }
 
-            if (!triggerEvaluator.shouldTrigger(achievement.getCountTrigger(), context) &&
-                achievement.getCountingStrategy() != CountingStrategy.STREAK) {
+            if (!triggerEvaluator.shouldTrigger(achievement.countTrigger(), context) &&
+                    achievement.countingStrategy() != CountingStrategy.STREAK) {
                 continue;
             }
 
             CountingStrategyHandler handler = strategyHandlers.stream()
-                    .filter(h -> h.supports(achievement.getCountingStrategy()))
+                    .filter(h -> h.supports(achievement.countingStrategy()))
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException(
-                            "No handler for strategy: " + achievement.getCountingStrategy()));
+                            "No handler for strategy: " + achievement.countingStrategy()));
 
             AchievementProgress updatedProgress = handler.handle(achievement, progress, context);
 
@@ -71,12 +71,12 @@ public class AchievementProgressService {
 
     public void completeAchievement(UUID userId, UUID gameSesssionId, String code, Instant timestamp) {
         // TODO: haal gameId uit lobby via gameSessionId -> zoek met die gameId en code de achievementId
-        Achievement achievement = gamesApi.findAchievementByCode(code).orElse(null);
+        AchievementDto achievement = gamesApi.findAchievementDtoByCode(code).orElse(null);
         if (achievement == null || !usersApi.existsById(userId)) {
             return;
         }
 
-        AchievementProgress progress = getProgress(new UserId(userId), achievement.getId());
+        AchievementProgress progress = getProgress(new UserId(userId), achievement.id());
 
         if (progress.isCompleted()) {
             return;

@@ -2,7 +2,6 @@ package be.kdg.ipj3.sessions.application;
 
 import be.kdg.ipj3.sessions.domain.Session;
 import be.kdg.ipj3.sessions.domain.SessionRepository;
-import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
@@ -21,10 +20,10 @@ public class SessionService {
         this.usersApi = usersApi;
     }
 
-    public List<Session> findSessionsByUserId(String userId) {
-        User user = usersApi.findByKeycloakId(userId);
+    public List<Session> findSessionsByUserId(String keycloakId) {
+        UserId userId = usersApi.findIdByKeycloakId(keycloakId);
 
-        return sessionRepository.findSessionsByUserId(user.getId());
+        return sessionRepository.findSessionsByUserId(userId);
     }
 
     public void save(Session session) {

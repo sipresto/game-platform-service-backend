@@ -1,7 +1,7 @@
 package be.kdg.ipj3.shared.infrastructure.rabbitmq.dto;
 
-import be.kdg.ipj3.lobbies.domain.Difficulty;
-import be.kdg.ipj3.sessions.domain.SessionResult;
+import be.kdg.ipj3.lobbies.shared.Difficulty;
+import be.kdg.ipj3.sessions.shared.SessionResult;
 
 import java.time.Instant;
 import java.util.List;

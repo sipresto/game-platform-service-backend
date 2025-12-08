@@ -1,14 +1,9 @@
 package be.kdg.ipj3.shop.api;
 
-import be.kdg.ipj3.catalog.shared.GameId;
-import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.shop.api.dto.PurchaseDto;
 import be.kdg.ipj3.shop.application.PurchaseService;
 import be.kdg.ipj3.shop.domain.Purchase;
 import be.kdg.ipj3.shop.infrastructure.stripe.StripeService;
-import be.kdg.ipj3.users.domain.User;
-import be.kdg.ipj3.users.shared.UserId;
-import be.kdg.ipj3.users.shared.UsersApi;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 import org.springframework.http.HttpStatus;

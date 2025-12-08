@@ -4,9 +4,7 @@ import be.kdg.ipj3.achievements.application.AchievementProgressService;
 import be.kdg.ipj3.achievements.domain.GameContext;
 import be.kdg.ipj3.achievements.infrastructure.rabbitmq.config.RabbitMQTopologyAchievements;
 import be.kdg.ipj3.achievements.infrastructure.rabbitmq.dto.AchievementCompletedDto;
-import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.infrastructure.rabbitmq.dto.GameResultMessageDto;
-import be.kdg.ipj3.users.shared.UserId;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 

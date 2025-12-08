@@ -1,7 +1,5 @@
 package be.kdg.ipj3.users.api.dto;
 
-import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.shared.api.SmallGameDto;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.Visibility;
@@ -9,14 +7,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.List;
 import java.util.UUID;
 
 public record UserDto(
         @NotNull UUID id,
         @NotBlank String keycloakId,
         @NotBlank String username,
-        @Valid List<SmallGameDto> games,
         @Valid @NotNull ProfileDto profile,
         @NotNull Visibility visibility
 ) {
@@ -25,18 +21,6 @@ public record UserDto(
                 user.getId().id(),
                 user.getKeycloakId(),
                 user.getUsername(),
-                List.of(),
-                ProfileDto.fromDomain(user.getProfile()),
-                user.getVisibility()
-        );
-    }
-
-    public static UserDto fromDomainWithGames(User user, List<Game> games) {
-        return new UserDto(
-                user.getId().id(),
-                user.getKeycloakId(),
-                user.getUsername(),
-                games.stream().map(SmallGameDto::fromDomain).toList(),
                 ProfileDto.fromDomain(user.getProfile()),
                 user.getVisibility()
         );

@@ -1,4 +1,4 @@
-package be.kdg.ipj3.lobbies.domain;
+package be.kdg.ipj3.lobbies.shared;
 
 public enum Difficulty {
     EASY,

@@ -5,7 +5,6 @@ import be.kdg.ipj3.users.shared.UserId;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface UserRepository {
     Optional<User> findById(UserId userId);

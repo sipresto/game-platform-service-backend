@@ -3,6 +3,7 @@ package be.kdg.ipj3.catalog.api;
 import be.kdg.ipj3.catalog.api.dto.GameDto;
 import be.kdg.ipj3.catalog.api.dto.GameFilterRequestDto;
 import be.kdg.ipj3.catalog.application.GameService;
+import be.kdg.ipj3.catalog.shared.LibraryGameDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,5 +46,16 @@ public class GameController {
         GameDto gameDto = GameDto.fromDomain(gameService.findGameById(id));
 
         return ResponseEntity.ok(gameDto);
+    }
+
+    @GetMapping("/user/{keycloakId}")
+    public ResponseEntity<List<LibraryGameDto>> getOwnedGamesByKeycloakId(
+            @PathVariable String keycloakId
+    ) {
+        List<LibraryGameDto> dtos = gameService.findOwnedGamesByKeycloakId(keycloakId).stream()
+                .map(LibraryGameDto::from)
+                .toList();
+
+        return ResponseEntity.ok(dtos);
     }
 }

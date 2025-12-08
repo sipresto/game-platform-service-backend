@@ -1,9 +1,9 @@
 package be.kdg.ipj3.sessions.api.sessionController;
 
-import be.kdg.ipj3.lobbies.domain.Difficulty;
+import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.sessions.domain.SessionRepository;
 import be.kdg.ipj3.sessions.domain.Session;
-import be.kdg.ipj3.sessions.domain.SessionResult;
+import be.kdg.ipj3.sessions.shared.SessionResult;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.domain.UserRepository;

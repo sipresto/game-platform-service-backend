@@ -1,6 +1,5 @@
 package be.kdg.ipj3.catalog.shared;
 
-import be.kdg.ipj3.catalog.domain.Achievement;
 import be.kdg.ipj3.catalog.domain.Game;
 import org.springframework.modulith.NamedInterface;
 
@@ -14,14 +13,15 @@ public interface GamesApi {
 
     Game findGameById(UUID id);
 
-    List<Game> findGamesByIds(List<UUID> ids);
-
     boolean existsById(UUID id);
 
-    List<Achievement> findAchievementsByGameId(UUID game);
+    List<AchievementDto> findAchievementDtosByGameId(UUID game);
 
-    Optional<Achievement> findAchievementByCode(String code);
+    Optional<AchievementDto> findAchievementDtoByCode(String code);
 
     String findServiceByGameId(UUID id);
 
+    Optional<GamePurchaseDto> findGameDtoById(UUID id);
+
+    void addGame(UUID userId, UUID gameId);
 }

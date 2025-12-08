@@ -2,7 +2,7 @@ package be.kdg.ipj3.achievements.domain.strategies;
 
 import be.kdg.ipj3.achievements.domain.AchievementProgress;
 import be.kdg.ipj3.achievements.domain.GameContext;
-import be.kdg.ipj3.catalog.domain.Achievement;
+import be.kdg.ipj3.catalog.shared.AchievementDto;
 import be.kdg.ipj3.catalog.shared.CountingStrategy;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ public class IncrementStrategyHandler implements CountingStrategyHandler {
     }
 
     @Override
-    public AchievementProgress handle(Achievement achievement, AchievementProgress currentProgress, GameContext context) {
-        return currentProgress.incrementProgress(1, achievement.getRequiredValue());
+    public AchievementProgress handle(AchievementDto achievement, AchievementProgress currentProgress, GameContext context) {
+        return currentProgress.incrementProgress(1, achievement.requiredValue());
     }
 }

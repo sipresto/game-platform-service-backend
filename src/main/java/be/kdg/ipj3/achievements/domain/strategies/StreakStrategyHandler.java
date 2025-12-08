@@ -3,7 +3,7 @@ package be.kdg.ipj3.achievements.domain.strategies;
 import be.kdg.ipj3.achievements.domain.AchievementProgress;
 import be.kdg.ipj3.achievements.domain.GameContext;
 import be.kdg.ipj3.achievements.domain.TriggerEvaluator;
-import be.kdg.ipj3.catalog.domain.Achievement;
+import be.kdg.ipj3.catalog.shared.AchievementDto;
 import be.kdg.ipj3.catalog.shared.CountingStrategy;
 import org.springframework.stereotype.Component;
 
@@ -21,13 +21,13 @@ public class StreakStrategyHandler implements CountingStrategyHandler {
     }
 
     @Override
-    public AchievementProgress handle(Achievement achievement,
+    public AchievementProgress handle(AchievementDto achievement,
                                       AchievementProgress currentProgress,
                                       GameContext context) {
-        if (!triggerEvaluator.shouldTrigger(achievement.getCountTrigger(), context)) {
+        if (!triggerEvaluator.shouldTrigger(achievement.countTrigger(), context)) {
             return currentProgress.resetProgress();
         }
 
-        return currentProgress.incrementProgress(1, achievement.getRequiredValue());
+        return currentProgress.incrementProgress(1, achievement.requiredValue());
     }
 }

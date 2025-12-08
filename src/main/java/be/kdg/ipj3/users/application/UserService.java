@@ -1,8 +1,6 @@
 package be.kdg.ipj3.users.application;
 
-import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.shared.GameId;
-import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
@@ -21,11 +19,9 @@ import java.util.UUID;
 @Transactional
 public class UserService implements UsersApi {
     private final UserRepository userRepository;
-    private final GamesApi gamesApi;
 
-    public UserService(UserRepository userRepository, GamesApi gamesApi) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.gamesApi = gamesApi;
     }
 
     /**
@@ -63,22 +59,16 @@ public class UserService implements UsersApi {
         userRepository.save(user);
     }
 
-    public void addGame(UUID id, UUID gameIdParam) {
+    public void addGame(UUID id, UUID gameId) {
         var userId = new UserId(id);
-        var gameId = new GameId(gameIdParam);
-        if(!gamesApi.existsById(gameIdParam)){
-            throw gameId.notFound();
-        }
 
         User user = userRepository.findById(userId).orElseThrow(userId::notFound);
-        user.addGame(gameId);
+        user.addGame(new GameId(gameId));
         userRepository.save(user);
     }
 
-    public List<Game> findOwnedGamesByKeycloakId(String keycloakId) {
-        User user = findByKeycloakId(keycloakId);
-        List<GameId> ownedGameIds = userRepository.findOwnedGamesById(user.getId());
-        return gamesApi.findGamesByIds(ownedGameIds.stream().map(GameId::id).toList());
+    public List<GameId> findOwnedGamesById(UUID id) {
+        return userRepository.findOwnedGamesById(new UserId(id));
     }
 
     public User findByKeycloakId(String keycloakId) {
@@ -104,5 +94,9 @@ public class UserService implements UsersApi {
 
     public boolean existsById(UUID id) {
         return userRepository.existsById(new UserId(id));
+    }
+
+    public UserId findIdByKeycloakId(String keycloakId) {
+        return findByKeycloakId(keycloakId).getId();
     }
 }

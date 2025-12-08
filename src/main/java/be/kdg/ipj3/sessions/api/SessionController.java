@@ -2,8 +2,6 @@ package be.kdg.ipj3.sessions.api;
 
 import be.kdg.ipj3.sessions.api.dto.SessionDto;
 import be.kdg.ipj3.sessions.application.SessionService;
-import be.kdg.ipj3.users.domain.User;
-import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +20,7 @@ public class SessionController {
         this.sessionService = sessionService;
     }
 
-    // TODO: change to /user/{userId} and change this to receiving UserId instead of keycloak id
+    // TODO: change to /user/{userId} and maybe change this to receiving UserId instead of keycloak id?
     @GetMapping("/{userId}")
     public ResponseEntity<List<SessionDto>> getSessionsByUserId(
             @PathVariable String userId

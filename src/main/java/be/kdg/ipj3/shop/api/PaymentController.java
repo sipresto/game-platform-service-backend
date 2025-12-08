@@ -1,9 +1,5 @@
 package be.kdg.ipj3.shop.api;
 
-import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.shared.GamesApi;
-import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.shop.infrastructure.stripe.ChargeRequest;
 import be.kdg.ipj3.shop.infrastructure.stripe.StripeService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;

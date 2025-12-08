@@ -1,4 +1,4 @@
-package be.kdg.ipj3.sessions.domain;
+package be.kdg.ipj3.sessions.shared;
 
 public enum SessionResult {
     PLAYER_WIN,
