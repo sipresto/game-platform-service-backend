@@ -3,7 +3,7 @@ package be.kdg.ipj3.catalog.api;
 import be.kdg.ipj3.catalog.api.dto.GameDto;
 import be.kdg.ipj3.catalog.api.dto.GameFilterRequestDto;
 import be.kdg.ipj3.catalog.application.GameService;
-import be.kdg.ipj3.catalog.shared.LibraryGameDto;
+import be.kdg.ipj3.catalog.api.dto.LibraryGameDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
