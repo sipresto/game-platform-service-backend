@@ -77,12 +77,4 @@ public class GameService implements GamesApi {
         List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id());
         return gameRepository.findGamesByIds(ownedGameIds);
     }
-
-    public void addGame(UUID userId, UUID gameId) {
-        if (!existsById(gameId)) {
-            throw GameId.notFound(gameId);
-        }
-
-        usersApi.addGame(userId, gameId);
-    }
 }

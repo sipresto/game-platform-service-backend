@@ -27,7 +27,11 @@ public class PurchaseService {
 
         UserId userId = usersApi.findIdByKeycloakId(keycloakId);
 
-        gamesApi.addGame(userId.id(), gameIdParam);
+        if (!gamesApi.existsById(gameIdParam)) {
+            throw GameId.notFound(gameIdParam);
+        }
+
+        usersApi.addGame(userId.id(), gameIdParam);
 
         Purchase purchase = new Purchase(userId, gameId, chargeId);
         return purchaseRepository.save(purchase);

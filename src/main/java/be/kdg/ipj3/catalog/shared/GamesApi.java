@@ -22,6 +22,4 @@ public interface GamesApi {
     String findServiceByGameId(UUID id);
 
     Optional<GamePurchaseDto> findGameDtoById(UUID id);
-
-    void addGame(UUID userId, UUID gameId);
 }
