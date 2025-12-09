@@ -26,7 +26,7 @@ VALUES ('c3c1d2b0-82fa-43a7-b326-0eb96136ecbc', 'NATIVE'),
 INSERT INTO achievements(achievement_id, name, code, description, required_value, points,
                          counting_strategy, count_trigger, game_id)
 VALUES ('937a2c83-aa8d-46c8-8bdb-6fdec5cf5cd6', 'Tic', 'TIC', 'Win your 1st game',
-        1, 10, 'INCREMENT', 'WIN_ANY', 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc'),
+        1, 15, 'INCREMENT', 'WIN_ANY', 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc'),
        ('6c3d6f0a-af60-4874-98dc-168c4bf1a887', 'Tac', 'TAC', 'Win 5 games',
         5, 20, 'INCREMENT', 'WIN_ANY', 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc'),
        ('db0dcb50-ac90-485a-bd44-5e89737b2206', 'Toe', 'TOE', 'Win 10 games',

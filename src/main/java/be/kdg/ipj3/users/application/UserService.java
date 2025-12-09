@@ -8,6 +8,7 @@ import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.Visibility;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,7 +74,7 @@ public class UserService implements UsersApi {
         return userRepository.findOwnedGamesById(new UserId(id));
     }
 
-    @Override
+    @Transactional
     public void addPoints(UUID id, int points) {
         var userId = new UserId(id);
 
