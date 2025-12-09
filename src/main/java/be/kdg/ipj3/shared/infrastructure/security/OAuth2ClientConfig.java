@@ -29,7 +29,6 @@ public class OAuth2ClientConfig {
                 .scope("openid")
                 .build();
 
-        // Add more registrations here for 'ai-service', 'acl-service', etc.
         return new InMemoryClientRegistrationRepository(platformRegistration);
     }
 

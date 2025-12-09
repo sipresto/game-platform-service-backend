@@ -41,9 +41,9 @@ test-job:
     - chmod +x ./mvnw
   script:
     - ./mvnw test -Dspring.profiles.active=test
-#  rules:
-#    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_DEFAULT_BRANCH == $CI_COMMIT_BRANCH
 
 maven-package-job:
   stage: package
