@@ -56,6 +56,7 @@ class CreateLobbyTests {
                 keycloakId,
                 "someUsername",
                 List.of(),
+                0,
                 null
         );
 

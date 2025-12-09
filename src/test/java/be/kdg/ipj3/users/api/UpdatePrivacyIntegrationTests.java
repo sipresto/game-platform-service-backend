@@ -54,6 +54,7 @@ public class UpdatePrivacyIntegrationTests {
                 keycloakId,
                 username,
                 new JpaProfile(username, "Test bio"),
+                0,
                 Visibility.PUBLIC
         );
         userRepository.save(user);

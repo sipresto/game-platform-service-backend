@@ -73,6 +73,15 @@ public class UserService implements UsersApi {
         return userRepository.findOwnedGamesById(new UserId(id));
     }
 
+    @Override
+    public void addPoints(UUID id, int points) {
+        var userId = new UserId(id);
+
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        user.addPoints(points);
+        userRepository.save(user);
+    }
+
     @Transactional(readOnly = true)
     public User findByKeycloakId(String keycloakId) {
         return userRepository.findByKeycloakId(keycloakId)

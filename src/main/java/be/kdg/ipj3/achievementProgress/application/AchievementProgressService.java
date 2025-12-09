@@ -83,6 +83,7 @@ public class AchievementProgressService {
         }
 
         AchievementProgress updatedProgress = progress.markCompleted(timestamp);
+        usersApi.addPoints(userId, achievement.points());
 
         if (updatedProgress != progress) {
             progressRepository.save(updatedProgress);
