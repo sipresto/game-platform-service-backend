@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @Service
 @Transactional
@@ -24,6 +25,7 @@ public class LobbyService {
     private final LobbyRepository lobbyRepository;
     private final GamesApi gamesApi;
     private final UsersApi usersApi;
+    private final Logger logger = Logger.getLogger(LobbyService.class.getName());
 
     public LobbyService(GameClient gameClient, LobbyRepository lobbyRepository, GamesApi gamesApi, UsersApi usersApi) {
         this.gameClient = gameClient;
@@ -81,6 +83,7 @@ public class LobbyService {
             lobbyRepository.save(lobby);
             return gameUrl;
         } catch (Exception e) {
+            logger.warning(e.toString());
             throw new GameServiceUnavailableException("Game service is currently unavailable.");
         }
     }
