@@ -35,7 +35,7 @@ class UpdateProfileTests {
         String displayName = "Updated Display Name";
         String bio = "Updated bio";
         User user = new User(new UserId(UUID.randomUUID()), keycloakId, "oldusername",
-                new Profile("Old Display", "Old bio"));
+                new Profile("Old Display", "Old bio"),0);
 
         given(userRepository.findByKeycloakId(keycloakId)).willReturn(Optional.of(user));
 

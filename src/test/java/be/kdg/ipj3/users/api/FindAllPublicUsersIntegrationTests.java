@@ -41,6 +41,7 @@ public class FindAllPublicUsersIntegrationTests {
                 "kc-public",
                 "public-user",
                 new JpaProfile("Public", "I am public"),
+                0,
                 Visibility.PUBLIC
         );
 
@@ -49,6 +50,7 @@ public class FindAllPublicUsersIntegrationTests {
                 "kc-private",
                 "private-user",
                 new JpaProfile("Private", "I am private"),
+                0,
                 Visibility.PRIVATE
         );
 

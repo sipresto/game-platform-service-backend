@@ -63,6 +63,10 @@ public class AchievementProgressService {
 
             AchievementProgress updatedProgress = handler.handle(achievement, progress, context);
 
+            if (updatedProgress.isCompleted()) {
+                usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
+            }
+
             if (updatedProgress != progress) {
                 progressRepository.save(updatedProgress);
             }
@@ -83,6 +87,9 @@ public class AchievementProgressService {
         }
 
         AchievementProgress updatedProgress = progress.markCompleted(timestamp);
+        if (updatedProgress.isCompleted()) {
+            usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
+        }
 
         if (updatedProgress != progress) {
             progressRepository.save(updatedProgress);

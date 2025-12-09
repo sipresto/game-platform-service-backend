@@ -7,10 +7,11 @@ public record AchievementDto(
         Integer requiredValue,
         CountingStrategy countingStrategy,
         CountTrigger countTrigger,
-        boolean isCountedAfterGame
+        boolean isCountedAfterGame,
+        int points
 ) {
     public static AchievementDto fromDomain(Achievement achievement) {
         return new AchievementDto(achievement.getId(), achievement.getRequiredValue(), achievement.getCountingStrategy(),
-                achievement.getCountTrigger(), achievement.isCountedAfterGame());
+                achievement.getCountTrigger(), achievement.isCountedAfterGame(), achievement.getPoints());
     }
 }

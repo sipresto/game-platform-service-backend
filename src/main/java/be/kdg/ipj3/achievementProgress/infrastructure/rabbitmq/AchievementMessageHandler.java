@@ -36,6 +36,11 @@ public class AchievementMessageHandler {
 
     @RabbitListener(queues = RabbitMQTopologyAchievements.ACHIEVEMENT_COMPLETED_QUEUE)
     void onAchievementCompletedMessageReceived(AchievementCompletedDto dto) {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         progressService.completeAchievement(dto.userId(), dto.gameId(), dto.code(), dto.timestamp());
     }
 }

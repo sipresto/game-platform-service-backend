@@ -25,6 +25,9 @@ public class JpaUserEntity {
     private String username;
 
     @Column
+    private int points;
+
+    @Column
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
@@ -49,11 +52,12 @@ public class JpaUserEntity {
     protected JpaUserEntity() {
     } // for JPA
 
-    public JpaUserEntity(UUID id, String keycloakId, String username, JpaProfile profile, Visibility visibility) {
+    public JpaUserEntity(UUID id, String keycloakId, String username, JpaProfile profile, int points, Visibility visibility) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
         this.profile = profile;
+        this.points = points;
         this.visibility = visibility;
     }
 
@@ -63,6 +67,7 @@ public class JpaUserEntity {
                 user.getKeycloakId(),
                 user.getUsername(),
                 JpaProfile.fromDomain(user.getProfile()),
+                user.getPoints(),
                 user.getVisibility()
         );
 
@@ -78,7 +83,7 @@ public class JpaUserEntity {
     }
 
     public User toDomain() {
-        User user = new User(new UserId(id), keycloakId, username, profile.toDomain());
+        User user = new User(new UserId(id), keycloakId, username, profile.toDomain(), points);
         ownedGames.stream()
                 .map(GameId::new)
                 .forEach(user::addGame);

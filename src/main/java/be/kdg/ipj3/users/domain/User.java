@@ -15,32 +15,35 @@ public class User {
     private final String keycloakId;
     private String username;
     private final List<GameId> ownedGames;
+    private int points;
     private Profile profile;
     private Visibility visibility;
     private final List<UserId> friends;
 
-    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, Profile profile) {
+    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, int points, Profile profile) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
         this.ownedGames = ownedGames;
+        this.points = points;
         this.profile = profile;
         this.friends = new ArrayList<>();
         this.visibility = Visibility.PUBLIC;
     }
 
-    public User(UserId id, String keycloakId, String username, Profile profile) {
+    public User(UserId id, String keycloakId, String username, Profile profile, int points) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
         this.ownedGames = new ArrayList<>();
+        this.points = points;
         this.profile = profile;
         this.visibility = Visibility.PUBLIC;
         this.friends = new ArrayList<>();
     }
 
     public static User createFromKeycloak(String keycloakId, String keycloakUsername) {
-        return new User(UserId.create(), keycloakId, keycloakUsername, List.of(), new Profile(keycloakUsername, ""));
+        return new User(UserId.create(), keycloakId, keycloakUsername, List.of(), 0, new Profile(keycloakUsername, ""));
     }
 
     public UserId getId() {
@@ -96,11 +99,19 @@ public class User {
         return friends;
     }
 
+    public int getPoints() {
+        return points;
+    }
+
     public void addFriend(UserId userId) {
         if (!friends.contains(userId)) {
             friends.add(userId);
         } else {
             throw new IllegalArgumentException("You are already befriended with this user");
         }
+    }
+
+    public void addPoints(int points) {
+        this.points += points;
     }
 }
