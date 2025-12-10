@@ -7,15 +7,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQTopologyNotifications {
 
-    public static final String TURN_NOTIFICATION_QUEUE = "turn-notification-queue";
+    public static final String TURN_NOTIFICATIONS_QUEUE = "turn-notifications-queue";
 
     @Bean
     Queue turnNotificationsQueue() {
-        return QueueBuilder.durable(TURN_NOTIFICATION_QUEUE).build();
+        return QueueBuilder.durable(TURN_NOTIFICATIONS_QUEUE).build();
     }
 
     @Bean
-    Binding notificationBinding(Queue turnNotificationsQueue, TopicExchange notificationsExchange) {
+    Binding notificationsBinding(Queue turnNotificationsQueue, TopicExchange notificationsExchange) {
         return BindingBuilder.bind(turnNotificationsQueue)
                 .to(notificationsExchange)
                 .with("turn.notification.*");

@@ -1,6 +1,5 @@
 package be.kdg.ipj3.notifications.application;
 
-import be.kdg.ipj3.notifications.api.dto.NotificationDto;
 import be.kdg.ipj3.notifications.domain.Notification;
 import be.kdg.ipj3.notifications.domain.NotificationRepository;
 import be.kdg.ipj3.notifications.shared.NotificationType;
@@ -30,7 +29,21 @@ public class NotificationService implements NotificationsApi {
 
     @Override
     public void addNotification(String description, NotificationType type, UUID id) {
-        Notification notification = new Notification(description, type, new UserId(id));
+        Notification notification = null;
+        if (type == NotificationType.YOUR_TURN) {
+            List<Notification> notifications = notificationRepository.findByUserIdAndType(id, type);
+            if (!notifications.isEmpty()) {
+                for (Notification notif : notifications) {
+                    if (notif.getDescription().equals(description)) {
+                        notification = notif;
+                    }
+                }
+                if (notification != null) {
+                    notificationRepository.delete(notification);
+                }
+            }
+        }
+        notification = new Notification(description, type, new UserId(id));
         notificationRepository.save(notification);
     }
 }
