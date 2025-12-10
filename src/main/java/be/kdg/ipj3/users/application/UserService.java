@@ -6,9 +6,9 @@ import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,5 +115,10 @@ public class UserService implements UsersApi {
     @Transactional(readOnly = true)
     public UserId findIdByKeycloakId(String keycloakId) {
         return findByKeycloakId(keycloakId).getId();
+    }
+
+    @Transactional(readOnly = true)
+    public SmallUserDto findSmallUserDtoById(UUID id) {
+        return SmallUserDto.fromDomain(findById(id));
     }
 }

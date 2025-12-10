@@ -3,6 +3,7 @@ package be.kdg.ipj3.lobbies.application;
 import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.lobbies.api.dto.GameStartRequestDto;
 import be.kdg.ipj3.lobbies.api.dto.LobbyDetailDto;
+import be.kdg.ipj3.lobbies.api.dto.PlatformPlayerDto;
 import be.kdg.ipj3.lobbies.api.dto.PlayerDto;
 import be.kdg.ipj3.lobbies.domain.Lobby;
 import be.kdg.ipj3.lobbies.domain.LobbyId;
@@ -11,12 +12,15 @@ import be.kdg.ipj3.lobbies.domain.LobbyStatus;
 import be.kdg.ipj3.lobbies.domain.exceptions.GameServiceUnavailableException;
 import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
+import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -99,11 +103,15 @@ public class LobbyService {
 
         lobby.validateReadyToStart(requestor);
 
-        List<UUID> playerIds = lobby.getPlayers().stream()
-                .map(UserId::id)
-                .toList();
+        Set<UserId> playerIds = lobby.getPlayers();
+        List<PlatformPlayerDto> players = new ArrayList<>();
+        for (UserId userId : playerIds) {
+            SmallUserDto smallUserDto = usersApi.findSmallUserDtoById(userId.id());
+            PlatformPlayerDto playerDto = PlatformPlayerDto.fromDto(smallUserDto);
+            players.add(playerDto);
+        }
 
-        GameStartRequestDto dto = new GameStartRequestDto(playerIds, difficulty);
+        GameStartRequestDto dto = new GameStartRequestDto(players, difficulty);
 
         try {
             String gameUrl = gameClient.startGame(serviceUrl, dto).gameUrl();
