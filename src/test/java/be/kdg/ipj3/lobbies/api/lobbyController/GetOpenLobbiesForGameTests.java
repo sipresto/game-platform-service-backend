@@ -102,7 +102,7 @@ public class GetOpenLobbiesForGameTests {
         createTestLobby(gameId);
 
         // Act & Assert
-        mockMvc.perform(get("/api/lobbies/{gameId}", gameId.id())
+        mockMvc.perform(get("/api/lobbies/game/{gameId}", gameId.id())
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -121,7 +121,7 @@ public class GetOpenLobbiesForGameTests {
         createTestLobby(GameId.create());
 
         // Act & Assert
-        mockMvc.perform(get("/api/lobbies/{gameId}", gameId.id())
+        mockMvc.perform(get("/api/lobbies/game/{gameId}", gameId.id())
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -136,7 +136,7 @@ public class GetOpenLobbiesForGameTests {
         createTestLobby(GameId.create());
 
         // Act & Assert
-        mockMvc.perform(get("/api/lobbies/{gameId}", UUID.randomUUID())
+        mockMvc.perform(get("/api/lobbies/game/{gameId}", UUID.randomUUID())
                         .with(validJwt()))
                 .andExpect(status().isNotFound());
     }
@@ -163,7 +163,7 @@ public class GetOpenLobbiesForGameTests {
         createTestLobby(gameId);
 
         // Act & Assert
-        mockMvc.perform(get("/api/lobbies/{gameId}", UUID.randomUUID()))
+        mockMvc.perform(get("/api/lobbies/game/{gameId}", UUID.randomUUID()))
                 .andExpect(status().isUnauthorized());
     }
 }

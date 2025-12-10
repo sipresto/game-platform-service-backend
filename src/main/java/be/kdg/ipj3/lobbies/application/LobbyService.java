@@ -2,6 +2,8 @@ package be.kdg.ipj3.lobbies.application;
 
 import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.lobbies.api.dto.GameStartRequestDto;
+import be.kdg.ipj3.lobbies.api.dto.LobbyDetailDto;
+import be.kdg.ipj3.lobbies.api.dto.PlayerDto;
 import be.kdg.ipj3.lobbies.domain.Lobby;
 import be.kdg.ipj3.lobbies.domain.LobbyId;
 import be.kdg.ipj3.lobbies.domain.LobbyRepository;
@@ -55,6 +57,32 @@ public class LobbyService {
 
         lobbyRepository.save(lobby);
     }
+
+    public Lobby findLobbyById(UUID id) {
+        var lobbyId = new LobbyId(id);
+        return lobbyRepository.findById(lobbyId).orElseThrow(lobbyId::notFound);
+    }
+
+
+    public LobbyDetailDto getLobbyDetails(UUID lobbyId) {
+        Lobby lobby = findLobbyById(lobbyId);
+
+        List<PlayerDto> playerDtos = lobby.getPlayers().stream()
+                .map(userId -> {
+                   var user = usersApi.findById(userId.id());
+
+                    String username = (user != null) ? user.getUsername() : "Unknown";
+
+                    return new PlayerDto(
+                            userId.id().toString(),
+                            username
+                    );
+                })
+                .toList();
+
+        return LobbyDetailDto.fromDomain(lobby, playerDtos);
+    }
+
 
     public String startGame(UUID id, String requestorKeycloakId, Difficulty difficulty) {
 

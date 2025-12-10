@@ -89,8 +89,8 @@ public class LobbyController {
         return ResponseEntity.ok(new GameUrlDto(gameUrl));
     }
 
-    // TODO: change path to /game/{gameId}
-    @GetMapping("/{gameId}")
+
+    @GetMapping("game/{gameId}")
     public ResponseEntity<List<LobbyListDto>> getOpenLobbiesForGame(
             @PathVariable UUID gameId
     ) {
@@ -102,5 +102,12 @@ public class LobbyController {
                 .toList();
 
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<LobbyDetailDto> getLobby(@PathVariable UUID id) {
+        LobbyDetailDto lobbyDetail = lobbyService.getLobbyDetails(id);
+
+        return ResponseEntity.ok(lobbyDetail);
     }
 }
