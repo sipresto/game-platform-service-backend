@@ -7,6 +7,8 @@ import be.kdg.ipj3.achievementProgress.domain.GameContext;
 import be.kdg.ipj3.achievementProgress.domain.TriggerEvaluator;
 import be.kdg.ipj3.achievementProgress.domain.strategies.CountingStrategyHandler;
 import be.kdg.ipj3.catalog.shared.*;
+import be.kdg.ipj3.notifications.shared.NotificationType;
+import be.kdg.ipj3.notifications.shared.NotificationsApi;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
@@ -25,14 +27,17 @@ public class AchievementProgressService {
     private final AchievementProgressRepository progressRepository;
     private final GamesApi gamesApi;
     private final UsersApi usersApi;
+    private final NotificationsApi notificationsApi;
 
     public AchievementProgressService(TriggerEvaluator triggerEvaluator, List<CountingStrategyHandler> strategyHandlers,
-                                      AchievementProgressRepository progressRepository, GamesApi gamesApi, UsersApi usersApi) {
+                                      AchievementProgressRepository progressRepository, GamesApi gamesApi, UsersApi usersApi,
+                                      NotificationsApi notificationsApi) {
         this.triggerEvaluator = triggerEvaluator;
         this.strategyHandlers = strategyHandlers;
         this.progressRepository = progressRepository;
         this.gamesApi = gamesApi;
         this.usersApi = usersApi;
+        this.notificationsApi = notificationsApi;
     }
 
     public void evaluateAchievementsAfterGame(GameContext context) {
@@ -64,6 +69,7 @@ public class AchievementProgressService {
 
             if (updatedProgress.isCompleted()) {
                 usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
+                notificationsApi.addNotification(achievement.name(), NotificationType.ACHIEVEMENT, context.player());
             }
 
             if (updatedProgress != progress) {
@@ -88,6 +94,7 @@ public class AchievementProgressService {
         AchievementProgress updatedProgress = progress.markCompleted(timestamp);
         if (updatedProgress.isCompleted()) {
             usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
+            notificationsApi.addNotification(achievement.name(), NotificationType.ACHIEVEMENT, userId);
         }
 
         if (updatedProgress != progress) {

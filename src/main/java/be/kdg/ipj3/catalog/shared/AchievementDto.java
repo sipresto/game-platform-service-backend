@@ -4,6 +4,7 @@ import be.kdg.ipj3.catalog.domain.Achievement;
 
 public record AchievementDto(
         AchievementId id,
+        String name,
         Integer requiredValue,
         CountingStrategy countingStrategy,
         CountTrigger countTrigger,
@@ -11,7 +12,7 @@ public record AchievementDto(
         int points
 ) {
     public static AchievementDto fromDomain(Achievement achievement) {
-        return new AchievementDto(achievement.getId(), achievement.getRequiredValue(), achievement.getCountingStrategy(),
+        return new AchievementDto(achievement.getId(), achievement.getName(), achievement.getRequiredValue(), achievement.getCountingStrategy(),
                 achievement.getCountTrigger(), achievement.isCountedAfterGame(), achievement.getPoints());
     }
 }

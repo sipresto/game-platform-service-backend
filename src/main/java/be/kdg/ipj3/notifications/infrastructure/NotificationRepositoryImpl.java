@@ -32,4 +32,9 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     public void saveAll(List<Notification> notifications) {
         notifications.stream().map(JpaNotificationEntity::fromDomain).forEach(jpaNotificationRepository::save);
     }
+
+    @Override
+    public void save(Notification notification) {
+        jpaNotificationRepository.save(JpaNotificationEntity.fromDomain(notification));
+    }
 }

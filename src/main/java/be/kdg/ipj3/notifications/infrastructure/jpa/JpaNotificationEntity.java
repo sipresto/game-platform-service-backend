@@ -2,7 +2,7 @@ package be.kdg.ipj3.notifications.infrastructure.jpa;
 
 import be.kdg.ipj3.notifications.domain.Notification;
 import be.kdg.ipj3.notifications.domain.NotificationId;
-import be.kdg.ipj3.notifications.domain.NotificationType;
+import be.kdg.ipj3.notifications.shared.NotificationType;
 import be.kdg.ipj3.users.shared.UserId;
 import jakarta.persistence.*;
 

@@ -3,7 +3,7 @@ package be.kdg.ipj3.notifications.api.notificationController;
 import be.kdg.ipj3.notifications.domain.Notification;
 import be.kdg.ipj3.notifications.domain.NotificationId;
 import be.kdg.ipj3.notifications.domain.NotificationRepository;
-import be.kdg.ipj3.notifications.domain.NotificationType;
+import be.kdg.ipj3.notifications.shared.NotificationType;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;

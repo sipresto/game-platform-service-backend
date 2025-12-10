@@ -12,4 +12,6 @@ public interface NotificationRepository {
     void deleteAll();
 
     void saveAll(List<Notification> notifications);
+
+    void save(Notification notification);
 }

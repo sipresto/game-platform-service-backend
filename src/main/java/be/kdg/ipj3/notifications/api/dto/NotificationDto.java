@@ -1,7 +1,7 @@
 package be.kdg.ipj3.notifications.api.dto;
 
 import be.kdg.ipj3.notifications.domain.Notification;
-import be.kdg.ipj3.notifications.domain.NotificationType;
+import be.kdg.ipj3.notifications.shared.NotificationType;
 
 import java.time.Instant;
 import java.util.UUID;
