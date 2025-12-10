@@ -29,7 +29,7 @@ This document describes the setup of security configurations for the **Game Plat
 
 - **Client ID**: `platform-backend-service`
 - **Protocol**: OpenID Connect
-- **Authentication**: On together with Service accounts roles
+- **Authentication**: Client authentication on together with Service accounts roles
 - **Service Accounts Roles**:
     - Assign the `service` role created in the next step to this client
 
