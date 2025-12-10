@@ -7,7 +7,6 @@ services:
   # ---------------------
   app_postgres:
     image: postgres:17.6-alpine
-    restart: always
     environment:
       POSTGRES_USER: "platform"
       POSTGRES_PASSWORD: "platformSecretPassword"
