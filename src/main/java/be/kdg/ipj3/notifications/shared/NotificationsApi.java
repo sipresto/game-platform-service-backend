@@ -6,5 +6,5 @@ import java.util.UUID;
 
 @NamedInterface
 public interface NotificationsApi {
-    void addNotification(String description, NotificationType type, UUID id);
+    void addNotification(String description, NotificationType type, UUID userId);
 }

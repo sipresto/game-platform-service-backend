@@ -19,13 +19,17 @@ public class JpaNotificationEntity {
     @Column(nullable = false)
     private UUID userId;
 
+    @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
     private Instant createdAt;
 
+    @Column(nullable = false)
     private boolean read;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private NotificationType type;
 
     protected JpaNotificationEntity() {} // for JPA
