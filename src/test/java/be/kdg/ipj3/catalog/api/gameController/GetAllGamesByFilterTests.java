@@ -58,8 +58,8 @@ public class GetAllGamesByFilterTests {
         gameRepository.save(game);
 
         GameFilterRequestDto filter = new GameFilterRequestDto(
-                Money.of(BigDecimal.valueOf(10)),
-                Money.of(BigDecimal.valueOf(30)),
+                BigDecimal.valueOf(10),
+                BigDecimal.valueOf(30),
                 List.of(Category.CARDGAME)
         );
 
@@ -80,8 +80,8 @@ public class GetAllGamesByFilterTests {
     void filterGames_shouldReturnEmptyList_whenNoMatchesExist() throws Exception {
         // Arrange
         GameFilterRequestDto filter = new GameFilterRequestDto(
-                Money.of(BigDecimal.valueOf(100)),
-                Money.of(BigDecimal.valueOf(200)),
+                BigDecimal.valueOf(100),
+                BigDecimal.valueOf(200),
                 List.of(Category.BOARDGAME)
         );
 
