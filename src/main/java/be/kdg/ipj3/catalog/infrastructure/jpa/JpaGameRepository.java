@@ -12,9 +12,9 @@ import java.util.UUID;
 public interface JpaGameRepository extends JpaRepository<JpaGameEntity, UUID> {
 
     @Query("""
-                SELECT DISTINCT g
+                SELECT g
                 FROM JpaGameEntity g
-                JOIN g.categories c
+                LEFT JOIN g.categories c
                 WHERE (:minPrice IS NULL OR g.price >= :minPrice)
                   AND (:maxPrice IS NULL OR g.price <= :maxPrice)
                   AND (:categories IS NULL OR c IN :categories)
