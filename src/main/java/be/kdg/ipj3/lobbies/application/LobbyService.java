@@ -11,7 +11,6 @@ import be.kdg.ipj3.lobbies.domain.LobbyStatus;
 import be.kdg.ipj3.lobbies.domain.exceptions.GameServiceUnavailableException;
 import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
-import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
@@ -70,7 +69,7 @@ public class LobbyService {
 
         List<PlayerDto> playerDtos = lobby.getPlayers().stream()
                 .map(userId -> {
-                   User user = usersApi.findById(userId.id());
+                   var user = usersApi.findById(userId.id());
 
                     String username = (user != null) ? user.getUsername() : "Unknown";
 
