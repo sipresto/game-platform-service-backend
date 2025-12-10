@@ -1,18 +1,17 @@
 package be.kdg.ipj3.catalog.application;
 
+import be.kdg.ipj3.catalog.domain.Achievement;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.GameRepository;
-import be.kdg.ipj3.catalog.shared.AchievementDto;
-import be.kdg.ipj3.catalog.shared.GameId;
-import be.kdg.ipj3.catalog.shared.GamePurchaseDto;
-import be.kdg.ipj3.catalog.shared.GamesApi;
+import be.kdg.ipj3.catalog.shared.*;
 import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -65,6 +64,27 @@ public class GameService implements GamesApi {
         return gameRepository.findAchievementsByGameId(gameId).stream()
                 .map(AchievementDto::fromDomain)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<GameAchievementDto> findGameAchievementDtosByIdWithAchievements(UUID id) {
+        var gameId = new GameId(id);
+        var game = gameRepository.findByIdWithAchievements(gameId);
+        if (game.isEmpty()) {
+            return List.of();
+        }
+        List<GameAchievementDto> gameAchievementDtos = new ArrayList<>();
+        for (Achievement achievement : game.get().getAchievements()) {
+            gameAchievementDtos.add(new GameAchievementDto(
+                    gameId,
+                    game.get().getName(),
+                    achievement.getId(),
+                    achievement.getName(),
+                    achievement.getDescription(),
+                    achievement.getRequiredValue()
+            ));
+        }
+        return gameAchievementDtos;
     }
 
     @Transactional(readOnly = true)

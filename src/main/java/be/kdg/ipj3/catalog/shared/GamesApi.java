@@ -15,7 +15,9 @@ public interface GamesApi {
 
     boolean existsById(UUID id);
 
-    List<AchievementDto> findAchievementDtosByGameId(UUID game);
+    List<AchievementDto> findAchievementDtosByGameId(UUID id);
+
+    List<GameAchievementDto> findGameAchievementDtosByIdWithAchievements(UUID id);
 
     Optional<AchievementDto> findAchievementDtoByCode(String code);
 

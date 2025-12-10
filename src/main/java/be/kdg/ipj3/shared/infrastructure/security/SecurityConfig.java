@@ -61,6 +61,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/**").hasRole("PLAYER")
                         .requestMatchers("/api/games/manage/**").hasRole("GAME_DEVELOPER")
                         .requestMatchers("/api/purchases/**").hasRole("PLAYER")
+                        .requestMatchers("/api/achievements").hasRole("PLAYER")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

@@ -1,20 +1,19 @@
 package be.kdg.ipj3.achievementProgress.application;
 
+import be.kdg.ipj3.achievementProgress.api.dto.AchievementProgressDto;
 import be.kdg.ipj3.achievementProgress.domain.AchievementProgress;
 import be.kdg.ipj3.achievementProgress.domain.AchievementProgressRepository;
 import be.kdg.ipj3.achievementProgress.domain.GameContext;
 import be.kdg.ipj3.achievementProgress.domain.TriggerEvaluator;
 import be.kdg.ipj3.achievementProgress.domain.strategies.CountingStrategyHandler;
-import be.kdg.ipj3.catalog.shared.AchievementDto;
-import be.kdg.ipj3.catalog.shared.AchievementId;
-import be.kdg.ipj3.catalog.shared.CountingStrategy;
-import be.kdg.ipj3.catalog.shared.GamesApi;
+import be.kdg.ipj3.catalog.shared.*;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -100,5 +99,53 @@ public class AchievementProgressService {
         return progressRepository
                 .findByUserIdAndAchievementId(userId, achievementId)
                 .orElse(new AchievementProgress(userId, achievementId));
+    }
+
+    public List<AchievementProgressDto> findAllAchievements(String keycloakId) {
+        var user = usersApi.findByKeycloakId(keycloakId);
+        var userGameIds = usersApi.findOwnedGamesById(user.getId().id());
+        if (userGameIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<List<GameAchievementDto>> achievements = new ArrayList<>();
+        for (GameId gameId : userGameIds) {
+            achievements.add(gamesApi.findGameAchievementDtosByIdWithAchievements(gameId.id()));
+        }
+
+        List<AchievementProgressDto> achievementProgressDtos = new ArrayList<>();
+
+        for (List<GameAchievementDto> gameAchievementDtos : achievements) {
+            for (GameAchievementDto gameAchievementDto : gameAchievementDtos) {
+                var ap = progressRepository.findByUserIdAndAchievementId(user.getId(), gameAchievementDto.achievementId());
+                if (ap.isPresent()) {
+                    var progress = ap.get();
+                    achievementProgressDtos.add(new AchievementProgressDto(
+                            gameAchievementDto.gameId().id(),
+                            gameAchievementDto.gameName(),
+                            gameAchievementDto.achievementId().id(),
+                            gameAchievementDto.achievementName(),
+                            gameAchievementDto.achievementDescription(),
+                            gameAchievementDto.requiredValue(),
+                            progress.getCurrentProgress(),
+                            progress.getCompletedAt()
+                    ));
+                }
+                else {
+                    achievementProgressDtos.add(new AchievementProgressDto(
+                            gameAchievementDto.gameId().id(),
+                            gameAchievementDto.gameName(),
+                            gameAchievementDto.achievementId().id(),
+                            gameAchievementDto.achievementName(),
+                            gameAchievementDto.achievementDescription(),
+                            gameAchievementDto.requiredValue(),
+                            null,
+                            null
+                    ));
+                }
+            }
+        }
+
+        return achievementProgressDtos;
     }
 }

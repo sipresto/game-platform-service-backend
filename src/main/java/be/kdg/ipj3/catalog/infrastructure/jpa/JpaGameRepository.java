@@ -32,4 +32,12 @@ public interface JpaGameRepository extends JpaRepository<JpaGameEntity, UUID> {
 
     @Query("SELECT a FROM JpaAchievementEntity a WHERE a.code = :code")
     Optional<JpaAchievementEntity> findAchievementByCode(String code);
+
+    @Query("""
+                SELECT g
+                FROM JpaGameEntity g
+                JOIN FETCH g.achievements
+                WHERE g.id = :id
+           """)
+    Optional<JpaGameEntity> findByIdWithAchievements(UUID id);
 }
