@@ -99,9 +99,7 @@ public class LobbyService {
 
         lobby.validateReadyToStart(requestor);
 
-        List<UUID> playerIds = lobby.getPlayers().stream()
-                .map(UserId::id)
-                .toList();
+        var playerIds = lobby.getPlayers();
 
         GameStartRequestDto dto = new GameStartRequestDto(playerIds, difficulty);
 
