@@ -1,4 +1,4 @@
-package be.kdg.ipj3.notifications.domain;
+package be.kdg.ipj3.notifications.shared;
 
 import org.jmolecules.ddd.annotation.ValueObject;
 
