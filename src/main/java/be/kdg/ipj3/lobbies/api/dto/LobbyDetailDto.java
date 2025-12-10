@@ -12,6 +12,8 @@ public record LobbyDetailDto(
         int currentPlayerCount,
         int maxPlayers,
         boolean isPrivate,
+        boolean started,
+        String gameUrl,
         List<PlayerDto> players
 ) {
     public static LobbyDetailDto fromDomain(Lobby lobby, List<PlayerDto> players) {
@@ -22,6 +24,8 @@ public record LobbyDetailDto(
                 lobby.getPlayers().size(),
                 lobby.getMaxPlayers(),
                 lobby.isPrivate(),
+                lobby.getActiveGameUrl() != null && !lobby.getActiveGameUrl().isBlank(),
+                lobby.getActiveGameUrl(),
                 players
         );
     }

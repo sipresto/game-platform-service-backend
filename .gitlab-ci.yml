@@ -66,3 +66,4 @@ maven-package-job:
 
 include:
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml

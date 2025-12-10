@@ -3,6 +3,7 @@ package be.kdg.ipj3.lobbies.application;
 import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.lobbies.api.dto.GameStartRequestDto;
 import be.kdg.ipj3.lobbies.api.dto.LobbyDetailDto;
+import be.kdg.ipj3.lobbies.api.dto.PlatformPlayerDto;
 import be.kdg.ipj3.lobbies.api.dto.PlayerDto;
 import be.kdg.ipj3.lobbies.domain.Lobby;
 import be.kdg.ipj3.lobbies.domain.LobbyId;
@@ -11,13 +12,17 @@ import be.kdg.ipj3.lobbies.domain.LobbyStatus;
 import be.kdg.ipj3.lobbies.domain.exceptions.GameServiceUnavailableException;
 import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
+import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @Service
 @Transactional
@@ -26,6 +31,7 @@ public class LobbyService {
     private final LobbyRepository lobbyRepository;
     private final GamesApi gamesApi;
     private final UsersApi usersApi;
+    private final Logger logger = Logger.getLogger(LobbyService.class.getName());
 
     public LobbyService(GameClient gameClient, LobbyRepository lobbyRepository, GamesApi gamesApi, UsersApi usersApi) {
         this.gameClient = gameClient;
@@ -97,11 +103,15 @@ public class LobbyService {
 
         lobby.validateReadyToStart(requestor);
 
-        List<UUID> playerIds = lobby.getPlayers().stream()
-                .map(UserId::id)
-                .toList();
+        Set<UserId> playerIds = lobby.getPlayers();
+        List<PlatformPlayerDto> players = new ArrayList<>();
+        for (UserId userId : playerIds) {
+            SmallUserDto smallUserDto = usersApi.findSmallUserDtoById(userId.id());
+            PlatformPlayerDto playerDto = PlatformPlayerDto.fromDto(smallUserDto);
+            players.add(playerDto);
+        }
 
-        GameStartRequestDto dto = new GameStartRequestDto(playerIds, difficulty);
+        GameStartRequestDto dto = new GameStartRequestDto(players, difficulty);
 
         try {
             String gameUrl = gameClient.startGame(serviceUrl, dto).gameUrl();
@@ -109,6 +119,7 @@ public class LobbyService {
             lobbyRepository.save(lobby);
             return gameUrl;
         } catch (Exception e) {
+            logger.warning(e.toString());
             throw new GameServiceUnavailableException("Game service is currently unavailable.");
         }
     }
