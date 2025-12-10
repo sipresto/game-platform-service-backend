@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface GameRepository {
     void save(Game game);
 
-    Optional<Game> findById(GameId gameId);
+    Optional<Game> findById(GameId id);
 
     List<Game> findAllGames();
 
@@ -21,11 +21,13 @@ public interface GameRepository {
 
     List<Game> findGamesByIds(List<GameId> ids);
 
-    boolean existsById(GameId gameId);
+    boolean existsById(GameId id);
 
     void deleteAll();
 
     List<Achievement> findAchievementsByGameId(GameId id);
 
     Optional<Achievement> findAchievementByCode(String code);
+
+    Optional<Game> findByIdWithAchievements(GameId id);
 }
