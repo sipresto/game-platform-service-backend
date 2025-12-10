@@ -21,7 +21,7 @@ public class AchievementProgressController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AchievementProgressDto>> getAchievements(
+    public ResponseEntity<List<AchievementProgressDto>> getAllAchievements(
             @AuthenticationPrincipal Jwt jwt
             ) {
         String keycloakId = jwt.getSubject();

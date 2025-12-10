@@ -118,16 +118,31 @@ public class AchievementProgressService {
         for (List<GameAchievementDto> gameAchievementDtos : achievements) {
             for (GameAchievementDto gameAchievementDto : gameAchievementDtos) {
                 var ap = progressRepository.findByUserIdAndAchievementId(user.getId(), gameAchievementDto.achievementId());
-                ap.ifPresent(progress -> achievementProgressDtos.add(new AchievementProgressDto(
-                        gameAchievementDto.gameId().id(),
-                        gameAchievementDto.gameName(),
-                        gameAchievementDto.achievementId().id(),
-                        gameAchievementDto.achievementName(),
-                        gameAchievementDto.achievementDescription(),
-                        gameAchievementDto.requiredValue(),
-                        progress.getCurrentProgress(),
-                        progress.getCompletedAt()
-                )));
+                if (ap.isPresent()) {
+                    var progress = ap.get();
+                    achievementProgressDtos.add(new AchievementProgressDto(
+                            gameAchievementDto.gameId().id(),
+                            gameAchievementDto.gameName(),
+                            gameAchievementDto.achievementId().id(),
+                            gameAchievementDto.achievementName(),
+                            gameAchievementDto.achievementDescription(),
+                            gameAchievementDto.requiredValue(),
+                            progress.getCurrentProgress(),
+                            progress.getCompletedAt()
+                    ));
+                }
+                else {
+                    achievementProgressDtos.add(new AchievementProgressDto(
+                            gameAchievementDto.gameId().id(),
+                            gameAchievementDto.gameName(),
+                            gameAchievementDto.achievementId().id(),
+                            gameAchievementDto.achievementName(),
+                            gameAchievementDto.achievementDescription(),
+                            gameAchievementDto.requiredValue(),
+                            null,
+                            null
+                    ));
+                }
             }
         }
 

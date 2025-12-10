@@ -10,7 +10,7 @@ public record AchievementProgressDto(
         String achievementName,
         String achievementDescription,
         Integer requiredValue,
-        Integer currenProgress,
+        Integer currentProgress,
         Instant completedAt
 
 ) {
