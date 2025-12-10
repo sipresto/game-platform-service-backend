@@ -6,13 +6,15 @@ import be.kdg.ipj3.catalog.domain.Achievement;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.GameRepository;
-import be.kdg.ipj3.catalog.shared.*;
+import be.kdg.ipj3.catalog.shared.AchievementId;
+import be.kdg.ipj3.catalog.shared.CountTrigger;
+import be.kdg.ipj3.catalog.shared.CountingStrategy;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.shared.UserId;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +39,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @TestPropertySource("classpath:application-test.properties")
-public class GetAllAchievementsTests {
+public class GetAchievementProgressByKeycloakIdTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private UserRepository userRepository;
@@ -70,7 +69,7 @@ public class GetAllAchievementsTests {
 
 
     @Test
-    void getAllAchievements_shouldReturnFilledAchievementProgressDtoList_WhenThereAreAchievements() throws Exception {
+    void getAchievementProgressByKeycloakId_shouldReturnFilledAchievementProgressDtoList_WhenThereAreAchievements() throws Exception {
         // Arrange
         List<AchievementId> achievementIds = List.of(
                 AchievementId.create(),
@@ -81,26 +80,26 @@ public class GetAllAchievementsTests {
         GameId gameId = GameId.create();
 
         List<Achievement> achievements = List.of(
-            new Achievement(
-                    achievementIds.get(0),
-                    "Achievement 1",
-                    "ACHIEVEMENT_1",
-                    "First achievement",
-                    1,
-                    10,
-                    CountingStrategy.INCREMENT,
-                    CountTrigger.WIN_PLAYER
-            ),
-            new Achievement(
-                    achievementIds.get(1),
-                    "Achievement 2",
-                    "ACHIEVEMENT_2",
-                    "Second achievement",
-                    null,
-                    20,
-                    null,
-                    null
-            ),
+                new Achievement(
+                        achievementIds.get(0),
+                        "Achievement 1",
+                        "ACHIEVEMENT_1",
+                        "First achievement",
+                        1,
+                        10,
+                        CountingStrategy.INCREMENT,
+                        CountTrigger.WIN_PLAYER
+                ),
+                new Achievement(
+                        achievementIds.get(1),
+                        "Achievement 2",
+                        "ACHIEVEMENT_2",
+                        "Second achievement",
+                        null,
+                        20,
+                        null,
+                        null
+                ),
                 new Achievement(
                         achievementIds.get(2),
                         "Achievement 3",
@@ -153,7 +152,7 @@ public class GetAllAchievementsTests {
         achievementProgressRepository.save(achievementProgress);
 
         // Act && Assert
-        mockMvc.perform(get("/api/achievements")
+        mockMvc.perform(get("/api/achievements/user/" + user.getKeycloakId())
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].achievementId").value(achievementIds.get(0).id().toString()))
@@ -175,14 +174,8 @@ public class GetAllAchievementsTests {
     }
 
     @Test
-    void getAllAchievements_shouldReturnEmptyAchievementProgressDtoList_WhenThereAreNoAchievements() throws Exception {
+    void getAchievementProgressByKeycloakId_shouldReturnEmptyAchievementProgressDtoList_WhenThereAreNoAchievements() throws Exception {
         // Arrange
-        List<AchievementId> achievementIds = List.of(
-                AchievementId.create(),
-                AchievementId.create(),
-                AchievementId.create()
-        );
-
         GameId gameId = GameId.create();
 
         List<Achievement> achievements = List.of();
@@ -212,7 +205,7 @@ public class GetAllAchievementsTests {
 
 
         // Act && Assert
-        mockMvc.perform(get("/api/achievements")
+        mockMvc.perform(get("/api/achievements/user/" + user.getKeycloakId())
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
