@@ -8,5 +8,4 @@ public record GameAchievementDto(
         String achievementDescription,
         Integer requiredValue
 ) {
-
 }

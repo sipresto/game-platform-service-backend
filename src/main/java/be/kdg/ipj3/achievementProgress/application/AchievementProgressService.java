@@ -110,7 +110,7 @@ public class AchievementProgressService {
 
         List<List<GameAchievementDto>> achievements = new ArrayList<>();
         for (GameId gameId : userGameIds) {
-            achievements.add(gamesApi.findByIdWithAchievements(gameId.id()));
+            achievements.add(gamesApi.findGameAchievementDtosByIdWithAchievements(gameId.id()));
         }
 
         List<AchievementProgressDto> achievementProgressDtos = new ArrayList<>();

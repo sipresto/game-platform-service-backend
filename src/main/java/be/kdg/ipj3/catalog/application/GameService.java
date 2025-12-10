@@ -67,7 +67,7 @@ public class GameService implements GamesApi {
     }
 
     @Transactional(readOnly = true)
-    public List<GameAchievementDto> findByIdWithAchievements(UUID id) {
+    public List<GameAchievementDto> findGameAchievementDtosByIdWithAchievements(UUID id) {
         var gameId = new GameId(id);
         var game = gameRepository.findByIdWithAchievements(gameId);
         if (game.isEmpty()) {

@@ -70,7 +70,7 @@ public class GetAllAchievementsTests {
 
 
     @Test
-    void getAllAchievements_shouldReturnAchievementProgressDtoList() throws Exception {
+    void getAllAchievements_shouldReturnFilledAchievementProgressDtoList_WhenThereAreAchievements() throws Exception {
         // Arrange
         List<AchievementId> achievementIds = List.of(
                 AchievementId.create(),
@@ -172,5 +172,49 @@ public class GetAllAchievementsTests {
                 .andExpect(jsonPath("$[2].achievementName").value("Achievement 3"))
                 .andExpect(jsonPath("$[2].requiredValue").value(5))
                 .andExpect(jsonPath("$[2].currentProgress").value(1));
+    }
+
+    @Test
+    void getAllAchievements_shouldReturnEmptyAchievementProgressDtoList_WhenThereAreNoAchievements() throws Exception {
+        // Arrange
+        List<AchievementId> achievementIds = List.of(
+                AchievementId.create(),
+                AchievementId.create(),
+                AchievementId.create()
+        );
+
+        GameId gameId = GameId.create();
+
+        List<Achievement> achievements = List.of();
+
+        Game game = new Game(
+                gameId,
+                "Game 1",
+                "Description",
+                Money.of(BigDecimal.valueOf(20.00)),
+                "http://test.com/service",
+                "A rule",
+                achievements,
+                List.of(Category.CARDGAME)
+        );
+        gameRepository.save(game);
+
+        UserId userId = UserId.create();
+        User user = new User(
+                userId,
+                "keycloakId",
+                "username",
+                List.of(gameId),
+                0,
+                new Profile("username", "Bio")
+        );
+        userRepository.save(user);
+
+
+        // Act && Assert
+        mockMvc.perform(get("/api/achievements")
+                        .with(validJwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
     }
 }
