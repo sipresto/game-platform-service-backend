@@ -29,8 +29,8 @@ class GetAllPublicUsersTests {
     @Test
     void shouldReturnAllPublicUsers_fromRepository() {
         // Arrange
-        User user1 = new User(new UserId(UUID.randomUUID()), "kc1", "user1", new Profile("User 1", "Bio 1"));
-        User user2 = new User(new UserId(UUID.randomUUID()), "kc2", "user2", new Profile("User 2", "Bio 2"));
+        User user1 = new User(new UserId(UUID.randomUUID()), "kc1", "user1", new Profile("User 1", "Bio 1"), 0);
+        User user2 = new User(new UserId(UUID.randomUUID()), "kc2", "user2", new Profile("User 2", "Bio 2"), 0);
         given(userRepository.findAllPublicUsers()).willReturn(List.of(user1, user2));
 
         // Act

@@ -14,7 +14,8 @@ public record UserDto(
         @NotBlank String keycloakId,
         @NotBlank String username,
         @Valid @NotNull ProfileDto profile,
-        @NotNull Visibility visibility
+        @NotNull Visibility visibility,
+        @NotNull int points
 ) {
     public static UserDto fromDomain(User user) {
         return new UserDto(
@@ -22,7 +23,8 @@ public record UserDto(
                 user.getKeycloakId(),
                 user.getUsername(),
                 ProfileDto.fromDomain(user.getProfile()),
-                user.getVisibility()
+                user.getVisibility(),
+                user.getPoints()
         );
     }
 

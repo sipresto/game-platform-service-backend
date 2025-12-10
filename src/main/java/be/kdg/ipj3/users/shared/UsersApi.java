@@ -22,4 +22,6 @@ public interface UsersApi {
     UserId findIdByKeycloakId(String keycloakId);
 
     List<GameId> findOwnedGamesById(UUID id);
+
+    void addPoints(UUID id, int points);
 }

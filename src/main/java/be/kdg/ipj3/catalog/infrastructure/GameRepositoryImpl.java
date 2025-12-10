@@ -87,4 +87,9 @@ public class GameRepositoryImpl implements GameRepository {
     public Optional<Achievement> findAchievementByCode(String code) {
         return jpaGameRepository.findAchievementByCode(code).map(JpaAchievementEntity::toDomain);
     }
+
+    @Override
+    public Optional<Game> findByIdWithAchievements(GameId id) {
+        return jpaGameRepository.findByIdWithAchievements(id.id()).map(JpaGameEntity::toDomain);
+    }
 }

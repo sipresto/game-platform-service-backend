@@ -52,6 +52,7 @@ public class FindUserIntegrationTests {
                 keycloakId,
                 username,
                 new JpaProfile(username, "Test bio"),
+                0,
                 Visibility.PUBLIC
         );
         userRepository.save(userEntity);

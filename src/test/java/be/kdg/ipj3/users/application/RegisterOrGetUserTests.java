@@ -37,7 +37,8 @@ class RegisterOrGetUserTests {
                 new UserId(UUID.randomUUID()),
                 keycloakId,
                 keycloakUsername,
-                new Profile("Existing User", "Bio")
+                new Profile("Existing User", "Bio"),
+                0
         );
 
         given(userRepository.findByKeycloakId(keycloakId)).willReturn(Optional.of(existingUser));

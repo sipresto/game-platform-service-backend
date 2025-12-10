@@ -38,7 +38,8 @@ class UpdatePrivacySettingsTests {
                 new UserId(UUID.randomUUID()),
                 "kc-id",
                 "username",
-                new Profile("Display", "Bio")
+                new Profile("Display", "Bio"),
+                0
         );
         Visibility newVisibility = Visibility.FRIENDS_ONLY;
 
@@ -57,7 +58,8 @@ class UpdatePrivacySettingsTests {
                 new UserId(UUID.randomUUID()),
                 "kc-id",
                 "username",
-                new Profile("Display", "Bio")
+                new Profile("Display", "Bio"),
+                0
         );
         Visibility newVisibility = Visibility.PUBLIC;
 
@@ -78,7 +80,8 @@ class UpdatePrivacySettingsTests {
                 new UserId(UUID.randomUUID()),
                 "kc-id",
                 "username",
-                new Profile("Display", "Bio")
+                new Profile("Display", "Bio"),
+                0
         );
 
         // Act
@@ -98,7 +101,8 @@ class UpdatePrivacySettingsTests {
                 new UserId(UUID.randomUUID()),
                 "kc-id",
                 "username",
-                new Profile("Display", "Bio")
+                new Profile("Display", "Bio"),
+                0
         );
         UserId originalId = user.getId();
         String originalKeycloakId = user.getKeycloakId();

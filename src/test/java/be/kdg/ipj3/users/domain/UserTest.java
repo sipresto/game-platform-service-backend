@@ -28,7 +28,7 @@ class UserTest {
             Profile profile = new Profile("Test User", "Test Bio");
 
             // When
-            User user = new User(userId, keycloakId, username, profile);
+            User user = new User(userId, keycloakId, username, profile, 0);
 
             // Then
             assertThat(user.getId()).isEqualTo(userId);
@@ -191,7 +191,7 @@ class UserTest {
             void userId_shouldBeImmutable() {
                 // Given
                 UserId originalId = new UserId(UUID.randomUUID());
-                User user = new User(originalId, "keycloak-123", "testuser", new Profile("Test", "Bio"));
+                User user = new User(originalId, "keycloak-123", "testuser", new Profile("Test", "Bio"), 0);
 
                 // When & Then
                 assertThat(user.getId()).isEqualTo(originalId);
@@ -202,7 +202,7 @@ class UserTest {
             void keycloakId_shouldBeImmutable() {
                 // Given
                 String originalKeycloakId = "keycloak-123";
-                User user = new User(new UserId(UUID.randomUUID()), originalKeycloakId, "testuser", new Profile("Test", "Bio"));
+                User user = new User(new UserId(UUID.randomUUID()), originalKeycloakId, "testuser", new Profile("Test", "Bio"), 0);
 
                 // When & Then
                 assertThat(user.getKeycloakId()).isEqualTo(originalKeycloakId);
@@ -215,7 +215,8 @@ class UserTest {
                 new UserId(UUID.randomUUID()),
                 "test-keycloak-id",
                 "testuser",
-                new Profile("Test User", "Test Bio")
+                new Profile("Test User", "Test Bio"),
+                0
         );
     }
 }
