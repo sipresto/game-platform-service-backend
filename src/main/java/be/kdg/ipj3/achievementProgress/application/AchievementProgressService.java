@@ -108,7 +108,7 @@ public class AchievementProgressService {
                 .orElse(new AchievementProgress(userId, achievementId));
     }
 
-    public List<AchievementProgressDto> findAllAchievements(String keycloakId) {
+    public List<AchievementProgressDto> findAllAchievementsByKeycloakId(String keycloakId) {
         var user = usersApi.findByKeycloakId(keycloakId);
         var userGameIds = usersApi.findOwnedGamesById(user.getId().id());
         if (userGameIds.isEmpty()) {

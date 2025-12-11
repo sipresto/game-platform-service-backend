@@ -20,7 +20,7 @@ public class SessionController {
         this.sessionService = sessionService;
     }
 
-    // TODO: change to /user/{userId} and maybe change this to receiving UserId instead of keycloak id?
+    // TODO: change to /user/{userId}
     @GetMapping("/{userId}")
     public ResponseEntity<List<SessionDto>> getSessionsByUserId(
             @PathVariable String userId
