@@ -129,6 +129,26 @@ services:
     restart: "no"
 
   # ---------------------
+  # QUORIDOR BACKEND
+  # ---------------------
+  quoridor_backend:
+    build:
+      context: ../../../quoridor-service-backend
+      dockerfile: Dockerfile
+    ports:
+      - "8097:8097"
+    depends_on:
+      - app_postgres
+      - app_rabbitmq
+      - idp-keycloak
+      - ai_player
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    networks:
+      - prod
+    restart: "no"
+
+  # ---------------------
   # AI PLAYER SERVICE
   # ---------------------
   ai_player:
@@ -167,6 +187,19 @@ services:
     restart: "no"
 
   # ---------------------
+  # QUORIDOR FRONTEND
+  # ---------------------
+  quoridor_frontend:
+    build:
+      context: ../../../../WebstormProjects/quoridor-service-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3002:80"
+    networks:
+      - prod
+    restart: "no"
+
+  # ---------------------
   # REVERSE PROXY
   # ---------------------
   reverse-proxy:
@@ -180,8 +213,10 @@ services:
     depends_on:
       - platform_backend
       - tictactoe_backend
+      - quoridor_backend
       - frontend
       - tictactoe_frontend
+      - quoridor_frontend
       - idp-keycloak
 
 networks:
