@@ -5,11 +5,10 @@ import be.kdg.ipj3.notifications.application.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/notifications")
@@ -31,5 +30,13 @@ public class NotificationController {
                 .stream().map(NotificationDto::fromDomain).toList();
 
         return ResponseEntity.ok(notificationDtos);
+    }
+
+    @PatchMapping("/{id}/read")
+    public ResponseEntity<Void> readNotification(
+            @PathVariable UUID id
+    ) {
+        notificationService.readNotification(id);
+        return ResponseEntity.ok().build();
     }
 }

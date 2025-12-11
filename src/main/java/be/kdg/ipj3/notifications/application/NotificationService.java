@@ -1,6 +1,7 @@
 package be.kdg.ipj3.notifications.application;
 
 import be.kdg.ipj3.notifications.domain.Notification;
+import be.kdg.ipj3.notifications.domain.NotificationId;
 import be.kdg.ipj3.notifications.domain.NotificationRepository;
 import be.kdg.ipj3.notifications.shared.NotificationType;
 import be.kdg.ipj3.notifications.shared.NotificationsApi;
@@ -44,6 +45,16 @@ public class NotificationService implements NotificationsApi {
             }
         }
         notification = new Notification(description, type, new UserId(id));
+        notificationRepository.save(notification);
+    }
+
+    public void readNotification(UUID id) {
+        NotificationId notificationId = new NotificationId(id);
+
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(notificationId::notFound);
+
+        notification.read();
         notificationRepository.save(notification);
     }
 }
