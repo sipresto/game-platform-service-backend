@@ -5,6 +5,7 @@ import be.kdg.ipj3.users.shared.UserId;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -20,4 +21,6 @@ public interface NotificationRepository {
     List<Notification> findByUserIdAndType(UUID id, NotificationType type);
 
     void delete(Notification notification);
+
+    Optional<Notification> findById(NotificationId id);
 }

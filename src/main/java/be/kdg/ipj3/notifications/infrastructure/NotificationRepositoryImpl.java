@@ -1,6 +1,7 @@
 package be.kdg.ipj3.notifications.infrastructure;
 
 import be.kdg.ipj3.notifications.domain.Notification;
+import be.kdg.ipj3.notifications.domain.NotificationId;
 import be.kdg.ipj3.notifications.domain.NotificationRepository;
 import be.kdg.ipj3.notifications.infrastructure.jpa.JpaNotificationEntity;
 import be.kdg.ipj3.notifications.infrastructure.jpa.JpaNotificationRepository;
@@ -9,6 +10,7 @@ import be.kdg.ipj3.users.shared.UserId;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -49,5 +51,10 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     @Override
     public void delete(Notification notification) {
         jpaNotificationRepository.delete(JpaNotificationEntity.fromDomain(notification));
+    }
+
+    @Override
+    public Optional<Notification> findById(NotificationId id) {
+        return jpaNotificationRepository.findById(id.id()).map(JpaNotificationEntity::toDomain);
     }
 }
