@@ -21,9 +21,11 @@ import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -129,5 +131,36 @@ public class GetAllNotificationsTests {
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void getAllNotifications_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
+        // Act & Assert
+        mockMvc.perform(get("/api/notifications")
+                        .with(validJwt()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getAllNotifications_shouldReturnNotFound_whenJwtIsInvalid() throws Exception {
+        // Arrange
+        UserId userId = UserId.create();
+        User user = new User(
+                userId,
+                "keycloakId",
+                "username",
+                List.of(),
+                0,
+                new Profile("username", "Bio")
+        );
+        userRepository.save(user);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/notifications")
+                        .with(jwt().authorities(() -> "ROLE_PLAYER")
+                                .jwt(builder -> builder
+                                        .subject("differentKeycloakId")
+                                        .claim("preferred_username", "username"))))
+                .andExpect(status().isNotFound());
     }
 }
