@@ -60,7 +60,8 @@ public class UpdateProfileIntegrationTests {
                 username,
                 new JpaProfile(username, "Initial bio"),
                 0,
-                Visibility.PUBLIC
+                Visibility.PUBLIC,
+                "Test@gmail.com"
         );
         userRepository.save(user);
         return keycloakId;

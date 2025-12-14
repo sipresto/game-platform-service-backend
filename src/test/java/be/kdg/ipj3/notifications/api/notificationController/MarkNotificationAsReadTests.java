@@ -65,7 +65,8 @@ public class MarkNotificationAsReadTests {
                 "username",
                 List.of(),
                 0,
-                new Profile("username", "Bio")
+                new Profile("username", "Bio"),
+                "Test@gmail.com"
         );
         userRepository.save(user);
 
@@ -96,7 +97,8 @@ public class MarkNotificationAsReadTests {
                 "username",
                 List.of(),
                 0,
-                new Profile("username", "Bio")
+                new Profile("username", "Bio"),
+                "Test@gmail.com"
         );
         userRepository.save(user);
 
@@ -129,7 +131,8 @@ public class MarkNotificationAsReadTests {
                 "username",
                 List.of(),
                 0,
-                new Profile("username", "Bio")
+                new Profile("username", "Bio"),
+                "Test@gmail.com"
         );
         userRepository.save(user);
 

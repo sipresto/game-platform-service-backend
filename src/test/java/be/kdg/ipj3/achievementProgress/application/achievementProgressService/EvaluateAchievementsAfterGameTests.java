@@ -95,7 +95,7 @@ public class EvaluateAchievementsAfterGameTests {
     }
 
     private UserId createTestUser() {
-        User user = User.createFromKeycloak("keycloak-id", "test-user");
+        User user = User.createFromKeycloak("keycloak-id", "test-user", "Test@gmail.com");
         userRepository.save(user);
 
         return user.getId();

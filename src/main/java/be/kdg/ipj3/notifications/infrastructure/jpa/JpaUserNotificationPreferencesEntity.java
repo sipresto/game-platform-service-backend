@@ -69,7 +69,7 @@ public class JpaUserNotificationPreferencesEntity {
         java.util.Map<NotificationType, java.util.Map<NotificationChannel, Boolean>> prefs = preferences.getAllPreferences();
 
         return new JpaUserNotificationPreferencesEntity(
-                preferences.getUserId().id(),
+                preferences.userId().id(),
                 prefs.get(NotificationType.FRIEND_REQUEST).get(NotificationChannel.IN_APP),
                 prefs.get(NotificationType.FRIEND_REQUEST).get(NotificationChannel.EMAIL),
                 prefs.get(NotificationType.ACHIEVEMENT).get(NotificationChannel.IN_APP),

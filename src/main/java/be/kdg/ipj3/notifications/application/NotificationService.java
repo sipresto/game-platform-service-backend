@@ -6,6 +6,9 @@ import be.kdg.ipj3.notifications.shared.NotificationsApi;
 import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,12 +16,18 @@ import java.util.UUID;
 
 @Service
 public class NotificationService implements NotificationsApi {
+    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
+
     private final NotificationRepository notificationRepository;
     private final UsersApi usersApi;
+    private final EmailService emailService;
 
-    public NotificationService(NotificationRepository notificationRepository, UsersApi usersApi) {
+    public NotificationService(NotificationRepository notificationRepository,
+                               UsersApi usersApi,
+                               EmailService emailService) {
         this.notificationRepository = notificationRepository;
         this.usersApi = usersApi;
+        this.emailService = emailService;
     }
 
     public List<Notification> findAllNotifications(String keycloakId) {
@@ -39,10 +48,9 @@ public class NotificationService implements NotificationsApi {
             handleInAppNotification(description, type, id, notification);
         }
 
-        // TODO: Add email sending logic here
-        // if (notification.shouldSendViaChannel(NotificationChannel.EMAIL)) {
-        //     sendEmailNotification(description, type, userId);
-        // }
+        if (notification.shouldSendViaChannel(NotificationChannel.EMAIL)) {
+            sendEmailNotification(description, type, userId);
+        }
     }
 
     private void handleInAppNotification(String description, NotificationType type, UUID id, Notification notification) {
@@ -57,8 +65,26 @@ public class NotificationService implements NotificationsApi {
                 }
             }
         }
-
         notificationRepository.save(notification);
+    }
+
+    @Async
+    public void sendEmailNotification(String description, NotificationType type, UserId userId) {
+        try {
+            String userEmail = usersApi.findEmailByUserId(userId);
+            if (userEmail == null || userEmail.isBlank()) {
+                logger.warn("User {} has no email address, skipping email notification", userId.id());
+                return;
+            }
+
+            var user = usersApi.findById(userId.id());
+            String username = user != null ? user.getUsername() : "User";
+
+            emailService.sendNotificationEmail(userEmail, username, type, description);
+
+        } catch (Exception e) {
+            logger.error("Failed to send email notification for user {}", userId.id(), e);
+        }
     }
 
     public void readNotification(UUID id, String keycloakid) {

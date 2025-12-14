@@ -57,7 +57,8 @@ public class FindFriendsForUserIntegrationTests {
                 "main-user-" + mainId,
                 new JpaProfile("Main", "main bio"),
                 0,
-                Visibility.PUBLIC
+                Visibility.PUBLIC,
+                "Test@gmail.com"
         );
 
         JpaUserEntity friend = new JpaUserEntity(
@@ -66,7 +67,8 @@ public class FindFriendsForUserIntegrationTests {
                 "friend-user-" + friendId,
                 new JpaProfile("Friend", "friend bio"),
                 0,
-                Visibility.PUBLIC
+                Visibility.PUBLIC,
+                "Test@gmail.com"
         );
 
         mainUser.getFriends().add(friendId);

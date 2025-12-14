@@ -19,22 +19,25 @@ public class User {
     private Profile profile;
     private Visibility visibility;
     private final List<UserId> friends;
+    private final String email;
 
-    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, int points, Profile profile) {
+    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, int points, Profile profile, String email) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
         this.ownedGames = ownedGames;
         this.points = points;
         this.profile = profile;
+        this.email = email;
         this.friends = new ArrayList<>();
         this.visibility = Visibility.PUBLIC;
     }
 
-    public User(UserId id, String keycloakId, String username, Profile profile, int points) {
+    public User(UserId id, String keycloakId, String username, Profile profile, int points, String email) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
+        this.email = email;
         this.ownedGames = new ArrayList<>();
         this.points = points;
         this.profile = profile;
@@ -42,8 +45,8 @@ public class User {
         this.friends = new ArrayList<>();
     }
 
-    public static User createFromKeycloak(String keycloakId, String keycloakUsername) {
-        return new User(UserId.create(), keycloakId, keycloakUsername, List.of(), 0, new Profile(keycloakUsername, ""));
+    public static User createFromKeycloak(String keycloakId, String keycloakUsername, String email) {
+        return new User(UserId.create(), keycloakId, keycloakUsername, List.of(), 0, new Profile(keycloakUsername, ""), email);
     }
 
     public UserId getId() {
@@ -113,5 +116,9 @@ public class User {
 
     public void addPoints(int points) {
         this.points += points;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }

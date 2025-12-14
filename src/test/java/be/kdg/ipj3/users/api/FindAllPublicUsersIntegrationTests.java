@@ -42,7 +42,8 @@ public class FindAllPublicUsersIntegrationTests {
                 "public-user",
                 new JpaProfile("Public", "I am public"),
                 0,
-                Visibility.PUBLIC
+                Visibility.PUBLIC,
+                "Test@gmail.com"
         );
 
         JpaUserEntity privateUser = new JpaUserEntity(
@@ -51,7 +52,8 @@ public class FindAllPublicUsersIntegrationTests {
                 "private-user",
                 new JpaProfile("Private", "I am private"),
                 0,
-                Visibility.PRIVATE
+                Visibility.PRIVATE,
+                "Test@gmail.com"
         );
 
         userRepository.save(publicUser);

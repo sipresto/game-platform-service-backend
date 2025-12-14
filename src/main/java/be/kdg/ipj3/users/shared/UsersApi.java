@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface UsersApi {
     User findByKeycloakId(String keycloakId);
 
-    User registerOrGetUser(String keycloakId, String keycloakUsername);
+    User registerOrGetUser(String keycloakId, String keycloakUsername, String email);
 
     void addGame(UUID id, UUID gameId);
 
@@ -26,4 +26,6 @@ public interface UsersApi {
     void addPoints(UUID id, int points);
 
     SmallUserDto findSmallUserDtoById(UUID id);
+
+    String findEmailByUserId(UserId id);
 }

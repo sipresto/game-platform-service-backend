@@ -57,7 +57,8 @@ class CreateLobbyTests {
                 "someUsername",
                 List.of(),
                 0,
-                null
+                null,
+                "Test@gmail.com"
         );
 
         Game mockGame = new Game(

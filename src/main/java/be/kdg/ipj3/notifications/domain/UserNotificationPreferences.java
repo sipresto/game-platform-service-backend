@@ -9,15 +9,10 @@ import java.util.EnumMap;
 import java.util.Map;
 
 @Entity
-public class UserNotificationPreferences {
-    @Identity
-    private final UserId userId;
-
-    private final Map<NotificationType, Map<NotificationChannel, Boolean>> preferences;
-
+public record UserNotificationPreferences(@Identity UserId userId,
+                                          Map<NotificationType, Map<NotificationChannel, Boolean>> preferences) {
     public UserNotificationPreferences(UserId userId) {
-        this.userId = userId;
-        this.preferences = new EnumMap<>(NotificationType.class);
+        this(userId, new EnumMap<>(NotificationType.class));
         initializeDefaultPreferences();
     }
 
@@ -76,5 +71,8 @@ public class UserNotificationPreferences {
         if (channel == null) throw new IllegalArgumentException("Notification channel cannot be null");
     }
 
-    public UserId getUserId() { return userId; }
+    @Override
+    public UserId userId() {
+        return userId;
+    }
 }
