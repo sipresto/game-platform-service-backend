@@ -1,4 +1,4 @@
-package be.kdg.ipj3.notifications.api.notificationController;
+package be.kdg.ipj3.notifications.api;
 
 import be.kdg.ipj3.notifications.domain.Notification;
 import be.kdg.ipj3.notifications.domain.NotificationId;
@@ -21,11 +21,13 @@ import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -55,9 +57,7 @@ public class MarkNotificationAsReadTests {
                         .claim("preferred_username", "username"));
     }
 
-    @Test
-    void readNotification_shouldMarkNotificationAsRead() throws Exception {
-        // Arrange
+    private UserId createUser() {
         UserId userId = UserId.create();
         User user = new User(
                 userId,
@@ -69,6 +69,13 @@ public class MarkNotificationAsReadTests {
                 "Test@gmail.com"
         );
         userRepository.save(user);
+        return userId;
+    }
+
+    @Test
+    void readNotification_shouldMarkNotificationAsRead() throws Exception {
+        // Arrange
+        UserId userId = createUser();
 
         NotificationId notificationId = NotificationId.create();
         Notification notification = new Notification(
@@ -85,22 +92,15 @@ public class MarkNotificationAsReadTests {
         mockMvc.perform(patch("/api/notifications/{id}/read", notificationId.id().toString())
                         .with(validJwt()))
                 .andExpect(status().isOk());
+
+        Optional<Notification> updatedNotification = notificationRepository.findById(notificationId);
+        assertTrue(updatedNotification.isPresent() && updatedNotification.get().isRead());
     }
 
     @Test
     void readNotification_shouldReturnNotFound_whenNotificationDoesNotExist() throws Exception {
         // Arrange
-        UserId userId = UserId.create();
-        User user = new User(
-                userId,
-                "keycloakId",
-                "username",
-                List.of(),
-                0,
-                new Profile("username", "Bio"),
-                "Test@gmail.com"
-        );
-        userRepository.save(user);
+        createUser();
 
         UUID nonExistentNotificationId = UUID.randomUUID();
 
@@ -124,17 +124,7 @@ public class MarkNotificationAsReadTests {
     @Test
     void readNotification_shouldReturnNotFound_whenJwtIsInvalid() throws Exception {
         // Arrange
-        UserId userId = UserId.create();
-        User user = new User(
-                userId,
-                "keycloakId",
-                "username",
-                List.of(),
-                0,
-                new Profile("username", "Bio"),
-                "Test@gmail.com"
-        );
-        userRepository.save(user);
+        UserId userId = createUser();
 
         NotificationId notificationId = NotificationId.create();
         Notification notification = new Notification(

@@ -1,4 +1,4 @@
-package be.kdg.ipj3.notifications.api.notificationController;
+package be.kdg.ipj3.notifications.api;
 
 import be.kdg.ipj3.notifications.domain.NotificationRepository;
 import be.kdg.ipj3.users.domain.Profile;
@@ -19,14 +19,15 @@ import org.testcontainers.utility.TestcontainersConfiguration;
 import java.util.List;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @TestPropertySource("classpath:application-test.properties")
-public class UpdateNotificationPreferencesTests {
+public class GetNotificationPreferencesTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,9 +51,7 @@ public class UpdateNotificationPreferencesTests {
                         .claim("preferred_username", "username"));
     }
 
-    @Test
-    void updatePreference_shouldUpdateUserPreference() throws Exception {
-        // Arrange
+    private void createUser() {
         UserId userId = UserId.create();
         User user = new User(
                 userId,
@@ -64,87 +63,42 @@ public class UpdateNotificationPreferencesTests {
                 "Test@gmail.com"
         );
         userRepository.save(user);
-
-        // Act & Assert
-        mockMvc.perform(put("/api/notifications/preferences/FRIEND_REQUEST/EMAIL")
-                        .param("enabled", "false")
-                        .with(validJwt()))
-                .andExpect(status().isOk());
     }
 
     @Test
-    void updatePreference_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
+    void getPreferences_shouldReturnUserPreferences() throws Exception {
         // Arrange
+        createUser();
 
         // Act & Assert
-        mockMvc.perform(put("/api/notifications/preferences/FRIEND_REQUEST/EMAIL")
-                        .param("enabled", "false")
+        mockMvc.perform(get("/api/notifications/preferences")
+                        .with(validJwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.FRIEND_REQUEST.IN_APP").value(true))
+                .andExpect(jsonPath("$.FRIEND_REQUEST.EMAIL").value(true))
+                .andExpect(jsonPath("$.ACHIEVEMENT.IN_APP").value(true))
+                .andExpect(jsonPath("$.ACHIEVEMENT.EMAIL").value(true))
+                .andExpect(jsonPath("$.YOUR_TURN.IN_APP").value(false))
+                .andExpect(jsonPath("$.YOUR_TURN.EMAIL").value(false));
+    }
+
+    @Test
+    void getPreferences_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
+        // Arrange - No user is created
+
+        // Act & Assert
+        mockMvc.perform(get("/api/notifications/preferences")
                         .with(validJwt()))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    void updatePreference_shouldReturnBadRequest_whenNotificationTypeIsInvalid() throws Exception {
+    void getPreferences_shouldReturnNotFound_whenJwtIsInvalid() throws Exception {
         // Arrange
-        UserId userId = UserId.create();
-        User user = new User(
-                userId,
-                "keycloakId",
-                "username",
-                List.of(),
-                0,
-                new Profile("username", "Bio"),
-                "Test@gmail.com"
-        );
-        userRepository.save(user);
+        createUser();
 
         // Act & Assert
-        mockMvc.perform(put("/api/notifications/preferences/INVALID_TYPE/EMAIL")
-                        .param("enabled", "false")
-                        .with(validJwt()))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void updatePreference_shouldReturnBadRequest_whenChannelIsInvalid() throws Exception {
-        // Arrange
-        UserId userId = UserId.create();
-        User user = new User(
-                userId,
-                "keycloakId",
-                "username",
-                List.of(),
-                0,
-                new Profile("username", "Bio"),
-                "Test@gmail.com"
-        );
-        userRepository.save(user);
-
-        // Act & Assert
-        mockMvc.perform(put("/api/notifications/preferences/FRIEND_REQUEST/INVALID_CHANNEL")
-                        .param("enabled", "false")
-                        .with(validJwt()))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void updatePreference_shouldReturnNotFound_whenJwtIsInvalid() throws Exception {
-        // Arrange
-        UserId userId = UserId.create();
-        User user = new User(
-                userId,
-                "keycloakId",
-                "username",
-                List.of(),
-                0,
-                new Profile("username", "Bio"),
-                "Test@gmail.com"
-        );
-        userRepository.save(user);
-
-        // Act & Assert
-        mockMvc.perform(put("/api/notifications/preferences/FRIEND_REQUEST/EMAIL")
-                        .param("enabled", "false")
+        mockMvc.perform(get("/api/notifications/preferences")
                         .with(jwt().authorities(() -> "ROLE_PLAYER")
                                 .jwt(builder -> builder
                                         .subject("differentKeycloakId")

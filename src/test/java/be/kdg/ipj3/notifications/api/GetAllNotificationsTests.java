@@ -1,4 +1,4 @@
-package be.kdg.ipj3.notifications.api.notificationController;
+package be.kdg.ipj3.notifications.api;
 
 import be.kdg.ipj3.notifications.domain.Notification;
 import be.kdg.ipj3.notifications.domain.NotificationId;
@@ -21,11 +21,9 @@ import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -57,9 +55,7 @@ public class GetAllNotificationsTests {
                         .claim("preferred_username", "username"));
     }
 
-    @Test
-    void getAllNotifications_shouldReturnFilledNotificationDtoList_WhenThereAreNotifications() throws Exception {
-        // Arrange
+    private UserId createUser() {
         UserId userId = UserId.create();
         User user = new User(
                 userId,
@@ -71,6 +67,13 @@ public class GetAllNotificationsTests {
                 "Test@gmail.com"
         );
         userRepository.save(user);
+        return userId;
+    }
+
+    @Test
+    void getAllNotifications_shouldReturnFilledNotificationDtoList_WhenThereAreNotifications() throws Exception {
+        // Arrange
+        UserId userId = createUser();
 
         List<NotificationId> notificationIds = List.of(
                 NotificationId.create(),
@@ -116,17 +119,7 @@ public class GetAllNotificationsTests {
     @Test
     void getAllNotifications_shouldReturnEmptyNotificationDtoList_WhenThereAreNoNotifications() throws Exception {
         // Arrange
-        UserId userId = UserId.create();
-        User user = new User(
-                userId,
-                "keycloakId",
-                "username",
-                List.of(),
-                0,
-                new Profile("username", "Bio"),
-                "Test@gmail.com"
-        );
-        userRepository.save(user);
+        createUser();
 
         // Act && Assert
         mockMvc.perform(get("/api/notifications")
@@ -146,17 +139,7 @@ public class GetAllNotificationsTests {
     @Test
     void getAllNotifications_shouldReturnNotFound_whenJwtIsInvalid() throws Exception {
         // Arrange
-        UserId userId = UserId.create();
-        User user = new User(
-                userId,
-                "keycloakId",
-                "username",
-                List.of(),
-                0,
-                new Profile("username", "Bio"),
-                "Test@gmail.com"
-        );
-        userRepository.save(user);
+        createUser();
 
         // Act & Assert
         mockMvc.perform(get("/api/notifications")
