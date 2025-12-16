@@ -1,11 +1,11 @@
-INSERT INTO games(price, game_id, description, name, service_url, rules)
+INSERT INTO games(price, game_id, description, name, service_url, rules, last_registration)
 VALUES (1.99, 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc',
         'Tic Tac Toe is a puzzle game for two players, "X" and "O", who take turns marking spaces in a 3×3 grid. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row wins the game.',
         'Tic-Tac-Toe', '/api/games/tictactoe',
         'Two players take turns.
         Players alternate marking empty spaces in the grid with their assigned mark (X or O).
         The first player to get three of their marks in a row (horizontally, vertically, or diagonally) wins the game.
-        If all nine spaces are filled and no player has three in a row, the game ends in a tie.'),
+        If all nine spaces are filled and no player has three in a row, the game ends in a tie.', '2024-01-14T19:45:12Z'),
        (6.99, '0de4ce93-1319-48fa-9041-b430d68cedb3',
         'The abstract strategy game Quoridor is surprisingly deep for its simplistic rules. The goal of the game is to get your pawn to the other side of the board.',
         'Quoridor', '/api/games/quoridor',
@@ -17,7 +17,7 @@ VALUES (1.99, 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc',
         By placing fences, you force your opponent to move around it and increase the number of moves they need to make. But be careful, you are not allowed to lock up to lock up your opponents pawn, it must always be able to reach it''s goal by at least one square.
         When two pawns face each other on neighboring squares which are not separated by a fence, the player whose turn it is can jump the opponent''s pawn (and place himself behind him), thus advancing an extra square.
         If there is a fence behind the said pawn, the player can place his pawn to the left or the right of the other pawn.
-        The first player who reaches one of the 9 squares opposite his base line is the winner.');
+        The first player who reaches one of the 9 squares opposite his base line is the winner.', '2024-01-14T19:45:12Z');
 
 INSERT INTO game_categories (game_id, category)
 VALUES ('c3c1d2b0-82fa-43a7-b326-0eb96136ecbc', 'NATIVE'),

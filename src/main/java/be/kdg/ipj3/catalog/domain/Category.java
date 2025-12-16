@@ -13,13 +13,15 @@ public enum Category {
         this.description = description;
     }
 
-    public static Category find(String description) {
-        for (Category c : Category.values()) {
-            if (c.description.equalsIgnoreCase(description)) {
-                return c;
-            }
+    public static Category fromStringOrNull(String value) {
+        if (value == null) {
+            return null;
         }
-        return null;
+        try {
+            return valueOf(value.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     @Override
