@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -23,13 +24,13 @@ public class JpaGameEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
     private String description;
 
     private BigDecimal price;
 
     @Column(nullable = false)
     private String serviceUrl;
+
     @Size(max = 2000)
     private String rules;
 
@@ -50,11 +51,17 @@ public class JpaGameEntity {
     )
     private List<JpaAchievementEntity> achievements = new ArrayList<>();
 
+    private String imageUrl;
+
+    @Column(nullable = false)
+    private Instant lastRegistration;
+
     protected JpaGameEntity() {
     } // for JPA
 
 
-    public JpaGameEntity(UUID id, String name, String description, BigDecimal price, String serviceUrl, String rules, List<Category> categories) {
+    public JpaGameEntity(UUID id, String name, String description, BigDecimal price, String serviceUrl, String rules,
+                         List<Category> categories, String imageUrl, Instant lastRegistration) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -62,6 +69,8 @@ public class JpaGameEntity {
         this.serviceUrl = serviceUrl;
         this.rules = rules;
         this.categories = categories;
+        this.imageUrl = imageUrl;
+        this.lastRegistration = lastRegistration;
     }
 
     public static JpaGameEntity fromDomain(Game game) {
@@ -72,7 +81,9 @@ public class JpaGameEntity {
                 game.getPrice().amount(),
                 game.getServiceUrl(),
                 game.getRules(),
-                game.getCategories()
+                game.getCategories(),
+                game.getImageUrl(),
+                game.getLastRegistration()
         );
 
         game.getAchievements().stream()
@@ -96,7 +107,9 @@ public class JpaGameEntity {
                 this.serviceUrl,
                 this.rules,
                 achievements,
-                new ArrayList<>(this.categories)
+                new ArrayList<>(this.categories),
+                this.imageUrl,
+                this.lastRegistration
         );
     }
 
@@ -130,6 +143,14 @@ public class JpaGameEntity {
 
     public List<JpaAchievementEntity> getAchievements() {
         return achievements;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public Instant getLastRegistration() {
+        return lastRegistration;
     }
 
     private void addAchievement(JpaAchievementEntity achievement) {

@@ -4,6 +4,7 @@ import be.kdg.ipj3.catalog.api.dto.GameFilterRequestDto;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -48,12 +50,16 @@ public class GetAllGamesByFilterTests {
     void filterGames_shouldReturnFilteredGames_whenMatchesExist() throws Exception {
         // Arrange
         Game game = new Game(
+                GameId.create(),
                 "Filtered Game",
                 "Filtered Description",
                 Money.of(BigDecimal.valueOf(20.00)),
                 "http://test.com/service",
                 "A rule",
-                List.of(Category.CARDGAME)
+                List.of(),
+                List.of(Category.CARDGAME),
+                "",
+                Instant.now()
         );
         gameRepository.save(game);
 

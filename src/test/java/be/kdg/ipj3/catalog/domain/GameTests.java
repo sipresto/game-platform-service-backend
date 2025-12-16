@@ -1,9 +1,11 @@
 package be.kdg.ipj3.catalog.domain;
 
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,7 +23,7 @@ class GameTests {
         List<Category> categories = List.of(Category.CARDGAME);
 
         // Act
-        Game game = new Game(name, description, price, serviceUrl, rule, categories);
+        Game game = new Game(GameId.create(), name, description, price, serviceUrl, rule, List.of(), categories, "", Instant.now());
 
         // Assert
         assertNotNull(game.getId());

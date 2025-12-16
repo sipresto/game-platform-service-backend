@@ -4,6 +4,7 @@ import be.kdg.ipj3.catalog.domain.Achievement;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.catalog.infrastructure.rabbitmq.dto.RegisterGameDto;
 import be.kdg.ipj3.catalog.shared.*;
 import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.users.shared.UserId;
@@ -105,5 +106,19 @@ public class GameService implements GamesApi {
         UserId userId = usersApi.findIdByKeycloakId(keycloakId);
         List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id());
         return gameRepository.findGamesByIds(ownedGameIds);
+    }
+
+    public void registerGame(RegisterGameDto dto) {
+        Game game = gameRepository.findById(new GameId(dto.id()))
+                .orElse(null);
+
+        if (game != null) {
+            game.activate(dto.timestamp());
+            gameRepository.save(game);
+        }
+        else {
+            game = dto.toDomain();
+            gameRepository.save(game);
+        }
     }
 }
