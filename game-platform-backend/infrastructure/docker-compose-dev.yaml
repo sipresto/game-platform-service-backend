@@ -54,7 +54,7 @@ services:
     networks:
       - dev
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ppassword"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-ppassword" ]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -99,6 +99,39 @@ services:
     networks:
       - dev
     restart: unless-stopped
+
+  # ---------------------
+  # Chess B and F
+  # ---------------------
+  app_chessgame_front:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/demo-content/chessgame/front:latest
+    ports:
+      - '3333:80'
+    networks:
+      - dev
+    depends_on:
+      - app_chessgame_back
+      - app_rabbitmq
+      - app_postgres
+
+  app_chessgame_back:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/demo-content/chessgame/back:latest
+    ports:
+      - '8080:8080'
+    networks:
+      - dev
+    depends_on:
+      - app_postgres
+      - app_rabbitmq
+    environment:
+      - GAME_REGISTRATION_ID=8496c496-a884-48ed-9bb3-7c3aa50fb8ca
+      - DATASOURCE_URL=jdbc:postgresql://app_postgres:5432/platformdb?currentSchema=acl
+      - DATASOURCE_USER=platform
+      - DATASOURCE_PASSWORD=platformSecretPassword
+      - RABBIT_HOST=app_rabbitmq
+      - RABBIT_PORT=5672
+      - RABBIT_USER=user
+      - RABBIT_PASSWORD=password
 
 networks:
   dev:
