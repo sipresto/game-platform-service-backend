@@ -55,7 +55,7 @@ public class FindFriendsForUserIntegrationTests {
                 mainId,
                 "kc-main-" + mainId,
                 "main-user-" + mainId,
-                new JpaProfile("Main", "main bio"),
+                new JpaProfile("Main", "main bio", null, null),
                 0,
                 Visibility.PUBLIC,
                 "Test@gmail.com"
@@ -65,7 +65,7 @@ public class FindFriendsForUserIntegrationTests {
                 friendId,
                 "kc-friend-" + friendId,
                 "friend-user-" + friendId,
-                new JpaProfile("Friend", "friend bio"),
+                new JpaProfile("Friend", "friend bio",null, null),
                 0,
                 Visibility.PUBLIC,
                 "Test@gmail.com"

@@ -53,7 +53,7 @@ public class UpdatePrivacyIntegrationTests {
                 userId,
                 keycloakId,
                 username,
-                new JpaProfile(username, "Test bio"),
+                new JpaProfile(username, "Test bio", null, null),
                 0,
                 Visibility.PUBLIC,
                 "Test@gmail.com"
