@@ -98,6 +98,15 @@ public class UserController {
     }
 
     /**
+     * Gets a user by their ID
+     */
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<UserDto> findUserById(@PathVariable UUID userId) {
+        User user = userService.findById(userId);
+        return ResponseEntity.ok(UserDto.fromDomain(user));
+    }
+
+    /**
      * Uploads or updates the profile image for the current user
      */
     @PutMapping(value = "/me/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

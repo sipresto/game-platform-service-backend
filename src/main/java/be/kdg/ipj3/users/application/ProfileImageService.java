@@ -1,4 +1,3 @@
-// New: ProfileImageService.java
 package be.kdg.ipj3.users.application;
 
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
