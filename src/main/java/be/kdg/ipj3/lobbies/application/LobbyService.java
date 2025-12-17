@@ -128,7 +128,8 @@ public class LobbyService {
                     .toList();
             sessionsApi.createSession(sessionId.id(), gameId, playerList, difficulty);
 
-            lobbyRepository.deleteById(lobbyId);
+            // TODO: cleanup job to remove after a period because polling
+            //lobbyRepository.deleteById(lobbyId);
 
             return gameUrl;
         } catch (Exception e) {
