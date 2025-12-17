@@ -29,14 +29,14 @@ public class UserService implements UsersApi {
      * Register or get existing user fromDomain Keycloak JWT
      * This is called automatically on first login
      */
-    public User registerOrGetUser(String keycloakId, String keycloakUsername) {
+    public User registerOrGetUser(String keycloakId, String keycloakUsername, String email) {
         if (keycloakId == null || keycloakId.isBlank()) {
             throw new IllegalArgumentException("Keycloak id cannot be null or blank");
         }
 
         return userRepository.findByKeycloakId(keycloakId)
                 .orElseGet(() -> {
-                    User newUser = User.createFromKeycloak(keycloakId, keycloakUsername);
+                    User newUser = User.createFromKeycloak(keycloakId, keycloakUsername, email);
                     userRepository.save(newUser);
                     return newUser;
                 });
@@ -120,5 +120,10 @@ public class UserService implements UsersApi {
     @Transactional(readOnly = true)
     public SmallUserDto findSmallUserDtoById(UUID id) {
         return SmallUserDto.fromDomain(findById(id));
+    }
+
+    @Override
+    public String findEmailByUserId(UserId id) {
+        return userRepository.findById(id).orElseThrow(id::notFound).getEmail();
     }
 }

@@ -32,8 +32,9 @@ public class UserController {
     ) {
         String keycloakId = jwt.getSubject();
         String keycloakUsername = jwt.getClaim("preferred_username");
+        String email = jwt.getClaim("email");
 
-        User user = userService.registerOrGetUser(keycloakId, keycloakUsername);
+        User user = userService.registerOrGetUser(keycloakId, keycloakUsername, email);
 
         return ResponseEntity.ok(UserDto.fromDomain(user));
     }

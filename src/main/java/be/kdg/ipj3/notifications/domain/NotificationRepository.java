@@ -2,25 +2,19 @@ package be.kdg.ipj3.notifications.domain;
 
 import be.kdg.ipj3.notifications.shared.NotificationType;
 import be.kdg.ipj3.users.shared.UserId;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
 public interface NotificationRepository {
     List<Notification> findByUserId(UserId id);
-
-    void deleteAll();
-
-    void saveAll(List<Notification> notifications);
-
-    void save(Notification notification);
-
-    List<Notification> findByUserIdAndType(UUID id, NotificationType type);
-
-    void delete(Notification notification);
-
     Optional<Notification> findById(NotificationId id);
+    void save(Notification notification);
+    void delete(Notification notification);
+    void deleteAll();
+    void saveAll(List<Notification> notifications);
+    List<Notification> findByUserIdAndType(UUID id, NotificationType type);
+    Optional<UserNotificationPreferences> findPreferencesByUserId(UserId userId);
+    void savePreferences(UserNotificationPreferences preferences);
 }

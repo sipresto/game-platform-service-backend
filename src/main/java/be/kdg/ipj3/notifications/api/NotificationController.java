@@ -2,22 +2,28 @@ package be.kdg.ipj3.notifications.api;
 
 import be.kdg.ipj3.notifications.api.dto.NotificationDto;
 import be.kdg.ipj3.notifications.application.NotificationService;
+import be.kdg.ipj3.notifications.domain.NotificationChannel;
+import be.kdg.ipj3.notifications.domain.UserNotificationPreferences;
+import be.kdg.ipj3.notifications.shared.NotificationType;
+import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/notifications")
 public class NotificationController {
     private final NotificationService notificationService;
+    private final UsersApi usersApi;
 
-
-    public NotificationController(NotificationService notificationService) {
+    public NotificationController(NotificationService notificationService, UsersApi usersApi) {
         this.notificationService = notificationService;
+        this.usersApi = usersApi;
     }
 
     @GetMapping
@@ -34,9 +40,34 @@ public class NotificationController {
 
     @PatchMapping("/{id}/read")
     public ResponseEntity<Void> readNotification(
-            @PathVariable UUID id
+            @PathVariable UUID id,
+            @AuthenticationPrincipal Jwt jwt
     ) {
-        notificationService.readNotification(id);
+        String keycloakId = jwt.getSubject();
+        notificationService.readNotification(id, keycloakId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/preferences")
+    public ResponseEntity<Map<NotificationType, Map<NotificationChannel, Boolean>>> getPreferences(
+            @AuthenticationPrincipal Jwt jwt) {
+        String keycloakId = jwt.getSubject();
+        var user = usersApi.findByKeycloakId(keycloakId);
+
+        UserNotificationPreferences prefs = notificationService.getPreferences(user.getId().id());
+        return ResponseEntity.ok(prefs.getAllPreferences());
+    }
+
+    @PutMapping("/preferences/{notificationType}/{channel}")
+    public ResponseEntity<Void> updatePreference(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable NotificationType notificationType,
+            @PathVariable NotificationChannel channel,
+            @RequestParam boolean enabled) {
+        String keycloakId = jwt.getSubject();
+        var user = usersApi.findByKeycloakId(keycloakId);
+
+        notificationService.updatePreferences(user.getId().id(), notificationType, channel, enabled);
         return ResponseEntity.ok().build();
     }
 }

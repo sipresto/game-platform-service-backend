@@ -1,4 +1,4 @@
-package be.kdg.ipj3.notifications.api.notificationController;
+package be.kdg.ipj3.notifications.api;
 
 import be.kdg.ipj3.notifications.domain.Notification;
 import be.kdg.ipj3.notifications.domain.NotificationId;
@@ -55,9 +55,7 @@ public class GetAllNotificationsTests {
                         .claim("preferred_username", "username"));
     }
 
-    @Test
-    void getAllNotifications_shouldReturnFilledNotificationDtoList_WhenThereAreNotifications() throws Exception {
-        // Arrange
+    private UserId createUser() {
         UserId userId = UserId.create();
         User user = new User(
                 userId,
@@ -65,9 +63,17 @@ public class GetAllNotificationsTests {
                 "username",
                 List.of(),
                 0,
-                new Profile("username", "Bio")
+                new Profile("username", "Bio"),
+                "Test@gmail.com"
         );
         userRepository.save(user);
+        return userId;
+    }
+
+    @Test
+    void getAllNotifications_shouldReturnFilledNotificationDtoList_WhenThereAreNotifications() throws Exception {
+        // Arrange
+        UserId userId = createUser();
 
         List<NotificationId> notificationIds = List.of(
                 NotificationId.create(),
@@ -113,16 +119,7 @@ public class GetAllNotificationsTests {
     @Test
     void getAllNotifications_shouldReturnEmptyNotificationDtoList_WhenThereAreNoNotifications() throws Exception {
         // Arrange
-        UserId userId = UserId.create();
-        User user = new User(
-                userId,
-                "keycloakId",
-                "username",
-                List.of(),
-                0,
-                new Profile("username", "Bio")
-        );
-        userRepository.save(user);
+        createUser();
 
         // Act && Assert
         mockMvc.perform(get("/api/notifications")
