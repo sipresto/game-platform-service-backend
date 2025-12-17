@@ -7,6 +7,7 @@ import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.GameRepository;
 import be.kdg.ipj3.catalog.shared.AchievementId;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.domain.UserRepository;
@@ -55,12 +56,16 @@ public class CompleteAchievementTests {
 
     private Game createTestGame() {
         Game game = new Game(
+                GameId.create(),
                 "Test Game",
                 "Test Description",
                 Money.of(BigDecimal.valueOf(49.99)),
                 "http://test.com/service",
                 "Rules",
-                List.of(Category.NATIVE)
+                List.of(),
+                List.of(Category.NATIVE),
+                "",
+                Instant.now()
         );
         gameRepository.save(game);
 

@@ -1,6 +1,5 @@
 package be.kdg.ipj3.lobbies.application;
 
-import be.kdg.ipj3.catalog.api.dto.GameDto;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.lobbies.domain.LobbyRepository;
@@ -9,7 +8,6 @@ import be.kdg.ipj3.lobbies.domain.LobbyStatus;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.users.domain.User;
-import be.kdg.ipj3.users.domain.Visibility;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.junit.jupiter.api.Test;
@@ -19,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -69,7 +68,9 @@ class CreateLobbyTests {
                 "http://example.service",
                 "Some rules",
                 List.of(),
-                List.of()
+                List.of(),
+                "",
+                Instant.now()
         );
 
         // Mock API calls

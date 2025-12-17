@@ -22,6 +22,8 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,12 +72,16 @@ public class CreateLobbyTests {
 
     private GameId createTestGame() {
         Game game = new Game(
+                GameId.create(),
                 "Game",
                 "Description",
                 Money.of(new java.math.BigDecimal("19.99")),
                 "https://test.com/service",
                 "A rule",
-                java.util.List.of(Category.NATIVE)
+                List.of(),
+                List.of(Category.NATIVE),
+                "",
+                Instant.now()
         );
         gameRepository.save(game);
         return game.getId();

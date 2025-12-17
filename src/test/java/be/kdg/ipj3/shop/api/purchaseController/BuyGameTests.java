@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -83,12 +84,16 @@ class BuyGameTests {
 
     private GameId createTestGame() {
         Game game = new Game(
+                GameId.create(),
                 "Game",
                 "Description",
                 Money.of(BigDecimal.valueOf(19.99)),
                 "https://test.com/service",
                 "A rule",
-                List.of(Category.NATIVE)
+                List.of(),
+                List.of(Category.NATIVE),
+                "",
+                Instant.now()
         );
         gameRepository.save(game);
 

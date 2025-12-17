@@ -120,7 +120,10 @@ public class GetAchievementProgressByKeycloakIdTests {
                 "http://test.com/service",
                 "A rule",
                 achievements,
-                List.of(Category.CARDGAME)
+                List.of(Category.CARDGAME),
+                null,
+                Instant.now(),
+                true
         );
         gameRepository.save(game);
 
@@ -189,7 +192,10 @@ public class GetAchievementProgressByKeycloakIdTests {
                 "http://test.com/service",
                 "A rule",
                 achievements,
-                List.of(Category.CARDGAME)
+                List.of(Category.CARDGAME),
+                "",
+                Instant.now(),
+                true
         );
         gameRepository.save(game);
 

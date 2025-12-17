@@ -10,6 +10,7 @@ import be.kdg.ipj3.catalog.domain.GameRepository;
 import be.kdg.ipj3.catalog.shared.AchievementId;
 import be.kdg.ipj3.catalog.shared.CountTrigger;
 import be.kdg.ipj3.catalog.shared.CountingStrategy;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.sessions.shared.SessionResult;
 import be.kdg.ipj3.shared.domain.*;
@@ -25,6 +26,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,12 +59,16 @@ public class EvaluateAchievementsAfterGameTests {
 
     private Game createTestGame() {
         Game game = new Game(
+                GameId.create(),
                 "Test Game",
                 "Test Description",
                 Money.of(BigDecimal.valueOf(49.99)),
                 "http://test.com/service",
                 "rules",
-                List.of(Category.NATIVE)
+                List.of(),
+                List.of(Category.NATIVE),
+                "",
+                Instant.now()
         );
         gameRepository.save(game);
 

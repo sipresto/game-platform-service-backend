@@ -3,6 +3,7 @@ package be.kdg.ipj3.catalog.api.gameController;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItem;
@@ -44,21 +46,29 @@ public class GetAllGamesTests {
     void getAllGames_shouldReturnListOfGames_whenGamesExist() throws Exception {
         // Arrange
         Game game1 = new Game(
+                GameId.create(),
                 "Test Game",
                 "Test Description",
                 Money.of(BigDecimal.valueOf(49.99)),
                 "http://test.com/service",
                 "A rule",
-                List.of(Category.CARDGAME, Category.NATIVE, Category.STRATEGY)
+                List.of(),
+                List.of(Category.CARDGAME, Category.NATIVE, Category.STRATEGY),
+                "",
+                Instant.now()
         );
 
         Game game2 = new Game(
+                GameId.create(),
                 "Test Game 2",
                 "Test Description 2",
                 Money.of(BigDecimal.valueOf(39.99)),
                 "http://test.com/service2",
                 "A rule",
-                List.of(Category.BOARDGAME)
+                List.of(),
+                List.of(Category.BOARDGAME),
+                "",
+                Instant.now()
         );
 
         gameRepository.save(game1);

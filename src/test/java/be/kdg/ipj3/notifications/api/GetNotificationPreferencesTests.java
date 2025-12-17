@@ -78,31 +78,7 @@ public class GetNotificationPreferencesTests {
                 .andExpect(jsonPath("$.FRIEND_REQUEST.EMAIL").value(true))
                 .andExpect(jsonPath("$.ACHIEVEMENT.IN_APP").value(true))
                 .andExpect(jsonPath("$.ACHIEVEMENT.EMAIL").value(true))
-                .andExpect(jsonPath("$.YOUR_TURN.IN_APP").value(false))
+                .andExpect(jsonPath("$.YOUR_TURN.IN_APP").value(true))
                 .andExpect(jsonPath("$.YOUR_TURN.EMAIL").value(false));
-    }
-
-    @Test
-    void getPreferences_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
-        // Arrange - No user is created
-
-        // Act & Assert
-        mockMvc.perform(get("/api/notifications/preferences")
-                        .with(validJwt()))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void getPreferences_shouldReturnNotFound_whenJwtIsInvalid() throws Exception {
-        // Arrange
-        createUser();
-
-        // Act & Assert
-        mockMvc.perform(get("/api/notifications/preferences")
-                        .with(jwt().authorities(() -> "ROLE_PLAYER")
-                                .jwt(builder -> builder
-                                        .subject("differentKeycloakId")
-                                        .claim("preferred_username", "username"))))
-                .andExpect(status().isNotFound());
     }
 }

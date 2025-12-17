@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItem;
@@ -44,12 +45,16 @@ public class GetGameByIdTests {
     void getGameById_shouldReturnGame_whenGameExists() throws Exception {
         // Arrange
         Game game = new Game(
+                GameId.create(),
                 "Test Game",
                 "Test Description",
                 Money.of(BigDecimal.valueOf(49.99)),
                 "http://test.com/service",
                 "A rule",
-                List.of(Category.CARDGAME, Category.NATIVE, Category.STRATEGY)
+                List.of(),
+                List.of(Category.CARDGAME, Category.NATIVE, Category.STRATEGY),
+                "",
+                Instant.now()
         );
 
         gameRepository.save(game);

@@ -27,6 +27,9 @@ public record UserNotificationPreferences(@Identity UserId userId,
             Map<NotificationChannel, Boolean> channelSettings = new EnumMap<>(NotificationChannel.class);
             for (NotificationChannel channel : NotificationChannel.values()) {
                 boolean defaultValue = (type != NotificationType.YOUR_TURN);
+                if(type.equals(NotificationType.YOUR_TURN) && channel.equals(NotificationChannel.IN_APP)) {
+                    defaultValue = true;
+                }
                 channelSettings.put(channel, defaultValue);
             }
             preferences.put(type, channelSettings);

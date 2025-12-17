@@ -7,6 +7,7 @@ import be.kdg.ipj3.shared.domain.Money;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +22,13 @@ public class Game {
     private final String rules;
     private final List<Category> categories;
     private final List<Achievement> achievements = new ArrayList<>();
+    private final String imageUrl;
+    private Instant lastRegistration;
+    private boolean isActive;
 
-    public Game(GameId id, String name, String description, Money price, String serviceUrl, String rules, List<Achievement> achievements, List<Category> categories) {
+    public Game(GameId id, String name, String description, Money price, String serviceUrl, String rules,
+                List<Achievement> achievements, List<Category> categories, String imageUrl, Instant lastRegistration,
+                boolean isActive) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -31,10 +37,24 @@ public class Game {
         this.rules = rules;
         this.achievements.addAll(achievements);
         this.categories = List.copyOf(categories);
+        this.imageUrl = imageUrl;
+        this.lastRegistration = lastRegistration;
+        this.isActive = isActive;
     }
 
-    public Game(String name, String description, Money price, String serviceUrl, String rules, List<Category> categories) {
-        this(GameId.create(), name, description, price, serviceUrl, rules, List.of(), categories);
+    public Game(GameId id, String name, String description, Money price, String serviceUrl, String rules,
+                List<Achievement> achievements, List<Category> categories, String imageUrl, Instant lastRegistration) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.serviceUrl = serviceUrl;
+        this.rules = rules;
+        this.achievements.addAll(achievements);
+        this.categories = List.copyOf(categories);
+        this.imageUrl = imageUrl;
+        this.lastRegistration = lastRegistration;
+        this.isActive = true;
     }
 
     public GameId getId() {
@@ -69,12 +89,29 @@ public class Game {
         return List.copyOf(categories);
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public Instant getLastRegistration() {
+        return lastRegistration;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
     public void addAchievement(String name, String code, String description, Integer requiredValue, int points,
                                CountingStrategy countingStrategy, CountTrigger countTrigger) {
         achievements.add(new Achievement(name, code, description, requiredValue, points, countingStrategy, countTrigger));
     }
 
-    public boolean hasCategory(Category category) {
-        return categories.contains(category);
+    public void activate(Instant registrationTime) {
+        this.isActive = true;
+        this.lastRegistration = registrationTime;
+    }
+
+    public void deactivate() {
+        this.isActive = false;
     }
 }

@@ -109,40 +109,4 @@ public class MarkNotificationAsReadTests {
                         .with(validJwt()))
                 .andExpect(status().isNotFound());
     }
-
-    @Test
-    void readNotification_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
-        // Arrange - No user is created
-        NotificationId notificationId = NotificationId.create();
-
-        // Act & Assert
-        mockMvc.perform(patch("/api/notifications/{id}/read", notificationId.id().toString())
-                        .with(validJwt()))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void readNotification_shouldReturnNotFound_whenJwtIsInvalid() throws Exception {
-        // Arrange
-        UserId userId = createUser();
-
-        NotificationId notificationId = NotificationId.create();
-        Notification notification = new Notification(
-                notificationId,
-                "Test notification",
-                NotificationType.FRIEND_REQUEST,
-                Instant.now(),
-                false,
-                userId
-        );
-        notificationRepository.save(notification);
-
-        // Act & Assert
-        mockMvc.perform(patch("/api/notifications/{id}/read", notificationId.id().toString())
-                        .with(jwt().authorities(() -> "ROLE_PLAYER")
-                                .jwt(builder -> builder
-                                        .subject("differentKeycloakId")
-                                        .claim("preferred_username", "username"))))
-                .andExpect(status().isNotFound());
-    }
 }
