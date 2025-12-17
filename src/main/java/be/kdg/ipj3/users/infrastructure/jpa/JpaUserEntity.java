@@ -49,6 +49,13 @@ public class JpaUserEntity {
 
     private JpaProfile profile;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "friend_requests",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    private final List<JpaFriendRequest> friendRequests = new ArrayList<>();
+
     protected JpaUserEntity() {
     } // for JPA
 
@@ -79,6 +86,10 @@ public class JpaUserEntity {
                 .map(UserId::id)
                 .forEach(jpaUserEntity::addFriend);
 
+        user.getFriendRequests().stream()
+                .map(JpaFriendRequest::fromDomain)
+                .forEach(jpaUserEntity.friendRequests::add);
+
         return jpaUserEntity;
     }
 
@@ -92,6 +103,10 @@ public class JpaUserEntity {
                 .map(UserId::new)
                 .forEach(user::addFriend);
 
+        friendRequests.stream()
+                .map(JpaFriendRequest::toDomain)
+                .forEach(user::addFriendRequest);
+
         user.updateVisibility(this.visibility);
         return user;
     }
@@ -100,10 +115,6 @@ public class JpaUserEntity {
         this.ownedGames.add(gameId);
     }
 
-    /**
-     * This is only to be used for testing!
-     * This was made in sprint 2 when friend logic was not present yet.
-     */
     private void addFriend(UUID friendId) {
         this.friends.add(friendId);
     }

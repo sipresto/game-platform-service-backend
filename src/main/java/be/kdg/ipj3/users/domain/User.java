@@ -19,6 +19,7 @@ public class User {
     private Profile profile;
     private Visibility visibility;
     private final List<UserId> friends;
+    private final List<FriendRequest> friendRequests;
 
     public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, int points, Profile profile) {
         this.id = id;
@@ -29,6 +30,7 @@ public class User {
         this.profile = profile;
         this.friends = new ArrayList<>();
         this.visibility = Visibility.PUBLIC;
+        this.friendRequests = new ArrayList<>();
     }
 
     public User(UserId id, String keycloakId, String username, Profile profile, int points) {
@@ -40,6 +42,7 @@ public class User {
         this.profile = profile;
         this.visibility = Visibility.PUBLIC;
         this.friends = new ArrayList<>();
+        this.friendRequests = new ArrayList<>();
     }
 
     public static User createFromKeycloak(String keycloakId, String keycloakUsername) {
@@ -113,5 +116,27 @@ public class User {
 
     public void addPoints(int points) {
         this.points += points;
+    }
+
+    public void addFriendRequest(FriendRequest friendRequest) {
+        this.friendRequests.add(friendRequest);
+    }
+
+    public void removeFriendRequest(UserId userId) {
+        this.friendRequests.remove(friendRequests.stream().filter(friendRequest -> friendRequest.sender().equals(userId)).findFirst().orElse(null));
+    }
+
+    public List<FriendRequest> getFriendRequests() {
+        return friendRequests;
+    }
+
+    public void acceptFriendRequest(UserId userId) {
+        FriendRequest request = friendRequests.stream()
+                .filter(friendRequest -> friendRequest.sender().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No friend request from this user"));
+
+        this.addFriend(request.sender());
+        this.removeFriendRequest(userId);
     }
 }

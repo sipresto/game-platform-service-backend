@@ -2,10 +2,7 @@ package be.kdg.ipj3.users.application;
 
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
-import be.kdg.ipj3.users.domain.Profile;
-import be.kdg.ipj3.users.domain.User;
-import be.kdg.ipj3.users.domain.UserRepository;
-import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
@@ -120,5 +117,28 @@ public class UserService implements UsersApi {
     @Transactional(readOnly = true)
     public SmallUserDto findSmallUserDtoById(UUID id) {
         return SmallUserDto.fromDomain(findById(id));
+    }
+
+    public void sendFriendRequest(UUID receiver, UUID sender) {
+        User receiverUser = findById(receiver);
+        User senderUser = findById(sender);
+        receiverUser.addFriendRequest(FriendRequest.create(senderUser.getId()));
+        userRepository.save(receiverUser);
+    }
+
+    public void acceptFriendRequest(UUID receiver, UUID sender) {
+        User receiverUser = findById(receiver);
+        User senderUser = findById(sender);
+        receiverUser.acceptFriendRequest(senderUser.getId());
+        senderUser.addFriend(receiverUser.getId());
+        userRepository.save(receiverUser);
+        userRepository.save(senderUser);
+    }
+
+    public void rejectFriendRequest(UUID receiver, UUID sender) {
+        User receiverUser = findById(receiver);
+        User senderUser = findById(sender);
+        receiverUser.removeFriendRequest(senderUser.getId());
+        userRepository.save(receiverUser);
     }
 }

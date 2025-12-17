@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record UserDto(
@@ -15,7 +17,8 @@ public record UserDto(
         @NotBlank String username,
         @Valid @NotNull ProfileDto profile,
         @NotNull Visibility visibility,
-        @NotNull int points
+        @NotNull int points,
+        List<FriendRequestDto> friendRequests
 ) {
     public static UserDto fromDomain(User user) {
         return new UserDto(
@@ -24,7 +27,8 @@ public record UserDto(
                 user.getUsername(),
                 ProfileDto.fromDomain(user.getProfile()),
                 user.getVisibility(),
-                user.getPoints()
+                user.getPoints(),
+                user.getFriendRequests().stream().map(FriendRequestDto::fromDomain).toList()
         );
     }
 
@@ -36,6 +40,18 @@ public record UserDto(
             return new ProfileDto(
                     profile.displayName(),
                     profile.bio()
+            );
+        }
+    }
+
+    public record FriendRequestDto(
+            @NotNull UUID senderId,
+            @NotNull Instant createdAt
+    ) {
+        public static FriendRequestDto fromDomain(be.kdg.ipj3.users.domain.FriendRequest friendRequest) {
+            return new FriendRequestDto(
+                    friendRequest.sender().id(),
+                    friendRequest.createdAt()
             );
         }
     }
