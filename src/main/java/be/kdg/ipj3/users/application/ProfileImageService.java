@@ -5,6 +5,7 @@ import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.shared.UserId;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 @Service
 @Transactional
@@ -26,6 +28,7 @@ public class ProfileImageService {
     private static final byte[] JPEG_MAGIC = {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF};
     private static final byte[] PNG_MAGIC = {(byte) 0x89, 'P', 'N', 'G'};
     private static final byte[] GIF_MAGIC = {'G', 'I', 'F'};
+    private final Logger _logger = Logger.getLogger(ProfileImageService.class.getName());
 
     private final UserRepository userRepository;
 
@@ -64,6 +67,7 @@ public class ProfileImageService {
 
         user.updateProfileImage(processedImage, mimeType);
         userRepository.save(user);
+        _logger.info("Profile image has been updated for keycloakId: " + keycloakId);
     }
 
     public byte[] getProfileImage(UserId userId) {
