@@ -128,6 +128,9 @@ public class LobbyService {
                     .toList();
             sessionsApi.createSession(sessionId.id(), gameId, playerList, difficulty);
 
+            lobby.startGame(gameUrl);
+            lobbyRepository.save(lobby);
+
             // TODO: cleanup job to remove after a period because polling
             //lobbyRepository.deleteById(lobbyId);
 

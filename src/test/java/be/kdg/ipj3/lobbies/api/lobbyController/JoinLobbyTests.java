@@ -71,7 +71,7 @@ public class JoinLobbyTests {
         );
 
         if (!markOpen) {
-            lobby.markAsInGame("gameUrl");
+            lobby.startGame("gameUrl");
         }
 
         lobbyRepository.save(lobby);
