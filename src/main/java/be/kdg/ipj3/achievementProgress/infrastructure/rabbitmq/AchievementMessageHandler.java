@@ -41,6 +41,6 @@ public class AchievementMessageHandler {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        progressService.completeAchievement(dto.userId(), dto.gameId(), dto.code(), dto.timestamp());
+        progressService.completeAchievement(dto.userId(), dto.gameSessionId(), dto.code(), dto.timestamp());
     }
 }
