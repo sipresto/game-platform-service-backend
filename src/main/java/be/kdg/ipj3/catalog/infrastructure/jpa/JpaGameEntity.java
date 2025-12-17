@@ -29,7 +29,10 @@ public class JpaGameEntity {
     private BigDecimal price;
 
     @Column(nullable = false)
-    private String serviceUrl;
+    private String backendUrl;
+
+    @Column(nullable = false)
+    private String frontendUrl;
 
     @Size(max = 2000)
     private String rules;
@@ -60,13 +63,14 @@ public class JpaGameEntity {
     } // for JPA
 
 
-    public JpaGameEntity(UUID id, String name, String description, BigDecimal price, String serviceUrl, String rules,
-                         List<Category> categories, String imageUrl, Instant lastRegistration) {
+    public JpaGameEntity(UUID id, String name, String description, BigDecimal price, String backendUrl, String frontendUrl,
+                         String rules, List<Category> categories, String imageUrl, Instant lastRegistration) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
-        this.serviceUrl = serviceUrl;
+        this.backendUrl = backendUrl;
+        this.frontendUrl = frontendUrl;
         this.rules = rules;
         this.categories = categories;
         this.imageUrl = imageUrl;
@@ -79,7 +83,8 @@ public class JpaGameEntity {
                 game.getName(),
                 game.getDescription(),
                 game.getPrice().amount(),
-                game.getServiceUrl(),
+                game.getBackendUrl(),
+                game.getFrontendUrl(),
                 game.getRules(),
                 game.getCategories(),
                 game.getImageUrl(),
@@ -104,7 +109,8 @@ public class JpaGameEntity {
                 this.name,
                 this.description,
                 Money.of(this.price),
-                this.serviceUrl,
+                this.backendUrl,
+                this.frontendUrl,
                 this.rules,
                 achievements,
                 new ArrayList<>(this.categories),
@@ -129,8 +135,12 @@ public class JpaGameEntity {
         return price;
     }
 
-    public String getServiceUrl() {
-        return serviceUrl;
+    public String getBackendUrl() {
+        return backendUrl;
+    }
+
+    public String getFrontendUrl() {
+        return frontendUrl;
     }
 
     public String getRules() {

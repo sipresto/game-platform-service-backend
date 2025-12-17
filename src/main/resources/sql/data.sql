@@ -1,14 +1,14 @@
-INSERT INTO games(price, game_id, description, name, service_url, rules, last_registration)
+INSERT INTO games(price, game_id, description, name, frontend_url, backend_url, rules, last_registration)
 VALUES (1.99, 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc',
         'Tic Tac Toe is a puzzle game for two players, "X" and "O", who take turns marking spaces in a 3×3 grid. The player who succeeds in placing three of their marks in a horizontal, vertical, or diagonal row wins the game.',
-        'Tic-Tac-Toe', '/api/games/tictactoe',
+        'Tic-Tac-Toe', 'http://localhost:5174/games/tictactoe', '/api/games/tictactoe',
         'Two players take turns.
         Players alternate marking empty spaces in the grid with their assigned mark (X or O).
         The first player to get three of their marks in a row (horizontally, vertically, or diagonally) wins the game.
         If all nine spaces are filled and no player has three in a row, the game ends in a tie.', '2024-01-14T19:45:12Z'),
        (6.99, '0de4ce93-1319-48fa-9041-b430d68cedb3',
         'The abstract strategy game Quoridor is surprisingly deep for its simplistic rules. The goal of the game is to get your pawn to the other side of the board.',
-        'Quoridor', '/api/games/quoridor',
+        'Quoridor', 'http://localhost:5175/games/quoridor', '/api/games/quoridor',
         'Each player in turn, chooses to move his pawn or to put up one of his fences. When he has run out of fences, the player must move his pawn.
         At the beginning the board is empty. Choose and place your pawn in the center of the first line of your side of the board, your opponent takes another pawn and places it in the center of the first line of his side of the board (the one facing yours). Then take 10 fences each.
         The pawns are moved one square at a time, horizontally or vertically, forwards or backwards, never diagonally.
@@ -56,7 +56,7 @@ VALUES ('cf0138b7-3272-4d1c-a34d-de88a47fe94c', 'c3c1d2b0-82fa-43a7-b326-0eb9613
        ('04518661-62b1-47f4-933d-87c6f85ba5fb', 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc'),
        ('6d0cdf67-26c4-4354-a4df-9c4a7575dbb6', 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc');
 
-INSERT INTO sessions (session_id, game_id, difficulty, winner_id, result, completed_at)
+INSERT INTO sessions (session_id, game_id, difficulty, winner_id, status, completed_at)
 VALUES ('02d0ae5f-9547-4efe-b55f-a2a29c9a3068',
         'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc',
         null,

@@ -3,8 +3,8 @@ package be.kdg.ipj3.sessions.infrastructure.jpa;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.sessions.domain.Session;
-import be.kdg.ipj3.sessions.domain.SessionId;
-import be.kdg.ipj3.sessions.shared.SessionResult;
+import be.kdg.ipj3.sessions.shared.SessionId;
+import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.users.shared.UserId;
 import jakarta.persistence.*;
 
@@ -35,11 +35,11 @@ public class JpaSessionEntity {
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
 
-    private UUID winnerId;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SessionResult result;
+    private SessionStatus status;
+
+    private UUID winnerId;
 
     @Column(nullable = false)
     private Instant completedAt;
@@ -48,13 +48,13 @@ public class JpaSessionEntity {
     } // for JPA
 
     public JpaSessionEntity(UUID id, UUID gameId, List<UUID> players, Difficulty difficulty,
-                            UUID winnerId, SessionResult result, Instant completedAt) {
+                            SessionStatus status, UUID winnerId, Instant completedAt) {
         this.id = id;
         this.gameId = gameId;
         this.players = new ArrayList<>(players);
         this.difficulty = difficulty;
+        this.status = status;
         this.winnerId = winnerId;
-        this.result = result;
         this.completedAt = completedAt;
     }
 
@@ -64,8 +64,8 @@ public class JpaSessionEntity {
                 session.getGame().id(),
                 session.getPlayers().stream().map(UserId::id).toList(),
                 session.getDifficulty(),
+                session.getStatus(),
                 session.getWinner() != null ? session.getWinner().id() : null,
-                session.getResult(),
                 session.getCompletedAt()
         );
     }
@@ -76,8 +76,8 @@ public class JpaSessionEntity {
                 new GameId(this.gameId),
                 this.players.stream().map(UserId::new).toList(),
                 this.difficulty,
+                this.status,
                 this.winnerId != null ? new UserId(this.winnerId) : null,
-                this.result,
                 this.completedAt
         );
     }
@@ -98,12 +98,12 @@ public class JpaSessionEntity {
         return difficulty;
     }
 
-    public UUID getWinnerId() {
-        return winnerId;
+    public SessionStatus getStatus() {
+        return status;
     }
 
-    public SessionResult getResult() {
-        return result;
+    public UUID getWinnerId() {
+        return winnerId;
     }
 
     public Instant getCompletedAt() {

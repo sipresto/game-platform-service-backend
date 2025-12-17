@@ -12,7 +12,7 @@ import be.kdg.ipj3.catalog.shared.CountTrigger;
 import be.kdg.ipj3.catalog.shared.CountingStrategy;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
-import be.kdg.ipj3.sessions.shared.SessionResult;
+import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.shared.domain.*;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;
@@ -90,12 +90,12 @@ public class EvaluateAchievementsAfterGameTests {
     }
 
     private GameContext createTestGameContext(UUID gameId, UUID userId, UUID winnerId,
-                                              SessionResult sessionResult, Difficulty difficulty) {
+                                              SessionStatus sessionStatus, Difficulty difficulty) {
         return new GameContext(
                 gameId,
                 userId,
                 winnerId,
-                sessionResult,
+                sessionStatus,
                 difficulty
         );
     }
@@ -114,7 +114,7 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_ANY);
 
         UserId userId = createTestUser();
-        GameContext context = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionResult.PLAYER_WIN, null);
+        GameContext context = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionStatus.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -140,7 +140,7 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_PLAYER);
 
         UserId userId = createTestUser();
-        GameContext context = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionResult.PLAYER_WIN, null);
+        GameContext context = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionStatus.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -164,7 +164,7 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_AI);
 
         UserId userId = createTestUser();
-        GameContext context = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionResult.PLAYER_WIN, null);
+        GameContext context = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionStatus.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -185,7 +185,7 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 3, CountingStrategy.STREAK, CountTrigger.WIN_OR_DRAW_ANY);
 
         UserId userId = createTestUser();
-        GameContext winContext = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionResult.PLAYER_WIN, null);
+        GameContext winContext = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionStatus.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -210,8 +210,8 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 3, CountingStrategy.STREAK, CountTrigger.WIN_OR_DRAW_ANY);
 
         UserId userId = createTestUser();
-        GameContext winContext = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionResult.PLAYER_WIN, null);
-        GameContext loseContext = createTestGameContext(game.getId().id(), userId.id(), UUID.randomUUID(), SessionResult.PLAYER_WIN, null);
+        GameContext winContext = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionStatus.PLAYER_WIN, null);
+        GameContext loseContext = createTestGameContext(game.getId().id(), userId.id(), UUID.randomUUID(), SessionStatus.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 

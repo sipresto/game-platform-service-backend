@@ -15,7 +15,9 @@ public interface GameRepository {
 
     List<Game> findAllGames();
 
-    Optional<String> findServiceUrlByGameId(GameId id);
+    Optional<String> findBackendUrlByGameId(GameId id);
+
+    Optional<String> findFrontendUrlByGameId(GameId id);
 
     List<Game> filterGames(Money minPrice, Money maxPrice, List<Category> categories);
 

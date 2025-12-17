@@ -3,7 +3,7 @@ package be.kdg.ipj3.sessions.api.sessionController;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.sessions.domain.SessionRepository;
 import be.kdg.ipj3.sessions.domain.Session;
-import be.kdg.ipj3.sessions.shared.SessionResult;
+import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.domain.UserRepository;
@@ -61,7 +61,7 @@ public class GetSessionByUserIdTests {
                 List.of(userId),
                 Difficulty.EASY,
                 userId,
-                SessionResult.PLAYER_WIN
+                SessionStatus.PLAYER_WIN
         );
 
         Session session2 = new Session(
@@ -69,7 +69,7 @@ public class GetSessionByUserIdTests {
                 List.of(userId),
                 Difficulty.HARD,
                 null,
-                SessionResult.AI_WIN
+                SessionStatus.AI_WIN
         );
 
         sessionRepository.save(session1);

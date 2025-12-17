@@ -2,7 +2,7 @@ package be.kdg.ipj3.sessions.api.dto;
 
 import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.sessions.domain.Session;
-import be.kdg.ipj3.sessions.shared.SessionResult;
+import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.users.shared.UserId;
 import jakarta.validation.constraints.NotNull;
 
@@ -16,7 +16,7 @@ public record SessionDto(
         @NotNull List<UUID> playerIds,
         Difficulty difficulty,
         UUID winnerId,
-        SessionResult result,
+        SessionStatus result,
         @NotNull Instant completedAt
 ) {
     public static SessionDto fromDomain(Session session) {
@@ -30,7 +30,7 @@ public record SessionDto(
                 session.getWinner() == null
                         ? null
                         : session.getWinner().id(),
-                session.getResult(),
+                session.getStatus(),
                 session.getCompletedAt()
         );
     }

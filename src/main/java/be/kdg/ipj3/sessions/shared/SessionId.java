@@ -1,4 +1,4 @@
-package be.kdg.ipj3.sessions.domain;
+package be.kdg.ipj3.sessions.shared;
 
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import org.jmolecules.ddd.annotation.ValueObject;

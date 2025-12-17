@@ -21,7 +21,9 @@ public interface GamesApi {
 
     Optional<AchievementDto> findAchievementDtoByCode(String code);
 
-    String findServiceByGameId(UUID id);
+    String findBackendUrlByGameId(UUID id);
+
+    String findFrontendUrlByGameId(UUID id);
 
     Optional<GamePurchaseDto> findGameDtoById(UUID id);
 }

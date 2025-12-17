@@ -19,6 +19,7 @@ public record RegisterGameDto(
         @NotBlank String name,
         String description,
         BigDecimal price,
+        @NotBlank String backendUrl,
         @NotBlank String frontendUrl,
         @Size(max = 2000) String rules,
         List<RegisterAchievementDto> achievements,
@@ -32,6 +33,7 @@ public record RegisterGameDto(
                 name,
                 description,
                 Money.of(price),
+                backendUrl,
                 frontendUrl,
                 rules,
                 achievements.stream()

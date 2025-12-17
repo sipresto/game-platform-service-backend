@@ -1,7 +1,7 @@
 package be.kdg.ipj3.shared.infrastructure.rabbitmq.dto;
 
 import be.kdg.ipj3.lobbies.shared.Difficulty;
-import be.kdg.ipj3.sessions.shared.SessionResult;
+import be.kdg.ipj3.sessions.shared.SessionStatus;
 
 import java.time.Instant;
 import java.util.List;
@@ -12,7 +12,7 @@ public record GameResultMessageDto(
         List<UUID> players,
         UUID winnerId,
         Difficulty difficulty,
-        SessionResult sessionResult,
+        SessionStatus sessionStatus,
         Instant completedAt
 ) {
 }

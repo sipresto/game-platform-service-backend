@@ -30,7 +30,7 @@ class GameTests {
         assertEquals(name, game.getName());
         assertEquals(description, game.getDescription());
         assertEquals(price, game.getPrice());
-        assertEquals(serviceUrl, game.getServiceUrl());
+        assertEquals(serviceUrl, game.getFrontendUrl());
         assertEquals(categories, game.getCategories());
         assertTrue(game.getAchievements().isEmpty());
     }

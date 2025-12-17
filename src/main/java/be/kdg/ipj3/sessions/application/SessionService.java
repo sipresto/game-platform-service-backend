@@ -1,23 +1,38 @@
 package be.kdg.ipj3.sessions.application;
 
+import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.sessions.domain.Session;
 import be.kdg.ipj3.sessions.domain.SessionRepository;
+import be.kdg.ipj3.sessions.shared.SessionId;
+import be.kdg.ipj3.sessions.shared.SessionsApi;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
-public class SessionService {
+public class SessionService implements SessionsApi {
     private final SessionRepository sessionRepository;
     private final UsersApi usersApi;
 
     public SessionService(SessionRepository sessionRepository, UsersApi usersApi) {
         this.sessionRepository = sessionRepository;
         this.usersApi = usersApi;
+    }
+
+    @Override
+    public void createSession(UUID id, UUID gameId, List<UUID> players, Difficulty difficulty) {
+        List<UserId> playerIds = players.stream()
+                .map(UserId::new)
+                .toList();
+        Session session = new Session(new SessionId(id), new GameId(gameId), playerIds, difficulty);
+
+        sessionRepository.save(session);
     }
 
     @Transactional(readOnly = true)

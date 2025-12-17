@@ -2,7 +2,8 @@ package be.kdg.ipj3.sessions.domain;
 
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
-import be.kdg.ipj3.sessions.shared.SessionResult;
+import be.kdg.ipj3.sessions.shared.SessionId;
+import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.users.shared.UserId;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
@@ -17,23 +18,27 @@ public class Session {
     private final GameId game;
     private final List<UserId> players;
     private final Difficulty difficulty;
-    private final SessionResult result;
+    private final SessionStatus status;
     private final UserId winner;
     private final Instant completedAt;
 
-    public Session(SessionId id, GameId game, List<UserId> players, Difficulty difficulty,
-                   UserId winner, SessionResult result, Instant completedAt) {
+    public Session(SessionId id, GameId game, List<UserId> players, Difficulty difficulty, SessionStatus status,
+                   UserId winner, Instant completedAt) {
         this.id = id;
         this.game = game;
         this.players = List.copyOf(players);
         this.difficulty = difficulty;
-        this.result = result;
+        this.status = status;
         this.winner = winner;
         this.completedAt = completedAt;
     }
 
-    public Session(GameId game, List<UserId> players, Difficulty difficulty, UserId winner, SessionResult result) {
-        this(SessionId.create(), game, players, difficulty, winner, result, Instant.now());
+    public Session(GameId game, List<UserId> players, Difficulty difficulty, SessionStatus status, UserId winner) {
+        this(SessionId.create(), game, players, difficulty, status, winner, Instant.now());
+    }
+
+    public Session(SessionId id, GameId game, List<UserId> players, Difficulty difficulty) {
+        this(id, game, players, difficulty, SessionStatus.IN_PROGRESS, null, Instant.now());
     }
 
     public SessionId getId() {
@@ -56,8 +61,8 @@ public class Session {
         return winner;
     }
 
-    public SessionResult getResult() {
-        return result;
+    public SessionStatus getStatus() {
+        return status;
     }
 
     public Instant getCompletedAt() {

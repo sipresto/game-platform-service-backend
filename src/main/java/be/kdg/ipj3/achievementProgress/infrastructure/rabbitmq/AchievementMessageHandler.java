@@ -28,7 +28,7 @@ public class AchievementMessageHandler {
                     dto.winnerId() != null
                             ? dto.winnerId()
                             : null,
-                    dto.sessionResult(),
+                    dto.sessionStatus(),
                     dto.difficulty()
             ));
         }

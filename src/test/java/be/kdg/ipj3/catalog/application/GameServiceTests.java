@@ -65,31 +65,31 @@ class GameServiceTests {
     }
 
     @Test
-    void findServiceByGameId_shouldReturnUrl_whenGameExists() {
+    void findBackendUrlByGameId_shouldReturnUrl_whenGameExists() {
         // Arrange
         UUID gameId = UUID.randomUUID();
         String expectedUrl = "http://test.com/service";
 
-        given(gameRepository.findServiceUrlByGameId(new GameId(gameId))).willReturn(Optional.of(expectedUrl));
+        given(gameRepository.findBackendUrlByGameId(new GameId(gameId))).willReturn(Optional.of(expectedUrl));
 
         // Act
-        String serviceUrl = gameService.findServiceByGameId(gameId);
+        String serviceUrl = gameService.findBackendUrlByGameId(gameId);
 
         // Assert
         assertNotNull(serviceUrl);
         assertEquals(expectedUrl, serviceUrl);
-        then(gameRepository).should().findServiceUrlByGameId(new GameId(gameId));
+        then(gameRepository).should().findBackendUrlByGameId(new GameId(gameId));
     }
 
     @Test
-    void findServiceByGameId_shouldThrowNotFoundException_whenGameDoesNotExist() {
+    void findBackendUrlByGameId_shouldThrowNotFoundException_whenGameDoesNotExist() {
         // Arrange
         UUID gameId = UUID.randomUUID();
 
-        given(gameRepository.findServiceUrlByGameId(new GameId(gameId))).willReturn(Optional.empty());
+        given(gameRepository.findBackendUrlByGameId(new GameId(gameId))).willReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(NotFoundException.class, () -> gameService.findServiceByGameId(gameId));
-        then(gameRepository).should().findServiceUrlByGameId(new GameId(gameId));
+        assertThrows(NotFoundException.class, () -> gameService.findBackendUrlByGameId(gameId));
+        then(gameRepository).should().findBackendUrlByGameId(new GameId(gameId));
     }
 }

@@ -41,8 +41,13 @@ public class GameRepositoryImpl implements GameRepository {
     }
 
     @Override
-    public Optional<String> findServiceUrlByGameId(GameId id) {
-        return jpaGameRepository.findServiceUrlById(id.id());
+    public Optional<String> findBackendUrlByGameId(GameId id) {
+        return jpaGameRepository.findBackendUrlById(id.id());
+    }
+
+    @Override
+    public Optional<String> findFrontendUrlByGameId(GameId id) {
+        return jpaGameRepository.findFrontendUrlById(id.id());
     }
 
     @Override
