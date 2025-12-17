@@ -136,6 +136,10 @@ public class UploadProfileImageIntegrationTests {
 
         mockMvc.perform(multipart("/api/me/profile-image")
                         .file(imageFile)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        })
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isUnauthorized());
 

@@ -114,6 +114,10 @@ public class UserController {
             @AuthenticationPrincipal Jwt jwt,
             @RequestParam("image") MultipartFile file) throws IOException {
 
+        if (jwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         String keycloakId = jwt.getSubject();
         profileImageService.updateProfileImage(keycloakId, file);
 
