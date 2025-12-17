@@ -57,7 +57,7 @@ class SendFriendRequestIntegrationTests {
         // Arrange
         JpaUserEntity sender = createUser("kc-sender", "sender");
         JpaUserEntity receiver = createUser("kc-receiver", "receiver");
-        var dto = new SendFriendRequestDto(sender.getId(), receiver.getId());
+        var dto = new SendFriendRequestDto(receiver.getId(), sender.getId());
 
         // Act
         mockMvc.perform(post("/api/sendFriendRequest")
@@ -85,7 +85,7 @@ class SendFriendRequestIntegrationTests {
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isForbidden());
     }
 
     @Test
