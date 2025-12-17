@@ -44,12 +44,12 @@ VALUES ('937a2c83-aa8d-46c8-8bdb-6fdec5cf5cd6', 'Tic', 'TIC', 'Win your 1st game
        ('6e692b16-b6e9-4bce-a6ce-d6544f1ad87c', 'O-mazing', 'O_MAZING', 'Win one game as O',
         NULL, 10, NULL, NULL, 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc');
 
-INSERT INTO users(user_id, keycloak_id, username, display_name)
-VALUES ('cf0138b7-3272-4d1c-a34d-de88a47fe94c', 'c9d8cc34-6087-4a6f-a6c2-e208fbbc6ed2', 'xanderv', 'XanderV'),
-       ('d80e5017-3f16-4659-9c25-f206213c5221', '8c022ef4-e461-44ca-bd6b-5a76729f39c6', 'jurgenp', 'JurgenP'),
-       ('29b85f37-c8be-4323-bd88-77e359b0db30', '481aabea-5005-4dd4-8129-65421c7260f3', 'larsv', 'LarsV8'),
-       ('6d0cdf67-26c4-4354-a4df-9c4a7575dbb6', '05b10974-d0fe-4679-ac0f-1a9a0b3ce415', 'robbevm', 'Robbe123'),
-       ('04518661-62b1-47f4-933d-87c6f85ba5fb', '5041ef49-f46c-4083-993f-10780835bef8', 'johnny', 'JoTe');
+INSERT INTO users(points,user_id, keycloak_id, username, display_name)
+VALUES (0,'cf0138b7-3272-4d1c-a34d-de88a47fe94c', 'c9d8cc34-6087-4a6f-a6c2-e208fbbc6ed2', 'xanderv', 'XanderV'),
+       (0,'d80e5017-3f16-4659-9c25-f206213c5221', '8c022ef4-e461-44ca-bd6b-5a76729f39c6', 'jurgenp', 'JurgenP'),
+       (0,'29b85f37-c8be-4323-bd88-77e359b0db30', '481aabea-5005-4dd4-8129-65421c7260f3', 'larsv', 'LarsV8'),
+       (0,'6d0cdf67-26c4-4354-a4df-9c4a7575dbb6', '05b10974-d0fe-4679-ac0f-1a9a0b3ce415', 'robbevm', 'Robbe123'),
+       (0,'04518661-62b1-47f4-933d-87c6f85ba5fb', '5041ef49-f46c-4083-993f-10780835bef8', 'johnny', 'JoTe');
 
 INSERT INTO owned_games(user_id, game_id)
 VALUES ('cf0138b7-3272-4d1c-a34d-de88a47fe94c', 'c3c1d2b0-82fa-43a7-b326-0eb96136ecbc'),
