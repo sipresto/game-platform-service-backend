@@ -78,7 +78,7 @@ public class GetNotificationPreferencesTests {
                 .andExpect(jsonPath("$.FRIEND_REQUEST.EMAIL").value(true))
                 .andExpect(jsonPath("$.ACHIEVEMENT.IN_APP").value(true))
                 .andExpect(jsonPath("$.ACHIEVEMENT.EMAIL").value(true))
-                .andExpect(jsonPath("$.YOUR_TURN.IN_APP").value(false))
+                .andExpect(jsonPath("$.YOUR_TURN.IN_APP").value(true))
                 .andExpect(jsonPath("$.YOUR_TURN.EMAIL").value(false));
     }
 }
