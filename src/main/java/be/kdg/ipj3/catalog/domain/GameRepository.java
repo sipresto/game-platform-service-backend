@@ -29,7 +29,7 @@ public interface GameRepository {
 
     List<Achievement> findAchievementsByGameId(GameId id);
 
-    Optional<Achievement> findAchievementByCode(String code);
+    Optional<Achievement> findAchievementByGameIdAndCode(GameId gameId, String code);
 
     Optional<Game> findByIdWithAchievements(GameId id);
 }

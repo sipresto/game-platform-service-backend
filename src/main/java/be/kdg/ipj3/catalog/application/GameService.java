@@ -96,8 +96,8 @@ public class GameService implements GamesApi {
     }
 
     @Transactional(readOnly = true)
-    public Optional<AchievementDto> findAchievementDtoByCode(String code) {
-        return gameRepository.findAchievementByCode(code)
+    public Optional<AchievementDto> findAchievementDtoByGameIdAndCode(GameId gameId, String code) {
+        return gameRepository.findAchievementByGameIdAndCode(gameId, code)
                 .map(AchievementDto::fromDomain);
     }
 

@@ -5,12 +5,14 @@ import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.sessions.domain.Session;
 import be.kdg.ipj3.sessions.domain.SessionRepository;
 import be.kdg.ipj3.sessions.shared.SessionId;
+import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.sessions.shared.SessionsApi;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,7 +44,22 @@ public class SessionService implements SessionsApi {
         return sessionRepository.findSessionsByUserId(userId);
     }
 
-    public void save(Session session) {
+    @Transactional(readOnly = true)
+    public GameId findGameIdBySessionId(UUID id) {
+        SessionId sessionId = new SessionId(id);
+
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(sessionId::notFound);
+
+        return session.getGame();
+    }
+
+    public void endSession(SessionId id, SessionStatus status, UserId winnerId, Instant completedAt) {
+        Session session = sessionRepository.findById(id)
+                .orElseThrow(id::notFound);
+
+        session.end(status, winnerId, completedAt);
+
         sessionRepository.save(session);
     }
 }

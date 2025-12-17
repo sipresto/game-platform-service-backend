@@ -4,10 +4,12 @@ import be.kdg.ipj3.sessions.domain.Session;
 import be.kdg.ipj3.sessions.domain.SessionRepository;
 import be.kdg.ipj3.sessions.infrastructure.jpa.JpaSessionEntity;
 import be.kdg.ipj3.sessions.infrastructure.jpa.JpaSessionRepository;
+import be.kdg.ipj3.sessions.shared.SessionId;
 import be.kdg.ipj3.users.shared.UserId;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class SessionRepositoryImpl implements SessionRepository {
@@ -32,5 +34,10 @@ public class SessionRepositoryImpl implements SessionRepository {
     @Override
     public void deleteAll() {
         jpaSessionRepository.deleteAll();
+    }
+
+    @Override
+    public Optional<Session> findById(SessionId id) {
+        return jpaSessionRepository.findById(id.id()).map(JpaSessionEntity::toDomain);
     }
 }

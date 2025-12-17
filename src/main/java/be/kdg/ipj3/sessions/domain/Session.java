@@ -18,9 +18,9 @@ public class Session {
     private final GameId game;
     private final List<UserId> players;
     private final Difficulty difficulty;
-    private final SessionStatus status;
-    private final UserId winner;
-    private final Instant completedAt;
+    private SessionStatus status;
+    private UserId winner;
+    private Instant completedAt;
 
     public Session(SessionId id, GameId game, List<UserId> players, Difficulty difficulty, SessionStatus status,
                    UserId winner, Instant completedAt) {
@@ -67,5 +67,11 @@ public class Session {
 
     public Instant getCompletedAt() {
         return completedAt;
+    }
+
+    public void end(SessionStatus status, UserId winnerId, Instant completedAt) {
+        this.status = status;
+        this.winner = winnerId;
+        this.completedAt = completedAt;
     }
 }

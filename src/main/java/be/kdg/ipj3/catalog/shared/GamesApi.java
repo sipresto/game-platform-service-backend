@@ -19,7 +19,7 @@ public interface GamesApi {
 
     List<GameAchievementDto> findGameAchievementDtosByIdWithAchievements(UUID id);
 
-    Optional<AchievementDto> findAchievementDtoByCode(String code);
+    Optional<AchievementDto> findAchievementDtoByGameIdAndCode(GameId gameId, String code);
 
     String findBackendUrlByGameId(UUID id);
 

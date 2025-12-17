@@ -17,11 +17,10 @@ public record GameStartRequestDto(
 ) {
     public record PlatformPlayerDto(
             @NotBlank String keycloakId,
-            @NotNull String username,
             @NotNull String displayName
     ) {
         public static PlatformPlayerDto fromDto(SmallUserDto smallUserDto) {
-            return new PlatformPlayerDto(smallUserDto.keycloakId(), smallUserDto.username(), smallUserDto.displayName());
+            return new PlatformPlayerDto(smallUserDto.keycloakId(), smallUserDto.displayName());
         }
     }
 }
