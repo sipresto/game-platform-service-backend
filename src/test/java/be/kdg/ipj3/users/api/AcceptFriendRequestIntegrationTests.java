@@ -44,8 +44,8 @@ class AcceptFriendRequestIntegrationTests {
         ));
     }
 
-    private JwtRequestPostProcessor validJwt(String subject) {
-        return jwt().jwt(b -> b.subject(subject).claim("preferred_username", "user"))
+    private JwtRequestPostProcessor validJwt() {
+        return jwt().jwt(b -> b.subject("kc-receiver").claim("preferred_username", "user"))
                 .authorities(new SimpleGrantedAuthority("ROLE_PLAYER"));
     }
 
@@ -64,7 +64,7 @@ class AcceptFriendRequestIntegrationTests {
 
         // Act
         mockMvc.perform(put("/api/acceptFriendRequest/{userId}", senderEntity.getId())
-                        .with(validJwt("kc-receiver")))
+                        .with(validJwt()))
                 .andExpect(status().isNoContent());
 
         // Assert
@@ -85,7 +85,7 @@ class AcceptFriendRequestIntegrationTests {
 
         // Act & Assert
         mockMvc.perform(put("/api/acceptFriendRequest/{userId}", sender.getId())
-                        .with(validJwt("kc-receiver")))
+                        .with(validJwt()))
                 .andExpect(status().isBadRequest());
     }
 
@@ -96,7 +96,7 @@ class AcceptFriendRequestIntegrationTests {
 
         // Act
         mockMvc.perform(put("/api/acceptFriendRequest/{userId}", UUID.randomUUID())
-                        .with(validJwt("kc-receiver")))
+                        .with(validJwt()))
                 .andExpect(status().isNotFound());
     }
 
