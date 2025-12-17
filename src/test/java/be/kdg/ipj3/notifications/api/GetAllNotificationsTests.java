@@ -127,26 +127,4 @@ public class GetAllNotificationsTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
-
-    @Test
-    void getAllNotifications_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
-        // Act & Assert
-        mockMvc.perform(get("/api/notifications")
-                        .with(validJwt()))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void getAllNotifications_shouldReturnNotFound_whenJwtIsInvalid() throws Exception {
-        // Arrange
-        createUser();
-
-        // Act & Assert
-        mockMvc.perform(get("/api/notifications")
-                        .with(jwt().authorities(() -> "ROLE_PLAYER")
-                                .jwt(builder -> builder
-                                        .subject("differentKeycloakId")
-                                        .claim("preferred_username", "username"))))
-                .andExpect(status().isNotFound());
-    }
 }

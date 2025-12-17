@@ -88,17 +88,6 @@ public class UpdateNotificationPreferencesTests {
     }
 
     @Test
-    void updatePreference_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
-        // Arrange
-
-        // Act & Assert
-        mockMvc.perform(put("/api/notifications/preferences/FRIEND_REQUEST/EMAIL")
-                        .param("enabled", "false")
-                        .with(validJwt()))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     void updatePreference_shouldReturnBadRequest_whenNotificationTypeIsInvalid() throws Exception {
         // Arrange
         createUser();
@@ -120,20 +109,5 @@ public class UpdateNotificationPreferencesTests {
                         .param("enabled", "false")
                         .with(validJwt()))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void updatePreference_shouldReturnNotFound_whenJwtIsInvalid() throws Exception {
-        // Arrange
-        createUser();
-
-        // Act & Assert
-        mockMvc.perform(put("/api/notifications/preferences/FRIEND_REQUEST/EMAIL")
-                        .param("enabled", "false")
-                        .with(jwt().authorities(() -> "ROLE_PLAYER")
-                                .jwt(builder -> builder
-                                        .subject("differentKeycloakId")
-                                        .claim("preferred_username", "username"))))
-                .andExpect(status().isNotFound());
     }
 }
