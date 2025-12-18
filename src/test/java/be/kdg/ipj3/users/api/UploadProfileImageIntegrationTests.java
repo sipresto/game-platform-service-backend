@@ -16,9 +16,13 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.Optional;
 import java.util.UUID;
 
+import static javax.imageio.ImageIO.write;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -81,14 +85,14 @@ public class UploadProfileImageIntegrationTests {
     }
 
     private byte[] createSimplePngImage() throws Exception {
-        java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(100, 100, java.awt.image.BufferedImage.TYPE_INT_ARGB);
-        java.awt.Graphics2D g2d = image.createGraphics();
+        BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
         g2d.setColor(java.awt.Color.RED);
         g2d.fillRect(0, 0, 100, 100);
         g2d.dispose();
 
-        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-        javax.imageio.ImageIO.write(image, "png", baos);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        write(image, "png", baos);
         return baos.toByteArray();
     }
 
