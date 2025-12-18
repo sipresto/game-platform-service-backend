@@ -78,7 +78,7 @@ public class User {
                 ? profile.bio()
                 : newProfile.bio();
 
-        this.profile = new Profile(displayName, bio);
+        this.profile = new Profile(displayName, bio, profile.profileImage(), profile.imageMimeType());
         this.username = displayName;
     }
 
@@ -120,5 +120,23 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public void updateProfileImage(byte[] image, String mimeType) {
+        this.profile = new Profile(
+                profile.displayName(),
+                profile.bio(),
+                image,
+                mimeType
+        );
+    }
+
+    public void removeProfileImage() {
+        this.profile = new Profile(
+                profile.displayName(),
+                profile.bio(),
+                null,
+                null
+        );
     }
 }
