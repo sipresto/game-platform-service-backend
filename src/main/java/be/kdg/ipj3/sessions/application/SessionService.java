@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -38,10 +39,10 @@ public class SessionService implements SessionsApi {
     }
 
     @Transactional(readOnly = true)
-    public List<Session> findSessionsByUserId(String keycloakId) {
+    public List<Session> findFinishedSessionsByUserId(String keycloakId) {
         UserId userId = usersApi.findIdByKeycloakId(keycloakId);
 
-        return sessionRepository.findSessionsByUserId(userId);
+        return sessionRepository.findFinishedSessionsByUserId(userId);
     }
 
     @Transactional(readOnly = true)
@@ -55,11 +56,20 @@ public class SessionService implements SessionsApi {
     }
 
     public void endSession(SessionId id, SessionStatus status, UserId winnerId, Instant completedAt) {
-        Session session = sessionRepository.findById(id)
-                .orElseThrow(id::notFound);
+        Optional<Session> optionalSession = sessionRepository.findById(id);
+        if (optionalSession.isEmpty()) {
+            return;
+        }
+
+        Session session = optionalSession.get();
 
         session.end(status, winnerId, completedAt);
 
         sessionRepository.save(session);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Session> findById(SessionId id) {
+        return sessionRepository.findById(id);
     }
 }

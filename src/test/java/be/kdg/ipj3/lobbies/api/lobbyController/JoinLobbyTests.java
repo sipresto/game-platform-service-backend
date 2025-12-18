@@ -1,13 +1,13 @@
 package be.kdg.ipj3.lobbies.api.lobbyController;
 
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.api.dto.JoinLobbyDto;
-import be.kdg.ipj3.lobbies.domain.LobbyRepository;
 import be.kdg.ipj3.lobbies.domain.Lobby;
 import be.kdg.ipj3.lobbies.domain.LobbyId;
-import be.kdg.ipj3.catalog.shared.GameId;
-import be.kdg.ipj3.users.shared.UserId;
-import be.kdg.ipj3.users.domain.UserRepository;
+import be.kdg.ipj3.lobbies.domain.LobbyRepository;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.UserRepository;
+import be.kdg.ipj3.users.shared.UserId;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,7 +67,7 @@ public class JoinLobbyTests {
                 "password",
                 maxPlayers,
                 GameId.create(),
-                UserId.create()     // host
+                UserId.create()
         );
 
         if (!markOpen) {

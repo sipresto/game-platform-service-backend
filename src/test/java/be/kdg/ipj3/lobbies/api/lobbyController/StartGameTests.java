@@ -3,17 +3,19 @@ package be.kdg.ipj3.lobbies.api.lobbyController;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.GameRepository;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.api.dto.GameStartDto;
-import be.kdg.ipj3.lobbies.shared.Difficulty;
-import be.kdg.ipj3.lobbies.domain.LobbyRepository;
 import be.kdg.ipj3.lobbies.domain.Lobby;
 import be.kdg.ipj3.lobbies.domain.LobbyId;
+import be.kdg.ipj3.lobbies.domain.LobbyRepository;
 import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
-import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.lobbies.shared.Difficulty;
+import be.kdg.ipj3.sessions.domain.Session;
+import be.kdg.ipj3.sessions.domain.SessionRepository;
 import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.users.shared.UserId;
-import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.UserRepository;
+import be.kdg.ipj3.users.shared.UserId;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,10 +33,14 @@ import org.testcontainers.utility.TestcontainersConfiguration;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -61,6 +67,9 @@ public class StartGameTests {
     @Autowired
     private GameRepository gameRepository;
 
+    @Autowired
+    private SessionRepository sessionRepository;
+
     @MockitoBean
     private GameClient gameClient;
 
@@ -69,6 +78,7 @@ public class StartGameTests {
         lobbyRepository.deleteAll();
         userRepository.deleteAll();
         gameRepository.deleteAll();
+        sessionRepository.deleteAll();
     }
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor validJwt() {
@@ -90,7 +100,8 @@ public class StartGameTests {
                 "Game",
                 "Description",
                 Money.of(BigDecimal.valueOf(19.99)),
-                "http://test.com/service",
+                "/api/game",
+                "/game",
                 "A rule",
                 List.of(),
                 List.of(Category.NATIVE),
@@ -128,10 +139,9 @@ public class StartGameTests {
 
         LobbyId lobbyId = createTestLobby(gameId, userId);
 
-        GameCreatedResponseDto response = new GameCreatedResponseDto("http://test.com/game");
-        given(gameClient.startGame(any(), any())).willReturn(response);
+        doNothing().when(gameClient).startGame(any(), any());
 
-        GameStartDto dto = new GameStartDto(gameId.id(), Difficulty.EASY);
+        GameStartDto dto = new GameStartDto(Difficulty.EASY);
 
         // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/start", lobbyId.id())
@@ -140,7 +150,18 @@ public class StartGameTests {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.url").value("http://test.com/game"));
+                .andExpect(jsonPath("$.url", startsWith("/game/")));
+
+        Optional<Lobby> lobby = lobbyRepository.findById(lobbyId);
+        @SuppressWarnings("OptionalGetWithoutIsPresent")
+        Lobby actualLobby = lobby.get();
+
+        Optional<Session> session = sessionRepository.findAllSessions().stream().findFirst();
+        @SuppressWarnings("OptionalGetWithoutIsPresent")
+        Session actualSession = session.get();
+
+        assertThat(actualSession.getGame()).isEqualTo(actualLobby.getGame());
+        assertThat(actualSession.getDifficulty()).isEqualTo(Difficulty.EASY);
     }
 
     @Test
@@ -152,9 +173,9 @@ public class StartGameTests {
 
         LobbyId lobbyId = createTestLobby(gameId, userId);
 
-        given(gameClient.startGame(any(), any())).willThrow(new RestClientException("Service unavailable"));
+        doThrow(new RestClientException("Service unavailable")).when(gameClient).startGame(any(), any());
 
-        GameStartDto dto = new GameStartDto(gameId.id(), Difficulty.EASY);
+        GameStartDto dto = new GameStartDto(Difficulty.EASY);
 
         // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/start", lobbyId.id())
@@ -167,11 +188,13 @@ public class StartGameTests {
     @Test
     void startGame_shouldReturnNotFound_whenLobbyDoesNotExist() throws Exception {
         // Arrange
-        UserId userId = createTestUser();
+        createTestUser();
 
-        GameId gameId = createTestGame();
+        createTestGame();
 
-        GameStartDto dto = new GameStartDto(gameId.id(), Difficulty.EASY);
+        doNothing().when(gameClient).startGame(any(), any());
+
+        GameStartDto dto = new GameStartDto(Difficulty.EASY);
 
         // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/start", UUID.randomUUID())
@@ -190,7 +213,9 @@ public class StartGameTests {
 
         LobbyId lobbyId = createTestLobby(gameId, userId, UserId.create());
 
-        GameStartDto dto = new GameStartDto(gameId.id(), Difficulty.EASY);
+        doNothing().when(gameClient).startGame(any(), any());
+
+        GameStartDto dto = new GameStartDto(Difficulty.EASY);
 
         // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/start", lobbyId.id())
@@ -225,7 +250,7 @@ public class StartGameTests {
 
         LobbyId lobbyId = createTestLobby(gameId, UserId.create());
 
-        GameStartDto dto = new GameStartDto(gameId.id(), Difficulty.EASY);
+        GameStartDto dto = new GameStartDto(Difficulty.EASY);
 
         // Act & Assert
         mockMvc.perform(post("/api/lobbies/{id}/start", lobbyId.id())

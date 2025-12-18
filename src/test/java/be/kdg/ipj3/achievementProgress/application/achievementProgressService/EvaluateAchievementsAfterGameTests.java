@@ -2,8 +2,8 @@ package be.kdg.ipj3.achievementProgress.application.achievementProgressService;
 
 import be.kdg.ipj3.achievementProgress.application.AchievementProgressService;
 import be.kdg.ipj3.achievementProgress.domain.AchievementProgress;
-import be.kdg.ipj3.achievementProgress.domain.GameContext;
 import be.kdg.ipj3.achievementProgress.domain.AchievementProgressRepository;
+import be.kdg.ipj3.achievementProgress.domain.GameContext;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.GameRepository;
@@ -13,7 +13,7 @@ import be.kdg.ipj3.catalog.shared.CountingStrategy;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.sessions.shared.SessionStatus;
-import be.kdg.ipj3.shared.domain.*;
+import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.shared.UserId;
@@ -29,7 +29,6 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -63,7 +62,8 @@ public class EvaluateAchievementsAfterGameTests {
                 "Test Game",
                 "Test Description",
                 Money.of(BigDecimal.valueOf(49.99)),
-                "http://test.com/service",
+                "/api/game",
+                "/game",
                 "rules",
                 List.of(),
                 List.of(Category.NATIVE),
@@ -89,7 +89,7 @@ public class EvaluateAchievementsAfterGameTests {
         gameRepository.save(game);
     }
 
-    private GameContext createTestGameContext(UUID gameId, UUID userId, UUID winnerId,
+    private GameContext createTestGameContext(GameId gameId, UserId userId, UserId winnerId,
                                               SessionStatus sessionStatus, Difficulty difficulty) {
         return new GameContext(
                 gameId,
@@ -107,6 +107,7 @@ public class EvaluateAchievementsAfterGameTests {
         return user.getId();
     }
 
+    //TODO: Check if points were added to user
     @Test
     void evaluateAchievementsAfterGame_shouldCreateProgressAndMarkAsCompleted_whenAchievementTriggered() {
         // Arrange
@@ -114,7 +115,7 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_ANY);
 
         UserId userId = createTestUser();
-        GameContext context = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionStatus.PLAYER_WIN, null);
+        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -140,7 +141,7 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_PLAYER);
 
         UserId userId = createTestUser();
-        GameContext context = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionStatus.PLAYER_WIN, null);
+        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -164,7 +165,7 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_AI);
 
         UserId userId = createTestUser();
-        GameContext context = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionStatus.PLAYER_WIN, null);
+        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -185,7 +186,7 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 3, CountingStrategy.STREAK, CountTrigger.WIN_OR_DRAW_ANY);
 
         UserId userId = createTestUser();
-        GameContext winContext = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionStatus.PLAYER_WIN, null);
+        GameContext winContext = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -210,8 +211,8 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 3, CountingStrategy.STREAK, CountTrigger.WIN_OR_DRAW_ANY);
 
         UserId userId = createTestUser();
-        GameContext winContext = createTestGameContext(game.getId().id(), userId.id(), userId.id(), SessionStatus.PLAYER_WIN, null);
-        GameContext loseContext = createTestGameContext(game.getId().id(), userId.id(), UUID.randomUUID(), SessionStatus.PLAYER_WIN, null);
+        GameContext winContext = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN, null);
+        GameContext loseContext = createTestGameContext(game.getId(), userId, UserId.create(), SessionStatus.PLAYER_WIN, null);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -230,5 +231,16 @@ public class EvaluateAchievementsAfterGameTests {
         assertThat(progress.isCompleted()).isFalse();
     }
 
-    // TODO: add test for non existing user
+    @Test
+    void evaluateAchievementsAfterGame_shouldNotCrash_whenUserDoesNotExist() {
+        // Arrange
+        Game game = createTestGame();
+        createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_ANY);
+
+        UserId userId = UserId.create();
+        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN, null);
+
+        // Act
+        achievementProgressService.evaluateAchievementsAfterGame(context);
+    }
 }

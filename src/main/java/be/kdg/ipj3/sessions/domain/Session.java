@@ -70,8 +70,18 @@ public class Session {
     }
 
     public void end(SessionStatus status, UserId winnerId, Instant completedAt) {
+        if (this.status != SessionStatus.IN_PROGRESS) {
+            return;
+        }
+
+        if (!players.contains(winnerId)) {
+            this.winner = null;
+        }
+        else {
+            this.winner = winnerId;
+        }
+
         this.status = status;
-        this.winner = winnerId;
         this.completedAt = completedAt;
     }
 }

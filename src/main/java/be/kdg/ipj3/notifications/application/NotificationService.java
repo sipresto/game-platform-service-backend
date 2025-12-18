@@ -29,10 +29,10 @@ public class NotificationService implements NotificationsApi {
     }
 
     @Override
-    public void addNotification(String description, NotificationType type, UUID id) {
+    public void addNotification(String description, NotificationType type, UUID userId) {
         Notification notification = null;
         if (type == NotificationType.YOUR_TURN) {
-            List<Notification> notifications = notificationRepository.findByUserIdAndType(id, type);
+            List<Notification> notifications = notificationRepository.findByUserIdAndType(userId, type);
             if (!notifications.isEmpty()) {
                 for (Notification notif : notifications) {
                     if (notif.getDescription().equals(description)) {
@@ -44,7 +44,7 @@ public class NotificationService implements NotificationsApi {
                 }
             }
         }
-        notification = new Notification(description, type, new UserId(id));
+        notification = new Notification(description, type, new UserId(userId));
         notificationRepository.save(notification);
     }
 

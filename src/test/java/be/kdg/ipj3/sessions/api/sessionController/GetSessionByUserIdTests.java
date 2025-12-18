@@ -60,16 +60,16 @@ public class GetSessionByUserIdTests {
                 GameId.create(),
                 List.of(userId),
                 Difficulty.EASY,
-                userId,
-                SessionStatus.PLAYER_WIN
+                SessionStatus.PLAYER_WIN,
+                userId
         );
 
         Session session2 = new Session(
                 GameId.create(),
                 List.of(userId),
                 Difficulty.HARD,
-                null,
-                SessionStatus.AI_WIN
+                SessionStatus.AI_WIN,
+                null
         );
 
         sessionRepository.save(session1);

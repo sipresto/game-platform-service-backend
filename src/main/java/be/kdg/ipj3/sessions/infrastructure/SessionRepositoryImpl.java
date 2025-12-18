@@ -25,8 +25,8 @@ public class SessionRepositoryImpl implements SessionRepository {
     }
 
     @Override
-    public List<Session> findSessionsByUserId(UserId userId) {
-        return jpaSessionRepository.findSessionsByUserId(userId.id()).stream()
+    public List<Session> findFinishedSessionsByUserId(UserId userId) {
+        return jpaSessionRepository.findFinishedSessionsByUserId(userId.id()).stream()
                 .map(JpaSessionEntity::toDomain)
                 .toList();
     }
@@ -39,5 +39,12 @@ public class SessionRepositoryImpl implements SessionRepository {
     @Override
     public Optional<Session> findById(SessionId id) {
         return jpaSessionRepository.findById(id.id()).map(JpaSessionEntity::toDomain);
+    }
+
+    @Override
+    public List<Session> findAllSessions() {
+        return jpaSessionRepository.findAll().stream()
+                .map(JpaSessionEntity::toDomain)
+                .toList();
     }
 }

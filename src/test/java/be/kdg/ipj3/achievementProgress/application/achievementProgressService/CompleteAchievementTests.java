@@ -9,9 +9,9 @@ import be.kdg.ipj3.catalog.domain.GameRepository;
 import be.kdg.ipj3.catalog.shared.AchievementId;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.users.shared.UserId;
-import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.UserRepository;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.BDDAssertions.within;
@@ -60,7 +59,8 @@ public class CompleteAchievementTests {
                 "Test Game",
                 "Test Description",
                 Money.of(BigDecimal.valueOf(49.99)),
-                "http://test.com/service",
+                "/api/game",
+                "/game",
                 "Rules",
                 List.of(),
                 List.of(Category.NATIVE),
@@ -92,6 +92,7 @@ public class CompleteAchievementTests {
         return user.getId();
     }
 
+    //TODO: Check if points were added to user
     @Test
     void completeAchievement_shouldMarkProgressAsCompleted_whenAchievementExists() {
         // Arrange
@@ -103,7 +104,7 @@ public class CompleteAchievementTests {
         Instant timestamp = Instant.now();
 
         // Act
-        achievementProgressService.completeAchievement(userId.id(), UUID.randomUUID(), "TEST", timestamp);
+        achievementProgressService.completeAchievement(userId, game.getId(), "TEST", timestamp);
 
         // Assert
         Optional<AchievementProgress> progress = progressRepository
@@ -127,10 +128,10 @@ public class CompleteAchievementTests {
         Instant timestamp = Instant.now();
         Instant timestamp2 = Instant.now().plusSeconds(10);
 
-        achievementProgressService.completeAchievement(userId.id(), UUID.randomUUID(), "TEST", timestamp);
+        achievementProgressService.completeAchievement(userId, game.getId(), "TEST", timestamp);
 
         // Act
-        achievementProgressService.completeAchievement(userId.id(), UUID.randomUUID(), "TEST", timestamp2);
+        achievementProgressService.completeAchievement(userId, game.getId(), "TEST", timestamp2);
 
         // Assert
         Optional<AchievementProgress> progress = progressRepository
@@ -147,13 +148,13 @@ public class CompleteAchievementTests {
     @Test
     void completeAchievement_shouldNotCrash_whenAchievementDoesNotExist() {
         // Arrange
-        createTestGame();
+        Game game = createTestGame();
 
         UserId userId = createTestUser();
         Instant timestamp = Instant.now();
 
         // Act & Assert
-        achievementProgressService.completeAchievement(userId.id(), UUID.randomUUID(), "FAKE_TEST", timestamp);
+        achievementProgressService.completeAchievement(userId, game.getId(), "FAKE_TEST", timestamp);
     }
 
     @Test
@@ -166,6 +167,6 @@ public class CompleteAchievementTests {
         Instant timestamp = Instant.now();
 
         // Act & Assert
-        achievementProgressService.completeAchievement(userId.id(), UUID.randomUUID(), "TEST", timestamp);
+        achievementProgressService.completeAchievement(userId, game.getId(), "TEST", timestamp);
     }
 }

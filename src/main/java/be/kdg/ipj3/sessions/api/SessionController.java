@@ -25,7 +25,7 @@ public class SessionController {
     public ResponseEntity<List<SessionDto>> getSessionsByUserId(
             @PathVariable String userId
     ) {
-        List<SessionDto> dtos = sessionService.findSessionsByUserId(userId).stream()
+        List<SessionDto> dtos = sessionService.findFinishedSessionsByUserId(userId).stream()
                 .map(SessionDto::fromDomain)
                 .toList();
 

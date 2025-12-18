@@ -9,9 +9,11 @@ import java.util.Optional;
 public interface SessionRepository {
     void save(Session session);
 
-    List<Session> findSessionsByUserId(UserId userId);
+    List<Session> findFinishedSessionsByUserId(UserId userId);
 
     void deleteAll();
 
     Optional<Session> findById(SessionId sessionId);
+
+    List<Session> findAllSessions();
 }
