@@ -1,42 +1,37 @@
 package be.kdg.ipj3.sessions.infrastructure.rabbitmq;
 
-import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.sessions.application.SessionService;
-import be.kdg.ipj3.sessions.domain.Session;
 import be.kdg.ipj3.sessions.infrastructure.rabbitmq.config.RabbitMQTopologySessions;
+import be.kdg.ipj3.sessions.shared.SessionId;
+import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.shared.infrastructure.rabbitmq.dto.GameResultMessageDto;
 import be.kdg.ipj3.users.shared.UserId;
+import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Component
 public class SessionMessageHandler {
 
     private final SessionService sessionService;
+    private final UsersApi usersApi;
 
-    public SessionMessageHandler(SessionService sessionService) {
+    public SessionMessageHandler(SessionService sessionService, UsersApi usersApi) {
         this.sessionService = sessionService;
+        this.usersApi = usersApi;
     }
 
     @RabbitListener(queues = RabbitMQTopologySessions.SESSION_GAME_RESULTS_QUEUE)
     void onGameResultMessageReceived(GameResultMessageDto dto) {
-        List<UserId> players = new ArrayList<>();
-        for (UUID player : dto.players()) {
-            players.add(new UserId(player));
-        }
+        UserId winnerId = dto.winnerId() != null
+                ? usersApi.findIdByKeycloakId(dto.winnerId())
+                : null;
 
-        Session session = new Session(
-                new GameId(dto.gameId()),
-                players,
-                dto.difficulty(),
-                dto.winnerId() != null ? new UserId(dto.winnerId()) : null,
-                dto.sessionResult()
+        sessionService.endSession(
+                new SessionId(dto.gameId()),
+                SessionStatus.fromStringOrNull(dto.status()),
+                winnerId,
+                dto.completedAt()
         );
-
-        sessionService.save(session);
     }
 }

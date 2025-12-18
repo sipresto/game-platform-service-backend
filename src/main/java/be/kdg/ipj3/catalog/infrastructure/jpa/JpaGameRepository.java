@@ -24,14 +24,17 @@ public interface JpaGameRepository extends JpaRepository<JpaGameEntity, UUID> {
     @Query("SELECT g FROM JpaGameEntity g WHERE g.id IN :ids")
     List<JpaGameEntity> findAllByIds(List<UUID> ids);
 
-    @Query("SELECT g.serviceUrl FROM JpaGameEntity g WHERE g.id = :id")
-    Optional<String> findServiceUrlById(UUID id);
+    @Query("SELECT g.backendUrl FROM JpaGameEntity g WHERE g.id = :id")
+    Optional<String> findBackendUrlById(UUID id);
+
+    @Query("SELECT g.frontendUrl FROM JpaGameEntity g WHERE g.id = :id")
+    Optional<String> findFrontendUrlById(UUID id);
 
     @Query("SELECT a FROM JpaAchievementEntity a WHERE a.game.id = :id")
     List<JpaAchievementEntity> findAchievementsByGameId(UUID id);
 
-    @Query("SELECT a FROM JpaAchievementEntity a WHERE a.code = :code")
-    Optional<JpaAchievementEntity> findAchievementByCode(String code);
+    @Query("SELECT a FROM JpaAchievementEntity a WHERE a.game.id = :gameId AND a.code = :code")
+    Optional<JpaAchievementEntity> findAchievementByGameIdAndCode(UUID gameId, String code);
 
     @Query("""
                 SELECT g
