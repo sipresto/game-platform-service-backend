@@ -1,5 +1,6 @@
 package be.kdg.ipj3.users.api;
 
+import be.kdg.ipj3.catalog.api.dto.GameDto;
 import be.kdg.ipj3.users.api.dto.UserDto;
 import be.kdg.ipj3.users.application.ProfileImageService;
 import be.kdg.ipj3.users.application.UserService;
@@ -32,6 +33,25 @@ public class UserController {
         this.profileImageService = profileImageService;
     }
 
+    @PutMapping("/library/favorite/{gameId}")
+    public ResponseEntity<Void> toggleFavoriteGame(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID gameId
+    ) {
+        String keycloakId = jwt.getSubject();
+
+        userService.favoriteGame(keycloakId, gameId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/library/favorites") //TODO reworke die handel
+    public ResponseEntity<List<GameDto>> findFavoriteGames(@AuthenticationPrincipal Jwt jwt) {
+        String keycloakId = jwt.getSubject();
+
+        List<GameDto> favorites
+        return ResponseEntity.ok(favorites);
+    }
     /**
      * Get current user's profile
      * Automatically registers user on first login

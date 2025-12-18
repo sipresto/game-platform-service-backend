@@ -55,6 +55,7 @@ class CreateLobbyTests {
                 keycloakId,
                 "someUsername",
                 List.of(),
+                List.of(),
                 0,
                 null,
                 "Test@gmail.com"

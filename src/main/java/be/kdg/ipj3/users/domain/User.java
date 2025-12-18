@@ -15,17 +15,19 @@ public class User {
     private final String keycloakId;
     private String username;
     private final List<GameId> ownedGames;
+    private final List<GameId> favoriteGames;
     private int points;
     private Profile profile;
     private Visibility visibility;
     private final List<UserId> friends;
     private final String email;
 
-    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, int points, Profile profile, String email) {
+    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, List<GameId> favoriteGames, int points, Profile profile, String email) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
         this.ownedGames = ownedGames;
+        this.favoriteGames = favoriteGames;
         this.points = points;
         this.profile = profile;
         this.email = email;
@@ -39,6 +41,7 @@ public class User {
         this.username = username;
         this.email = email;
         this.ownedGames = new ArrayList<>();
+        this.favoriteGames = new ArrayList<>();
         this.points = points;
         this.profile = profile;
         this.visibility = Visibility.PUBLIC;
@@ -46,7 +49,7 @@ public class User {
     }
 
     public static User createFromKeycloak(String keycloakId, String keycloakUsername, String email) {
-        return new User(UserId.create(), keycloakId, keycloakUsername, List.of(), 0, new Profile(keycloakUsername, ""), email);
+        return new User(UserId.create(), keycloakId, keycloakUsername, List.of(), List.of(),0, new Profile(keycloakUsername, ""), email);
     }
 
     public UserId getId() {
@@ -91,6 +94,13 @@ public class User {
             ownedGames.add(gameId);
         } else {
             throw new IllegalArgumentException("Game already owned by this user");
+        }
+    }
+    public void addOrRemoveFavorite(GameId gameId){
+        if (!favoriteGames.contains(gameId)){
+            favoriteGames.add(gameId);
+        } else {
+            favoriteGames.remove(gameId);
         }
     }
 
