@@ -78,7 +78,7 @@ public class AchievementProgressService {
         }
     }
 
-    public void completeAchievement(UUID userId, UUID gameSesssionId, String code, Instant timestamp) {
+    public void completeAchievement(UUID userId, UUID gameSessionId, String code, Instant timestamp) {
         // TODO: haal gameId uit lobby via gameSessionId -> zoek met die gameId en code de achievementId
         AchievementDto achievement = gamesApi.findAchievementDtoByCode(code).orElse(null);
         if (achievement == null || !usersApi.existsById(userId)) {

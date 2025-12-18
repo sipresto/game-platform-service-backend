@@ -29,9 +29,9 @@ class GetFriendsOfUserTests {
     @Test
     void shouldReturnUserPlusFriends_whenFriendsExist() {
         // Arrange
-        User mainUser = new User(new UserId(UUID.randomUUID()), "kc-main", "main", new Profile("Main", "Bio"), 0);
-        User friend1 = new User(new UserId(UUID.randomUUID()), "kc-f1", "friend1", new Profile("Friend1", "Bio"), 0);
-        User friend2 = new User(new UserId(UUID.randomUUID()), "kc-f2", "friend2", new Profile("Friend2", "Bio"), 0);
+        User mainUser = new User(new UserId(UUID.randomUUID()), "kc-main", "main", new Profile("Main", "Bio"), 0, "Test@gmail.com");
+        User friend1 = new User(new UserId(UUID.randomUUID()), "kc-f1", "friend1", new Profile("Friend1", "Bio"), 0, "Test@gmail.com");
+        User friend2 = new User(new UserId(UUID.randomUUID()), "kc-f2", "friend2", new Profile("Friend2", "Bio"), 0, "Test@gmail.com");
 
         given(userRepository.findFriends(mainUser.getId())).willReturn(List.of(friend1, friend2));
 
@@ -46,7 +46,7 @@ class GetFriendsOfUserTests {
     @Test
     void shouldReturnOnlyUser_whenNoFriends() {
         // Arrange
-        User mainUser = new User(new UserId(UUID.randomUUID()), "kc-main", "main", new Profile("Main", "Bio"), 0);
+        User mainUser = new User(new UserId(UUID.randomUUID()), "kc-main", "main", new Profile("Main", "Bio"), 0, "Test@gmail.com");
         given(userRepository.findFriends(mainUser.getId())).willReturn(List.of());
 
         // Act

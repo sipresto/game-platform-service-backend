@@ -28,7 +28,7 @@ class UserTest {
             Profile profile = new Profile("Test User", "Test Bio");
 
             // When
-            User user = new User(userId, keycloakId, username, profile, 0);
+            User user = new User(userId, keycloakId, username, profile, 0, "Test@gmail.com");
 
             // Then
             assertThat(user.getId()).isEqualTo(userId);
@@ -44,9 +44,10 @@ class UserTest {
             // Given
             String keycloakId = "keycloak-123";
             String keycloakUsername = "keycloak_user";
+            String email = "Test@gmail.com";
 
             // When
-            User user = User.createFromKeycloak(keycloakId, keycloakUsername);
+            User user = User.createFromKeycloak(keycloakId, keycloakUsername, email);
 
             // Then
             assertThat(user.getId()).isNotNull();
@@ -63,10 +64,13 @@ class UserTest {
             // Given
             String keycloakId1 = "keycloak-1";
             String keycloakId2 = "keycloak-2";
+            String email1 = "Test1@gmail.com";
+            String email2 = "Test2@gmail.com";
+
 
             // When
-            User user1 = User.createFromKeycloak(keycloakId1, "user1");
-            User user2 = User.createFromKeycloak(keycloakId2, "user2");
+            User user1 = User.createFromKeycloak(keycloakId1, "user1", email1);
+            User user2 = User.createFromKeycloak(keycloakId2, "user2", email2);
 
             // Then
             assertThat(user1.getId()).isNotEqualTo(user2.getId());
@@ -191,7 +195,7 @@ class UserTest {
             void userId_shouldBeImmutable() {
                 // Given
                 UserId originalId = new UserId(UUID.randomUUID());
-                User user = new User(originalId, "keycloak-123", "testuser", new Profile("Test", "Bio"), 0);
+                User user = new User(originalId, "keycloak-123", "testuser", new Profile("Test", "Bio"), 0, "Test@gmail.com");
 
                 // When & Then
                 assertThat(user.getId()).isEqualTo(originalId);
@@ -202,7 +206,7 @@ class UserTest {
             void keycloakId_shouldBeImmutable() {
                 // Given
                 String originalKeycloakId = "keycloak-123";
-                User user = new User(new UserId(UUID.randomUUID()), originalKeycloakId, "testuser", new Profile("Test", "Bio"), 0);
+                User user = new User(new UserId(UUID.randomUUID()), originalKeycloakId, "testuser", new Profile("Test", "Bio"), 0, "Test@gmail.com");
 
                 // When & Then
                 assertThat(user.getKeycloakId()).isEqualTo(originalKeycloakId);
@@ -216,7 +220,8 @@ class UserTest {
                 "test-keycloak-id",
                 "testuser",
                 new Profile("Test User", "Test Bio"),
-                0
+                0,
+                "Test@gmail.com"
         );
     }
 }

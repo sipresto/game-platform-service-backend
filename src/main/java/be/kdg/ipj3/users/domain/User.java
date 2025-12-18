@@ -19,6 +19,7 @@ public class User {
     private Profile profile;
     private Visibility visibility;
     private final List<UserId> friends;
+    private final String email;
     private final List<FriendRequest> friendRequests;
 
     public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, int points, Profile profile) {
@@ -30,7 +31,6 @@ public class User {
         this.profile = profile;
         this.friends = new ArrayList<>();
         this.visibility = Visibility.PUBLIC;
-        this.friendRequests = new ArrayList<>();
     }
 
     public User(UserId id, String keycloakId, String username, Profile profile, int points) {
@@ -42,7 +42,6 @@ public class User {
         this.profile = profile;
         this.visibility = Visibility.PUBLIC;
         this.friends = new ArrayList<>();
-        this.friendRequests = new ArrayList<>();
     }
 
     public static User createFromKeycloak(String keycloakId, String keycloakUsername) {
@@ -138,5 +137,27 @@ public class User {
 
         this.addFriend(request.sender());
         this.removeFriendRequest(userId);
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void updateProfileImage(byte[] image, String mimeType) {
+        this.profile = new Profile(
+                profile.displayName(),
+                profile.bio(),
+                image,
+                mimeType
+        );
+    }
+
+    public void removeProfileImage() {
+        this.profile = new Profile(
+                profile.displayName(),
+                profile.bio(),
+                null,
+                null
+        );
     }
 }

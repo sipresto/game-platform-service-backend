@@ -31,6 +31,9 @@ public class JpaUserEntity {
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
+    @Column
+    private String email;
+
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
             name = "owned_games",
@@ -59,13 +62,14 @@ public class JpaUserEntity {
     protected JpaUserEntity() {
     } // for JPA
 
-    public JpaUserEntity(UUID id, String keycloakId, String username, JpaProfile profile, int points, Visibility visibility) {
+    public JpaUserEntity(UUID id, String keycloakId, String username, JpaProfile profile, int points, Visibility visibility, String email) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
         this.profile = profile;
         this.points = points;
         this.visibility = visibility;
+        this.email = email;
     }
 
     public static JpaUserEntity fromDomain(User user) {
@@ -75,7 +79,8 @@ public class JpaUserEntity {
                 user.getUsername(),
                 JpaProfile.fromDomain(user.getProfile()),
                 user.getPoints(),
-                user.getVisibility()
+                user.getVisibility(),
+                user.getEmail()
         );
 
         user.getOwnedGames().stream()
@@ -94,7 +99,7 @@ public class JpaUserEntity {
     }
 
     public User toDomain() {
-        User user = new User(new UserId(id), keycloakId, username, profile.toDomain(), points);
+        User user = new User(new UserId(id), keycloakId, username, profile.toDomain(), points, email);
         ownedGames.stream()
                 .map(GameId::new)
                 .forEach(user::addGame);
