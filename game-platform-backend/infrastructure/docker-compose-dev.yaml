@@ -105,6 +105,7 @@ services:
   # ---------------------
   app_chessgame_front:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/demo-content/chessgame/front:latest
+    pull_policy: always
     ports:
       - '3333:80'
     networks:
@@ -116,6 +117,7 @@ services:
 
   app_chessgame_back:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/demo-content/chessgame/back:latest
+    pull_policy: always
     ports:
       - '8080:8080'
     networks:

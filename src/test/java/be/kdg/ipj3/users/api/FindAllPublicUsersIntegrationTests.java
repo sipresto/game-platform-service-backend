@@ -40,18 +40,20 @@ public class FindAllPublicUsersIntegrationTests {
                 UUID.randomUUID(),
                 "kc-public",
                 "public-user",
-                new JpaProfile("Public", "I am public"),
+                new JpaProfile("Public", "I am public", null, null),
                 0,
-                Visibility.PUBLIC
+                Visibility.PUBLIC,
+                "Test@gmail.com"
         );
 
         JpaUserEntity privateUser = new JpaUserEntity(
                 UUID.randomUUID(),
                 "kc-private",
                 "private-user",
-                new JpaProfile("Private", "I am private"),
+                new JpaProfile("Private", "I am private", null, null),
                 0,
-                Visibility.PRIVATE
+                Visibility.PRIVATE,
+                "Test@gmail.com"
         );
 
         userRepository.save(publicUser);

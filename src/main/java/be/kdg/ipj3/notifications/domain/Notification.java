@@ -6,6 +6,7 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @AggregateRoot
 public class Notification {
@@ -17,17 +18,39 @@ public class Notification {
     private boolean read;
     private final UserId user;
 
-    public Notification(NotificationId id, String description, NotificationType type, Instant createdAt, boolean read, UserId user) {
+    private Optional<UserNotificationPreferences> preferences;
+
+    public Notification(NotificationId id, String description, NotificationType type,
+                        Instant createdAt, boolean read, UserId user) {
         this.id = id;
         this.description = description;
         this.type = type;
         this.createdAt = createdAt;
         this.read = read;
         this.user = user;
+        this.preferences = Optional.empty();
     }
 
     public Notification(String description, NotificationType type, UserId user) {
         this(NotificationId.create(), description, type, Instant.now(), false, user);
+    }
+
+    public boolean shouldSendViaChannel(NotificationChannel channel) {
+        return preferences
+                .map(prefs -> prefs.isEnabled(type, channel))
+                .orElse(getDefaultForType(type, channel));
+    }
+
+    private boolean getDefaultForType(NotificationType type, NotificationChannel channel) {
+        return type != NotificationType.YOUR_TURN;
+    }
+
+    public void setPreferences(UserNotificationPreferences preferences) {
+        this.preferences = Optional.ofNullable(preferences);
+    }
+
+    public Optional<UserNotificationPreferences> getPreferences() {
+        return preferences;
     }
 
     public NotificationId getId() {

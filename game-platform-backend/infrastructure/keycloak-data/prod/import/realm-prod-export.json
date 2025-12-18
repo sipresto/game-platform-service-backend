@@ -571,16 +571,16 @@
       "defaultClientScopes": [
         "web-origins",
         "acr",
-        "roles",
         "profile",
+        "roles",
         "basic",
         "email"
       ],
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     },
@@ -629,16 +629,16 @@
       "defaultClientScopes": [
         "web-origins",
         "acr",
-        "roles",
         "profile",
+        "roles",
         "basic",
         "email"
       ],
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     },
@@ -673,16 +673,16 @@
       "defaultClientScopes": [
         "web-origins",
         "acr",
-        "roles",
         "profile",
+        "roles",
         "basic",
         "email"
       ],
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     },
@@ -716,16 +716,16 @@
       "defaultClientScopes": [
         "web-origins",
         "acr",
-        "roles",
         "profile",
+        "roles",
         "basic",
         "email"
       ],
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     },
@@ -788,16 +788,16 @@
       "defaultClientScopes": [
         "web-origins",
         "acr",
-        "roles",
         "profile",
+        "roles",
         "basic",
         "email"
       ],
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     },
@@ -846,16 +846,16 @@
         "web-origins",
         "service_account",
         "acr",
-        "roles",
         "profile",
+        "roles",
         "basic",
         "email"
       ],
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     },
@@ -889,16 +889,16 @@
       "defaultClientScopes": [
         "web-origins",
         "acr",
-        "roles",
         "profile",
+        "roles",
         "basic",
         "email"
       ],
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     },
@@ -958,16 +958,16 @@
       "defaultClientScopes": [
         "web-origins",
         "acr",
-        "roles",
         "profile",
+        "roles",
         "basic",
         "email"
       ],
       "optionalClientScopes": [
         "address",
         "phone",
-        "organization",
         "offline_access",
+        "organization",
         "microprofile-jwt"
       ]
     }
@@ -1685,7 +1685,23 @@
     "contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
     "strictTransportSecurity": "max-age=31536000; includeSubDomains"
   },
-  "smtpServer": {},
+  "smtpServer": {
+    "allowutf8": "",
+    "debug": "false",
+    "replyToDisplayName": "",
+    "starttls": "true",
+    "auth": "true",
+    "envelopeFrom": "",
+    "ssl": "false",
+    "password": "**********",
+    "port": "587",
+    "host": "smtp.gmail.com",
+    "replyTo": "",
+    "from": "vibegamesinfo@gmail.com",
+    "fromDisplayName": "Game Platform",
+    "authType": "basic",
+    "user": "vibegamesinfo@gmail.com"
+  },
   "eventsEnabled": false,
   "eventsListeners": [
     "jboss-logging"

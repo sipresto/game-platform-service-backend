@@ -8,11 +8,13 @@ import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
 import be.kdg.ipj3.users.shared.UserId;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Transactional
 public class UserRepositoryImpl implements UserRepository {
     private final JpaUserRepository jpaUserRepository;
 

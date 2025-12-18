@@ -33,21 +33,23 @@ class RegisterOrGetUserTests {
         // Arrange
         String keycloakId = "test-keycloak-id";
         String keycloakUsername = "testuser";
+        String testGmail = "Test@gmail.com";
         User existingUser = new User(
                 new UserId(UUID.randomUUID()),
                 keycloakId,
                 keycloakUsername,
                 new Profile("Existing User", "Bio"),
-                0
+                0,
+                testGmail
         );
 
         given(userRepository.findByKeycloakId(keycloakId)).willReturn(Optional.of(existingUser));
 
         // Act
-        User result = userService.registerOrGetUser(keycloakId, keycloakUsername);
+        User result = userService.registerOrGetUser(keycloakId, keycloakUsername, testGmail);
 
         // Assert
-        assertThat(result).isSameAs(existingUser);  // same instance
+        assertThat(result).isSameAs(existingUser);
         then(userRepository).should().findByKeycloakId(keycloakId);
         then(userRepository).shouldHaveNoMoreInteractions();
     }
@@ -57,11 +59,12 @@ class RegisterOrGetUserTests {
         // Arrange
         String keycloakId = "test-keycloak-id";
         String keycloakUsername = "testuser";
+        String testGmail = "Test@gmail.com";
 
         given(userRepository.findByKeycloakId(keycloakId)).willReturn(Optional.empty());
 
         // Act
-        User result = userService.registerOrGetUser(keycloakId, keycloakUsername);
+        User result = userService.registerOrGetUser(keycloakId, keycloakUsername, testGmail);
 
         // Assert
         assertThat(result.getKeycloakId()).isEqualTo(keycloakId);
@@ -81,14 +84,14 @@ class RegisterOrGetUserTests {
 
     @Test
     void registerOrGetUser_shouldThrowIllegalArgumentException_whenKeycloakIdIsNull() {
-        assertThatThrownBy(() -> userService.registerOrGetUser(null, "testuser"))
+        assertThatThrownBy(() -> userService.registerOrGetUser(null, "testuser", "Test@gmail.com"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Keycloak id cannot be null or blank");
     }
 
     @Test
     void registerOrGetUser_shouldThrowIllegalArgumentException_whenKeycloakIdIsBlank() {
-        assertThatThrownBy(() -> userService.registerOrGetUser("", "testuser"))
+        assertThatThrownBy(() -> userService.registerOrGetUser("", "testuser", "Test@gmail.com"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Keycloak id cannot be null or blank");
     }

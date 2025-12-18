@@ -51,6 +51,16 @@ Create the following realm roles:
 - Assign default role: `player`
 - Navigate too **Realm Settings → Login
 - Set forgot password, remember me, Edit username and user registration on 'on'
+- Navigate to **Realm Settings → Email
+- From: vibegamesinfo@gmail.com
+- From display name: Game Platform
+- Host: smtp.gmail.com
+- Port: 587
+- Enable StartTLS: on
+- Authentication: on
+- Username: vibegamesinfo@gmail.com
+- Password: Look into secret.properties for the password
+- Click 'Test connection' to verify email settings are correct
 ---
 
 ### 5. User Management
@@ -80,6 +90,10 @@ Secrets such as passwords and secret keys are to be put into secret.properties. 
 - app.services.platform.client-secret
 - spring.rabbitmq.password
 - spring.datasource.password
+- spring.mail.host
+- spring.mail.port
+- spring.mail.username
+- spring.mail.password
 
 There can be more secrets added if needed. Check the file regularly for updates.
 

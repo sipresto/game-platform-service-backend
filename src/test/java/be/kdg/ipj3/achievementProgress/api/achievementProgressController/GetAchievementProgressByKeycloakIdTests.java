@@ -135,7 +135,8 @@ public class GetAchievementProgressByKeycloakIdTests {
                 "username",
                 List.of(gameId),
                 0,
-                new Profile("username", "Bio")
+                new Profile("username", "Bio"),
+                "Test@gmail.com"
         );
         userRepository.save(user);
 
@@ -207,7 +208,8 @@ public class GetAchievementProgressByKeycloakIdTests {
                 "username",
                 List.of(gameId),
                 0,
-                new Profile("username", "Bio")
+                new Profile("username", "Bio"),
+                "Test@gmail.com"
         );
         userRepository.save(user);
 
