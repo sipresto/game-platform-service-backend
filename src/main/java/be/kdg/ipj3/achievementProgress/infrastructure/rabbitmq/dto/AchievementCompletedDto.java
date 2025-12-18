@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record AchievementCompletedDto(
         UUID userId,
-        UUID gameId,
+        UUID gameSessionId,
         String code,
         Instant timestamp
 ) {
