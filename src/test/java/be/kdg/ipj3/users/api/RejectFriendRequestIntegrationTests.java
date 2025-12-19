@@ -44,8 +44,8 @@ class RejectFriendRequestIntegrationTests {
         ));
     }
 
-    private JwtRequestPostProcessor validJwt() {
-        return jwt().jwt(b -> b.subject("kc-receiver").claim("preferred_username", "user"))
+    private JwtRequestPostProcessor jwtForUser(String keycloakId) {
+        return jwt().jwt(b -> b.subject(keycloakId).claim("preferred_username", "user"))
                 .authorities(new SimpleGrantedAuthority("ROLE_PLAYER"));
     }
 
@@ -58,28 +58,27 @@ class RejectFriendRequestIntegrationTests {
 
         User receiverDomain = receiverEntity.toDomain();
         User senderDomain = senderEntity.toDomain();
-        receiverDomain.addFriendRequest(FriendRequest.create(senderDomain.getId()));
+        receiverDomain.addFriendRequest(new FriendRequest(senderDomain.getId()));
         userRepository.save(JpaUserEntity.fromDomain(receiverDomain));
 
         // Act
-        mockMvc.perform(put("/api/rejectFriendRequest/{userId}", senderEntity.getId())
-                        .with(validJwt()))
+        mockMvc.perform(put("/api/user/{senderId}/friend-request/reject", senderEntity.getId())
+                        .with(jwtForUser(receiverEntity.getKeycloakId())))
                 .andExpect(status().isNoContent());
 
         // Assert
         JpaUserEntity updatedReceiver = userRepository.findById(receiverEntity.getId()).orElseThrow();
 
         assertThat(updatedReceiver.getFriends()).doesNotContain(senderEntity.getId());
-
         assertThat(updatedReceiver.toDomain().getFriendRequests()).isEmpty();
     }
 
     @Test
     void rejectFriendRequest_ShouldFail_WhenSenderDoesNotExist() throws Exception {
-        createUser("kc-receiver", "receiver");
+        JpaUserEntity receiver = createUser("kc-receiver", "receiver");
 
-        mockMvc.perform(put("/api/rejectFriendRequest/{userId}", UUID.randomUUID())
-                        .with(validJwt()))
+        mockMvc.perform(put("/api/user/{senderId}/friend-request/reject", UUID.randomUUID())
+                        .with(jwtForUser(receiver.getKeycloakId())))
                 .andExpect(status().isNotFound());
     }
 
@@ -88,11 +87,17 @@ class RejectFriendRequestIntegrationTests {
     void rejectFriendRequest_ShouldNotFail_WhenNoRequestExists() throws Exception {
         // Arrange
         JpaUserEntity sender = createUser("kc-sender", "sender");
-        createUser("kc-receiver", "receiver");
+        JpaUserEntity receiver = createUser("kc-receiver", "receiver");
 
         // Act
-        mockMvc.perform(put("/api/rejectFriendRequest/{userId}", sender.getId())
-                        .with(validJwt()))
+        mockMvc.perform(put("/api/user/{senderId}/friend-request/reject", sender.getId())
+                        .with(jwtForUser(receiver.getKeycloakId())))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void rejectFriendRequest_ShouldFail_WhenUnauthorized() throws Exception {
+        mockMvc.perform(put("/api/user/{senderId}/friend-request/reject", UUID.randomUUID()))
+                .andExpect(status().isUnauthorized());
     }
 }

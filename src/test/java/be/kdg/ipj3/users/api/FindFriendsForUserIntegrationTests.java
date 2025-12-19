@@ -91,9 +91,9 @@ public class FindFriendsForUserIntegrationTests {
                         .with(validJwt(mainKeycloakId, "main-user")))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[1].username").value("friend-user-" + friendId))
-                .andExpect(jsonPath("$[1].id").value(friendId.toString()));
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].username").value("friend-user-" + friendId))
+                .andExpect(jsonPath("$[0].id").value(friendId.toString()));
     }
 
     @Test

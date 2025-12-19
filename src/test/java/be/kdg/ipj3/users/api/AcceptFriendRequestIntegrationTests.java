@@ -44,8 +44,8 @@ class AcceptFriendRequestIntegrationTests {
         ));
     }
 
-    private JwtRequestPostProcessor validJwt() {
-        return jwt().jwt(b -> b.subject("kc-receiver").claim("preferred_username", "user"))
+    private JwtRequestPostProcessor jwtForUser(String keycloakId) {
+        return jwt().jwt(b -> b.subject(keycloakId).claim("preferred_username", "user"))
                 .authorities(new SimpleGrantedAuthority("ROLE_PLAYER"));
     }
 
@@ -59,12 +59,12 @@ class AcceptFriendRequestIntegrationTests {
         User receiverDomain = receiverEntity.toDomain();
         User senderDomain = senderEntity.toDomain();
 
-        receiverDomain.addFriendRequest(FriendRequest.create(senderDomain.getId()));
+        receiverDomain.addFriendRequest(new FriendRequest(senderDomain.getId()));
         userRepository.save(JpaUserEntity.fromDomain(receiverDomain));
 
         // Act
-        mockMvc.perform(put("/api/acceptFriendRequest/{userId}", senderEntity.getId())
-                        .with(validJwt()))
+        mockMvc.perform(put("/api/user/{senderId}/friend-request/accept", senderEntity.getId())
+                        .with(jwtForUser(receiverEntity.getKeycloakId())))
                 .andExpect(status().isNoContent());
 
         // Assert
@@ -84,25 +84,37 @@ class AcceptFriendRequestIntegrationTests {
         JpaUserEntity receiver = createUser("kc-receiver", "receiver");
 
         // Act & Assert
-        mockMvc.perform(put("/api/acceptFriendRequest/{userId}", sender.getId())
-                        .with(validJwt()))
+        mockMvc.perform(put("/api/user/{senderId}/friend-request/accept", sender.getId())
+                        .with(jwtForUser(receiver.getKeycloakId())))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void acceptFriendRequest_ShouldFail_WhenSenderDoesNotExist() throws Exception {
         // Arrange
-        createUser("kc-receiver", "receiver");
+        JpaUserEntity receiver = createUser("kc-receiver", "receiver");
 
         // Act
-        mockMvc.perform(put("/api/acceptFriendRequest/{userId}", UUID.randomUUID())
-                        .with(validJwt()))
+        mockMvc.perform(put("/api/user/{senderId}/friend-request/accept", UUID.randomUUID())
+                        .with(jwtForUser(receiver.getKeycloakId())))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void acceptFriendRequest_ShouldFail_WhenUnauthorized() throws Exception {
-        mockMvc.perform(put("/api/acceptFriendRequest/{userId}", UUID.randomUUID()))
+        mockMvc.perform(put("/api/user/{senderId}/friend-request/accept", UUID.randomUUID()))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @Transactional
+    void acceptFriendRequest_ShouldFail_WhenAcceptingOwnRequest() throws Exception {
+        // Arrange
+        JpaUserEntity user = createUser("kc-user", "user");
+
+        // Act & Assert
+        mockMvc.perform(put("/api/user/{senderId}/friend-request/accept", user.getId())
+                        .with(jwtForUser(user.getKeycloakId())))
+                .andExpect(status().isBadRequest());
     }
 }

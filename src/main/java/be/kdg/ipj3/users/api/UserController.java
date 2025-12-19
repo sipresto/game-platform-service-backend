@@ -1,6 +1,5 @@
 package be.kdg.ipj3.users.api;
 
-import be.kdg.ipj3.users.api.dto.SendFriendRequestDto;
 import be.kdg.ipj3.users.api.dto.UserDto;
 import be.kdg.ipj3.users.application.ProfileImageService;
 import be.kdg.ipj3.users.application.UserService;
@@ -94,7 +93,7 @@ public class UserController {
     @GetMapping("/friends")
     public ResponseEntity<List<UserDto>> findFriendsForUser(@AuthenticationPrincipal Jwt jwt) {
         var user = userService.findByKeycloakId(jwt.getSubject());
-        var friends = userService.findFriendsAndSelf(user).stream().map(UserDto::fromDomain).toList();
+        var friends = userService.findFriends(user).stream().map(UserDto::fromDomain).toList();
         return ResponseEntity.ok(friends);
     }
 
@@ -158,26 +157,21 @@ public class UserController {
     /**
      * Sends a friend request from one user to another
      */
-    @PostMapping("/sendFriendRequest")
+    @PostMapping("/user/{receiverId}/send-friend-request")
     public ResponseEntity<Void> sendFriendRequest(
-            @RequestBody @Valid SendFriendRequestDto sendFriendRequestDto,
+            @PathVariable("receiverId") UUID receiverId,
             @AuthenticationPrincipal Jwt jwt
     ) {
-        UserId currentUserId = userService.findIdByKeycloakId(jwt.getSubject());
-        if (!currentUserId.id().equals(sendFriendRequestDto.senderId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
-        userService.sendFriendRequest(sendFriendRequestDto.receiverId(), sendFriendRequestDto.senderId());
+        userService.sendFriendRequest(receiverId, jwt.getSubject());
         return ResponseEntity.noContent().build();
     }
 
     /**
      * Accepts a friend request
      */
-    @PutMapping("/acceptFriendRequest/{userId}")
+    @PutMapping("/user/{senderId}/friend-request/accept")
     public ResponseEntity<Void> acceptFriendRequest(
-            @PathVariable("userId") UUID senderId,
+            @PathVariable("senderId") UUID senderId,
             @AuthenticationPrincipal Jwt jwt
     ) {
         var receiverId = userService.findIdByKeycloakId(jwt.getSubject());
@@ -188,9 +182,9 @@ public class UserController {
     /**
      * Rejects a friend request
      */
-    @PutMapping("/rejectFriendRequest/{userId}")
+    @PutMapping("/user/{senderId}/friend-request/reject")
     public ResponseEntity<Void> rejectFriendRequest(
-            @PathVariable("userId") UUID senderId,
+            @PathVariable("senderId") UUID senderId,
             @AuthenticationPrincipal Jwt jwt
     ) {
         var receiverId = userService.findIdByKeycloakId(jwt.getSubject());

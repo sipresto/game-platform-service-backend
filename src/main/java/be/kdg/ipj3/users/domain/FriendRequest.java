@@ -7,7 +7,7 @@ import java.time.Instant;
 
 @ValueObject
 public record FriendRequest(UserId sender, Instant createdAt) {
-    public static FriendRequest create(UserId sender) {
-        return new FriendRequest(sender, Instant.now());
+    public FriendRequest(UserId sender) {
+        this(sender, Instant.now());
     }
 }

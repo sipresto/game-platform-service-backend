@@ -36,24 +36,10 @@ class GetFriendsOfUserTests {
         given(userRepository.findFriends(mainUser.getId())).willReturn(List.of(friend1, friend2));
 
         // Act
-        List<User> result = userService.findFriendsAndSelf(mainUser);
+        List<User> result = userService.findFriends(mainUser);
 
         // Assert
-        assertThat(result).containsExactly(mainUser, friend1, friend2);
-        verify(userRepository).findFriends(mainUser.getId());
-    }
-
-    @Test
-    void shouldReturnOnlyUser_whenNoFriends() {
-        // Arrange
-        User mainUser = new User(new UserId(UUID.randomUUID()), "kc-main", "main", new Profile("Main", "Bio"), 0, "Test@gmail.com");
-        given(userRepository.findFriends(mainUser.getId())).willReturn(List.of());
-
-        // Act
-        List<User> result = userService.findFriendsAndSelf(mainUser);
-
-        // Assert
-        assertThat(result).containsExactly(mainUser);
+        assertThat(result).containsExactly(friend1, friend2);
         verify(userRepository).findFriends(mainUser.getId());
     }
 }

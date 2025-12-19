@@ -6,6 +6,8 @@ import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,11 +100,8 @@ public class UserService implements UsersApi {
     }
 
     @Transactional(readOnly = true)
-    public List<User> findFriendsAndSelf(User user) {
-        List<User> usersReturn = new ArrayList<>();
-        usersReturn.add(user);
-        usersReturn.addAll(userRepository.findFriends(user.getId()));
-        return usersReturn;
+    public List<User> findFriends(User user) {
+        return new ArrayList<>(userRepository.findFriends(user.getId()));
     }
 
     @Transactional(readOnly = true)
@@ -125,10 +124,16 @@ public class UserService implements UsersApi {
         return userRepository.findById(id).orElseThrow(id::notFound).getEmail();
     }
 
-    public void sendFriendRequest(UUID receiver, UUID sender) {
+    public void sendFriendRequest(UUID receiver, String loggedInUserKeycloakId) {
         User receiverUser = findById(receiver);
-        User senderUser = findById(sender);
-        receiverUser.addFriendRequest(FriendRequest.create(senderUser.getId()));
+        User senderUser = findByKeycloakId(loggedInUserKeycloakId);
+        if(receiverUser.getId().equals(senderUser.getId())) {
+            throw new IllegalArgumentException("You cannot send friend requests to yourself");
+        }
+        if(receiverUser.getFriendRequests().stream().anyMatch(friendRequest -> friendRequest.sender().equals(senderUser.getId()))) {
+            throw new IllegalArgumentException("Friend request already sent to this user");
+        }
+        receiverUser.addFriendRequest(new FriendRequest(senderUser.getId()));
         userRepository.save(receiverUser);
     }
 
