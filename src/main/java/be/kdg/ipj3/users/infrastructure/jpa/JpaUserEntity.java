@@ -90,7 +90,7 @@ public class JpaUserEntity {
 
         user.getFavoriteGames().stream()
                 .map(GameId::id)
-                .forEach(jpaUserEntity::addGame);
+                .forEach(jpaUserEntity::addFavoriteGame);
 
         user.getFriends().stream()
                 .map(UserId::id)
@@ -107,7 +107,7 @@ public class JpaUserEntity {
 
         favoriteGames.stream()
                 .map(GameId::new)
-                .forEach(user::addOrRemoveFavorite);
+                .forEach(user::addFavorite);
 
         friends.stream()
                 .map(UserId::new)
@@ -119,6 +119,9 @@ public class JpaUserEntity {
 
     private void addGame(UUID gameId) {
         this.ownedGames.add(gameId);
+    }
+    private void addFavoriteGame(UUID gameId){
+        this.favoriteGames.add(gameId);
     }
 
     /**

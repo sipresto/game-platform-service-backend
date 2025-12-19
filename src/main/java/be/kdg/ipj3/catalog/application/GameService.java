@@ -121,6 +121,22 @@ public class GameService implements GamesApi {
         return gameRepository.findGamesByIds(favoriteGamesIds);
     }
 
+    public void favoriteGame(String id,UUID gameId){
+
+        if(existsById(gameId)){
+            throw GameId.notFound(gameId);
+        }
+        usersApi.addFavorite(id, gameId);
+    }
+
+    public void unfavoriteGame(String id,UUID gameId){
+
+        if(existsById(gameId)){
+            throw GameId.notFound(gameId);
+        }
+        usersApi.removeFavorite(id, gameId);
+    }
+
     public void registerGame(RegisterGameDto dto) {
         Game game = gameRepository.findById(new GameId(dto.id()))
                 .orElse(null);

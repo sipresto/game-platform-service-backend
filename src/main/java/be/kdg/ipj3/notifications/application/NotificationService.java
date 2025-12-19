@@ -31,8 +31,8 @@ public class NotificationService implements NotificationsApi {
     }
 
     public List<Notification> findAllNotifications(String keycloakId) {
-        var user = usersApi.findByKeycloakId(keycloakId);
-        return notificationRepository.findByUserId(user.getId());
+        var userId = usersApi.findIdByKeycloakId(keycloakId);
+        return notificationRepository.findByUserId(userId);
     }
 
     @Override
@@ -77,8 +77,8 @@ public class NotificationService implements NotificationsApi {
                 return;
             }
 
-            var user = usersApi.findById(userId.id());
-            String username = user != null ? user.getUsername() : "User";
+            var user = usersApi.findEmailUserDtoByKeycloakId(userId.id());
+            String username = user != null ? user.username() : "User";
 
             emailService.sendNotificationEmail(userEmail, username, type, description);
 

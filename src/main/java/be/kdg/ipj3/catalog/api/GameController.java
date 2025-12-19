@@ -54,7 +54,7 @@ public class GameController {
     }
 
     @GetMapping("/favorites")
-    public ResponseEntity<List<GameDto>> findFavoriteGames(
+    public ResponseEntity<List<GameDto>> getFavoriteGames(
             @AuthenticationPrincipal Jwt jwt
     ) {
         String keycloakId = jwt.getSubject();
@@ -63,6 +63,8 @@ public class GameController {
                 .toList();
         return ResponseEntity.ok(favorites);
     }
+
+
 
     @GetMapping("/user/{keycloakId}")
     public ResponseEntity<List<LibraryGameDto>> getOwnedGamesByKeycloakId(

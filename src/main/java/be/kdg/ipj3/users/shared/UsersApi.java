@@ -9,13 +9,11 @@ import java.util.UUID;
 
 @NamedInterface
 public interface UsersApi {
-    User findByKeycloakId(String keycloakId);
-
-    User registerOrGetUser(String keycloakId, String keycloakUsername, String email);
 
     void addGame(UUID id, UUID gameId);
 
-    User findById(UUID id);
+    void addFavorite(String id, UUID gameId);
+    void removeFavorite(String id, UUID gameId);
 
     boolean existsById(UUID id);
 
@@ -28,6 +26,7 @@ public interface UsersApi {
     void addPoints(UUID id, int points);
 
     SmallUserDto findSmallUserDtoById(UUID id);
+    EmailUserDto findEmailUserDtoByKeycloakId(UUID id);
 
     String findEmailByUserId(UserId id);
 }

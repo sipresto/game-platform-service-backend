@@ -26,8 +26,8 @@ public class User {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
-        this.ownedGames = ownedGames;
-        this.favoriteGames = favoriteGames;
+        this.ownedGames = ownedGames != null ? new ArrayList<>(ownedGames) : new ArrayList<>();
+        this.favoriteGames = favoriteGames != null ? new ArrayList<>(favoriteGames) : new ArrayList<>();
         this.points = points;
         this.profile = profile;
         this.email = email;
@@ -49,7 +49,10 @@ public class User {
     }
 
     public static User createFromKeycloak(String keycloakId, String keycloakUsername, String email) {
-        return new User(UserId.create(), keycloakId, keycloakUsername, List.of(), List.of(),0, new Profile(keycloakUsername, ""), email);
+        return new User(UserId.create(), keycloakId, keycloakUsername,
+                List.of(),
+                List.of(),
+                0, new Profile(keycloakUsername, ""), email);
     }
 
     public UserId getId() {
@@ -96,13 +99,21 @@ public class User {
             throw new IllegalArgumentException("Game already owned by this user");
         }
     }
-    public void addOrRemoveFavorite(GameId gameId){
+    public void addFavorite(GameId gameId){
         if (!favoriteGames.contains(gameId)){
             favoriteGames.add(gameId);
         } else {
-            favoriteGames.remove(gameId);
+            throw new IllegalArgumentException("Game already favorited by this user");
         }
     }
+    public void removeFavorite(GameId gameId){
+        if (favoriteGames.contains(gameId)){
+            favoriteGames.remove(gameId);
+        } else {
+            throw new IllegalArgumentException("Game not favorited by this user");
+        }
+    }
+
 
     public List<GameId> getFavoriteGames() {
         return favoriteGames;

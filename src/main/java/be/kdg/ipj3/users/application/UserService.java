@@ -1,11 +1,13 @@
 package be.kdg.ipj3.users.application;
 
 import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.shared.EmailUserDto;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
@@ -69,13 +71,17 @@ public class UserService implements UsersApi {
         userRepository.save(user);
     }
 
-    public void favoriteGame(String id,UUID gameId){
-
+    @Override
+    public void addFavorite(String id, UUID gameId) {
         var user = findByKeycloakId(id);
+        user.addFavorite(new GameId(gameId));
+    }
 
-        user.addOrRemoveFavorite(new GameId(gameId));
+    @Override
+    public void removeFavorite(String id, UUID gameId) {
+        var user = findByKeycloakId(id);
+        user.removeFavorite(new GameId(gameId));
 
-        userRepository.save(user);
     }
 
 
@@ -135,6 +141,11 @@ public class UserService implements UsersApi {
     public SmallUserDto findSmallUserDtoById(UUID id) {
         return SmallUserDto.fromDomain(findById(id));
     }
+    @Transactional(readOnly = true)
+    public EmailUserDto findEmailUserDtoByKeycloakId(UUID id){
+        return EmailUserDto.fromDomain(findById(id));
+    }
+
 
     @Override
     public String findEmailByUserId(UserId id) {

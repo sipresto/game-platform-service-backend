@@ -33,13 +33,25 @@ public class UserController {
     }
 
     @PutMapping("/favorite/{gameId}")
-    public ResponseEntity<Void> toggleFavoriteGame(
+    public ResponseEntity<Void> favoriteGame(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID gameId
     ) {
         String keycloakId = jwt.getSubject();
 
-        userService.favoriteGame(keycloakId, gameId);
+        userService.addFavorite(keycloakId, gameId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/unfavorite/{gameId}")
+    public ResponseEntity<Void> unfavoriteGame(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID gameId
+    ) {
+        String keycloakId = jwt.getSubject();
+
+        userService.removeFavorite(keycloakId, gameId);
 
         return ResponseEntity.ok().build();
     }
