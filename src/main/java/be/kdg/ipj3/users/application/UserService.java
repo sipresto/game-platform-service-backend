@@ -71,9 +71,13 @@ public class UserService implements UsersApi {
     }
 
     @Override
-    public void addFavorite(String id, UUID gameId) {
+    public void addFavorite(String id, UUID gameIdParam) {
         var user = findByKeycloakId(id);
-        user.addFavorite(new GameId(gameId));
+        var gameId = new GameId(gameIdParam);
+        if (!user.getOwnedGames().contains(gameId)) {
+            throw new IllegalArgumentException("You must own the game to add it to favorites.");
+        }
+        user.addFavorite(gameId);
         userRepository.save(user);
     }
 

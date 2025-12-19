@@ -88,6 +88,12 @@ public class GetFavoriteGamesIntegrationTests {
         Game game2 = createTestGame("Chess");
         Game game3 = createTestGame("Quoridor");
 
+        user.addGame(game1.getId());
+        user.addGame(game2.getId());
+        user.addGame(game3.getId());
+
+        userRepository.save(user);
+
         user.addFavorite(game1.getId());
         user.addFavorite(game3.getId());
         userRepository.save(user);

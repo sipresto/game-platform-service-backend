@@ -24,7 +24,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -85,8 +85,11 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         User user = createTestUser();
         Game game = createTestGame();
 
+        user.addGame(game.getId());
+        userRepository.save(user);
+
         // Act
-        mockMvc.perform(put("/api/games/favorite/{gameId}", game.getId().id())
+        mockMvc.perform(patch("/api/games/favorite/{gameId}", game.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isOk());
 
@@ -102,11 +105,14 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         User user = createTestUser();
         Game game = createTestGame();
 
+        user.addGame(game.getId());
+        userRepository.save(user);
+
         user.addFavorite(game.getId());
         userRepository.save(user);
 
         // Act & Assert
-        mockMvc.perform(put("/api/games/favorite/{gameId}", game.getId().id())
+        mockMvc.perform(patch("/api/games/favorite/{gameId}", game.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isBadRequest());
     }
@@ -117,11 +123,14 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         User user = createTestUser();
         Game game = createTestGame();
 
+        user.addGame(game.getId());
+        userRepository.save(user);
+
         user.addFavorite(game.getId());
         userRepository.save(user);
 
         // Act
-        mockMvc.perform(put("/api/games/unfavorite/{gameId}", game.getId().id())
+        mockMvc.perform(patch("/api/games/unfavorite/{gameId}", game.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isOk());
 
@@ -138,7 +147,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         Game game = createTestGame();
 
         // Act & Assert
-        mockMvc.perform(put("/api/games/unfavorite/{gameId}", game.getId().id())
+        mockMvc.perform(patch("/api/games/unfavorite/{gameId}", game.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isBadRequest());
     }
@@ -150,7 +159,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         UUID nonExistentId = UUID.randomUUID();
 
         // Act & Assert
-        mockMvc.perform(put("/api/games/favorite/{gameId}", nonExistentId)
+        mockMvc.perform(patch("/api/games/favorite/{gameId}", nonExistentId)
                         .with(validJwt()))
                 .andExpect(status().isNotFound());
     }

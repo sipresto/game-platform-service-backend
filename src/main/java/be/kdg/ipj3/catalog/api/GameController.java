@@ -5,7 +5,6 @@ import be.kdg.ipj3.catalog.api.dto.GameFilterRequestDto;
 import be.kdg.ipj3.catalog.api.dto.LibraryGameDto;
 import be.kdg.ipj3.catalog.application.GameService;
 import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -18,11 +17,9 @@ import java.util.UUID;
 @RequestMapping("/api/games")
 public class GameController {
     private final GameService gameService;
-    private final UsersApi usersApi;
 
-    public GameController(GameService gameService, UsersApi usersApi) {
+    public GameController(GameService gameService) {
         this.gameService = gameService;
-        this.usersApi = usersApi;
     }
 
     @GetMapping
@@ -67,7 +64,7 @@ public class GameController {
         return ResponseEntity.ok(favorites);
     }
 
-    @PutMapping("/favorite/{gameId}")
+    @PatchMapping("/favorite/{gameId}")
     public ResponseEntity<Void> favoriteGame(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID gameId
@@ -79,7 +76,7 @@ public class GameController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/unfavorite/{gameId}")
+    @PatchMapping("/unfavorite/{gameId}")
     public ResponseEntity<Void> unfavoriteGame(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID gameId
