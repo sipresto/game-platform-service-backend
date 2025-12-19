@@ -159,7 +159,7 @@ public class UserController {
      */
     @PostMapping("/user/{receiverId}/send-friend-request")
     public ResponseEntity<Void> sendFriendRequest(
-            @PathVariable("receiverId") UUID receiverId,
+            @PathVariable UUID receiverId,
             @AuthenticationPrincipal Jwt jwt
     ) {
         userService.sendFriendRequest(receiverId, jwt.getSubject());
@@ -171,7 +171,7 @@ public class UserController {
      */
     @PutMapping("/user/{senderId}/friend-request/accept")
     public ResponseEntity<Void> acceptFriendRequest(
-            @PathVariable("senderId") UUID senderId,
+            @PathVariable UUID senderId,
             @AuthenticationPrincipal Jwt jwt
     ) {
         var receiverId = userService.findIdByKeycloakId(jwt.getSubject());
@@ -184,7 +184,7 @@ public class UserController {
      */
     @PutMapping("/user/{senderId}/friend-request/reject")
     public ResponseEntity<Void> rejectFriendRequest(
-            @PathVariable("senderId") UUID senderId,
+            @PathVariable UUID senderId,
             @AuthenticationPrincipal Jwt jwt
     ) {
         var receiverId = userService.findIdByKeycloakId(jwt.getSubject());
