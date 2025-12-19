@@ -1,10 +1,10 @@
 package be.kdg.ipj3.users.application;
 
-import be.kdg.ipj3.users.shared.UserId;
-import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

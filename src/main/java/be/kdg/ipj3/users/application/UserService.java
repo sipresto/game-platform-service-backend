@@ -6,6 +6,7 @@ import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.shared.EmailUserDto;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
@@ -69,9 +70,32 @@ public class UserService implements UsersApi {
         userRepository.save(user);
     }
 
+    @Override
+    public void addFavorite(String id, UUID gameIdParam) {
+        var user = findByKeycloakId(id);
+        var gameId = new GameId(gameIdParam);
+        if (!user.getOwnedGames().contains(gameId)) {
+            throw new IllegalArgumentException("You must own the game to add it to favorites.");
+        }
+        user.addFavorite(gameId);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void removeFavorite(String id, UUID gameId) {
+        var user = findByKeycloakId(id);
+        user.removeFavorite(new GameId(gameId));
+        userRepository.save(user);
+    }
+
+
     @Transactional(readOnly = true)
     public List<GameId> findOwnedGamesById(UUID id) {
         return userRepository.findOwnedGamesById(new UserId(id));
+    }
+
+    public List<GameId> findFavoriteGamesByUserId(UUID id){
+        return userRepository.findFavoriteGamesByUserId(new UserId(id));
     }
 
     @Transactional
@@ -121,6 +145,11 @@ public class UserService implements UsersApi {
     public SmallUserDto findSmallUserDtoById(UUID id) {
         return SmallUserDto.fromDomain(findById(id));
     }
+    @Transactional(readOnly = true)
+    public EmailUserDto findEmailUserDtoByKeycloakId(UUID id){
+        return EmailUserDto.fromDomain(findById(id));
+    }
+
 
     @Override
     public String findEmailByUserId(UserId id) {

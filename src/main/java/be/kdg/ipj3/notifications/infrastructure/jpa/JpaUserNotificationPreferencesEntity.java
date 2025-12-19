@@ -5,6 +5,7 @@ import be.kdg.ipj3.notifications.domain.UserNotificationPreferences;
 import be.kdg.ipj3.notifications.shared.NotificationType;
 import be.kdg.ipj3.users.shared.UserId;
 import jakarta.persistence.*;
+
 import java.time.Instant;
 import java.util.UUID;
 

@@ -1,6 +1,9 @@
 package be.kdg.ipj3.notifications.infrastructure;
 
-import be.kdg.ipj3.notifications.domain.*;
+import be.kdg.ipj3.notifications.domain.Notification;
+import be.kdg.ipj3.notifications.domain.NotificationId;
+import be.kdg.ipj3.notifications.domain.NotificationRepository;
+import be.kdg.ipj3.notifications.domain.UserNotificationPreferences;
 import be.kdg.ipj3.notifications.infrastructure.jpa.JpaNotificationEntity;
 import be.kdg.ipj3.notifications.infrastructure.jpa.JpaNotificationRepository;
 import be.kdg.ipj3.notifications.infrastructure.jpa.JpaUserNotificationPreferencesEntity;

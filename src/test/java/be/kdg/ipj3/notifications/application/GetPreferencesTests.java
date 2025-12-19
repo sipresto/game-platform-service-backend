@@ -1,6 +1,7 @@
 package be.kdg.ipj3.notifications.application;
 
-import be.kdg.ipj3.notifications.domain.*;
+import be.kdg.ipj3.notifications.domain.NotificationRepository;
+import be.kdg.ipj3.notifications.domain.UserNotificationPreferences;
 import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

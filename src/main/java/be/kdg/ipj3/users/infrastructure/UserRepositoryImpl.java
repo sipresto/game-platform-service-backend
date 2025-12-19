@@ -47,6 +47,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public List<GameId> findFavoriteGamesByUserId(UserId id){
+        return jpaUserRepository.findFavoriteGamesByUserId(id.id())
+                .stream()
+                .map(GameId::new).toList();
+    }
+    @Override
     public void deleteAll() {
         jpaUserRepository.deleteAll();
     }

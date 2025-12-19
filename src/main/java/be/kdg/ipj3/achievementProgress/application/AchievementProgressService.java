@@ -107,8 +107,8 @@ public class AchievementProgressService {
     }
 
     public List<AchievementProgressDto> findAllAchievementsByKeycloakId(String keycloakId) {
-        var user = usersApi.findByKeycloakId(keycloakId);
-        var userGameIds = usersApi.findOwnedGamesById(user.getId().id());
+        var userId = usersApi.findIdByKeycloakId(keycloakId);
+        var userGameIds = usersApi.findOwnedGamesById(userId.id());
         if (userGameIds.isEmpty()) {
             return List.of();
         }
@@ -122,7 +122,7 @@ public class AchievementProgressService {
 
         for (List<GameAchievementDto> gameAchievementDtos : achievements) {
             for (GameAchievementDto gameAchievementDto : gameAchievementDtos) {
-                var ap = progressRepository.findByUserIdAndAchievementId(user.getId(), gameAchievementDto.achievementId());
+                var ap = progressRepository.findByUserIdAndAchievementId(userId, gameAchievementDto.achievementId());
                 if (ap.isPresent()) {
                     var progress = ap.get();
                     achievementProgressDtos.add(new AchievementProgressDto(

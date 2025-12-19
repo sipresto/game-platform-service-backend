@@ -22,6 +22,14 @@ public interface JpaUserRepository extends JpaRepository<JpaUserEntity, UUID> {
     )
     List<UUID> findOwnedGamesById(UUID id);
 
+    @Query("""
+            SELECT g
+            FROM JpaUserEntity u
+            JOIN u.favoriteGames g
+            WHERE u.id = :id
+            """
+    )
+    List<UUID> findFavoriteGamesByUserId(UUID id);
     List<JpaUserEntity> findAllByVisibility(Visibility visibility);
 
     @Query("""

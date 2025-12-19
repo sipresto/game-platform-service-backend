@@ -46,7 +46,7 @@ public class LobbyService {
     }
 
     public Lobby createLobby(String keycloakId, String password, int maxPlayers, UUID gameIdParam) {
-        var hostId = usersApi.findByKeycloakId(keycloakId).getId();
+        var hostId = usersApi.findIdByKeycloakId(keycloakId);
 
         var gameId = gamesApi.findGameById(gameIdParam).getId();
 
@@ -59,7 +59,7 @@ public class LobbyService {
 
     public void joinLobby(UUID id, String keycloakId, String password) {
 
-        var playerId = usersApi.findByKeycloakId(keycloakId).getId();
+        var playerId = usersApi.findIdByKeycloakId(keycloakId);
         var lobbyId = new LobbyId(id);
         Lobby lobby = lobbyRepository.findById(lobbyId)
                 .orElseThrow(lobbyId::notFound);
@@ -80,9 +80,9 @@ public class LobbyService {
 
         List<PlayerDto> playerDtos = lobby.getPlayers().stream()
                 .map(userId -> {
-                   var user = usersApi.findById(userId.id());
+                   var user = usersApi.findSmallUserDtoById(userId.id());
 
-                    String username = (user != null) ? user.getUsername() : "Unknown";
+                    String username = (user != null) ? user.username() : "Unknown";
 
                     return new PlayerDto(
                             userId.id().toString(),
@@ -96,7 +96,7 @@ public class LobbyService {
 
 
     public String startGame(UUID id, String requestorKeycloakId, Difficulty difficulty) {
-        var requestor = usersApi.findByKeycloakId(requestorKeycloakId).getId();
+        var requestor = usersApi.findIdByKeycloakId(requestorKeycloakId);
         var lobbyId = new LobbyId(id);
 
         Lobby lobby = lobbyRepository.findById(lobbyId)
@@ -156,7 +156,7 @@ public class LobbyService {
 
     public void leaveLobby(UUID id, String keycloakId) {
 
-        var playerId = usersApi.findByKeycloakId(keycloakId).getId();
+        var playerId = usersApi.findIdByKeycloakId(keycloakId);
         var lobbyId = new LobbyId(id);
 
         Lobby lobby = lobbyRepository.findById(lobbyId)

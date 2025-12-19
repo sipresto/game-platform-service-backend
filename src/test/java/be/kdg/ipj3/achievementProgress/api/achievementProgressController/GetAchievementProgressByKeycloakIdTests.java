@@ -134,6 +134,7 @@ public class GetAchievementProgressByKeycloakIdTests {
                 "keycloakId",
                 "username",
                 List.of(gameId),
+                List.of(),
                 0,
                 new Profile("username", "Bio"),
                 "Test@gmail.com"
@@ -207,6 +208,7 @@ public class GetAchievementProgressByKeycloakIdTests {
                 "keycloakId",
                 "username",
                 List.of(gameId),
+                List.of(),
                 0,
                 new Profile("username", "Bio"),
                 "Test@gmail.com"

@@ -1,9 +1,11 @@
 package be.kdg.ipj3.notifications.application;
 
-import be.kdg.ipj3.notifications.domain.*;
+import be.kdg.ipj3.notifications.domain.Notification;
+import be.kdg.ipj3.notifications.domain.NotificationChannel;
+import be.kdg.ipj3.notifications.domain.NotificationRepository;
+import be.kdg.ipj3.notifications.domain.UserNotificationPreferences;
 import be.kdg.ipj3.notifications.shared.NotificationType;
 import be.kdg.ipj3.users.shared.UserId;
-import be.kdg.ipj3.users.shared.UsersApi;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -11,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
