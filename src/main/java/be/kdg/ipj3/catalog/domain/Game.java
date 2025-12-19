@@ -18,7 +18,8 @@ public class Game {
     private final String name;
     private final String description;
     private final Money price;
-    private final String serviceUrl;
+    private final String backendUrl;
+    private final String frontendUrl;
     private final String rules;
     private final List<Category> categories;
     private final List<Achievement> achievements = new ArrayList<>();
@@ -26,14 +27,15 @@ public class Game {
     private Instant lastRegistration;
     private boolean isActive;
 
-    public Game(GameId id, String name, String description, Money price, String serviceUrl, String rules,
-                List<Achievement> achievements, List<Category> categories, String imageUrl, Instant lastRegistration,
-                boolean isActive) {
+    public Game(GameId id, String name, String description, Money price, String backendUrl, String frontendUrl,
+                String rules, List<Achievement> achievements, List<Category> categories, String imageUrl,
+                Instant lastRegistration, boolean isActive) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
-        this.serviceUrl = serviceUrl;
+        this.backendUrl = backendUrl;
+        this.frontendUrl = frontendUrl;
         this.rules = rules;
         this.achievements.addAll(achievements);
         this.categories = List.copyOf(categories);
@@ -42,13 +44,15 @@ public class Game {
         this.isActive = isActive;
     }
 
-    public Game(GameId id, String name, String description, Money price, String serviceUrl, String rules,
-                List<Achievement> achievements, List<Category> categories, String imageUrl, Instant lastRegistration) {
+    public Game(GameId id, String name, String description, Money price, String backendUrl, String frontendUrl,
+                String rules, List<Achievement> achievements, List<Category> categories, String imageUrl,
+                Instant lastRegistration) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
-        this.serviceUrl = serviceUrl;
+        this.backendUrl = backendUrl;
+        this.frontendUrl = frontendUrl;
         this.rules = rules;
         this.achievements.addAll(achievements);
         this.categories = List.copyOf(categories);
@@ -73,8 +77,12 @@ public class Game {
         return price;
     }
 
-    public String getServiceUrl() {
-        return serviceUrl;
+    public String getBackendUrl() {
+        return backendUrl;
+    }
+
+    public String getFrontendUrl() {
+        return frontendUrl;
     }
 
     public String getRules() {

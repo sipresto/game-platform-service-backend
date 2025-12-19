@@ -128,4 +128,6 @@ public class GetAllNotificationsTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
+
+    // TODO: Test when user does not exist
 }

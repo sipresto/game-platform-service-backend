@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface JpaSessionRepository extends JpaRepository<JpaSessionEntity, UUID> {
-    @Query("SELECT s FROM JpaSessionEntity s WHERE :userId MEMBER OF s.players")
-    List<JpaSessionEntity> findSessionsByUserId(UUID userId);
+    @Query("SELECT s FROM JpaSessionEntity s WHERE :userId MEMBER OF s.players AND s.completedAt IS NOT NULL")
+    List<JpaSessionEntity> findFinishedSessionsByUserId(UUID userId);
 }

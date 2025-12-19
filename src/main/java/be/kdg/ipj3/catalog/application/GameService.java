@@ -34,9 +34,16 @@ public class GameService implements GamesApi {
     }
 
     @Transactional(readOnly = true)
-    public String findServiceByGameId(UUID id) {
+    public String findBackendUrlByGameId(UUID id) {
         var gameId = new GameId(id);
-        return gameRepository.findServiceUrlByGameId(gameId)
+        return gameRepository.findBackendUrlByGameId(gameId)
+                .orElseThrow(gameId::notFound);
+    }
+
+    @Transactional(readOnly = true)
+    public String findFrontendUrlByGameId(UUID id) {
+        var gameId = new GameId(id);
+        return gameRepository.findFrontendUrlByGameId(gameId)
                 .orElseThrow(gameId::notFound);
     }
 
@@ -89,8 +96,8 @@ public class GameService implements GamesApi {
     }
 
     @Transactional(readOnly = true)
-    public Optional<AchievementDto> findAchievementDtoByCode(String code) {
-        return gameRepository.findAchievementByCode(code)
+    public Optional<AchievementDto> findAchievementDtoByGameIdAndCode(GameId gameId, String code) {
+        return gameRepository.findAchievementByGameIdAndCode(gameId, code)
                 .map(AchievementDto::fromDomain);
     }
 

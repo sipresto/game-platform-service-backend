@@ -2,8 +2,8 @@ package be.kdg.ipj3.lobbies.application;
 
 import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.lobbies.api.dto.GameStartRequestDto;
+import be.kdg.ipj3.lobbies.api.dto.GameStartRequestDto.PlatformPlayerDto;
 import be.kdg.ipj3.lobbies.api.dto.LobbyDetailDto;
-import be.kdg.ipj3.lobbies.api.dto.PlatformPlayerDto;
 import be.kdg.ipj3.lobbies.api.dto.PlayerDto;
 import be.kdg.ipj3.lobbies.domain.Lobby;
 import be.kdg.ipj3.lobbies.domain.LobbyId;
@@ -12,6 +12,8 @@ import be.kdg.ipj3.lobbies.domain.LobbyStatus;
 import be.kdg.ipj3.lobbies.domain.exceptions.GameServiceUnavailableException;
 import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
+import be.kdg.ipj3.sessions.shared.SessionId;
+import be.kdg.ipj3.sessions.shared.SessionsApi;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
@@ -31,13 +33,16 @@ public class LobbyService {
     private final LobbyRepository lobbyRepository;
     private final GamesApi gamesApi;
     private final UsersApi usersApi;
+    private final SessionsApi sessionsApi;
     private final Logger logger = Logger.getLogger(LobbyService.class.getName());
 
-    public LobbyService(GameClient gameClient, LobbyRepository lobbyRepository, GamesApi gamesApi, UsersApi usersApi) {
+    public LobbyService(GameClient gameClient, LobbyRepository lobbyRepository, GamesApi gamesApi, UsersApi usersApi,
+                        SessionsApi sessionsApi) {
         this.gameClient = gameClient;
         this.lobbyRepository = lobbyRepository;
         this.gamesApi = gamesApi;
         this.usersApi = usersApi;
+        this.sessionsApi = sessionsApi;
     }
 
     public Lobby createLobby(String keycloakId, String password, int maxPlayers, UUID gameIdParam) {
@@ -91,32 +96,44 @@ public class LobbyService {
 
 
     public String startGame(UUID id, String requestorKeycloakId, Difficulty difficulty) {
-
         var requestor = usersApi.findByKeycloakId(requestorKeycloakId).getId();
         var lobbyId = new LobbyId(id);
 
         Lobby lobby = lobbyRepository.findById(lobbyId)
                 .orElseThrow(lobbyId::notFound);
-        var gameId = lobby.getGame().id();
-
-        String serviceUrl = gamesApi.findServiceByGameId(gameId);
 
         lobby.validateReadyToStart(requestor);
+
+        var gameId = lobby.getGame().id();
+        String serviceUrl = gamesApi.findBackendUrlByGameId(gameId);
 
         Set<UserId> playerIds = lobby.getPlayers();
         List<PlatformPlayerDto> players = new ArrayList<>();
         for (UserId userId : playerIds) {
             SmallUserDto smallUserDto = usersApi.findSmallUserDtoById(userId.id());
             PlatformPlayerDto playerDto = PlatformPlayerDto.fromDto(smallUserDto);
+
             players.add(playerDto);
         }
 
-        GameStartRequestDto dto = new GameStartRequestDto(players, difficulty);
+        SessionId sessionId = SessionId.create();
+        GameStartRequestDto dto = new GameStartRequestDto(sessionId.id(), players, difficulty);
 
         try {
-            String gameUrl = gameClient.startGame(serviceUrl, dto).gameUrl();
-            lobby.markAsInGame(gameUrl);
+            gameClient.startGame(serviceUrl, dto);
+            String gameUrl = gamesApi.findFrontendUrlByGameId(gameId) + "/" + sessionId.id();
+
+            List<UUID> playerList = lobby.getPlayers().stream()
+                    .map(UserId::id)
+                    .toList();
+            sessionsApi.createSession(sessionId.id(), gameId, playerList, difficulty);
+
+            lobby.startGame(gameUrl);
             lobbyRepository.save(lobby);
+
+            // TODO: cleanup job to remove after a period because polling
+            //lobbyRepository.deleteById(lobbyId);
+
             return gameUrl;
         } catch (Exception e) {
             logger.warning(e.toString());

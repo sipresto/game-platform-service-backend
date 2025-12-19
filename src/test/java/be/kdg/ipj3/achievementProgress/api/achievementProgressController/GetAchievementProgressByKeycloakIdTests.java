@@ -117,7 +117,8 @@ public class GetAchievementProgressByKeycloakIdTests {
                 "Game 1",
                 "Description",
                 Money.of(BigDecimal.valueOf(20.00)),
-                "http://test.com/service",
+                "/api/game",
+                "/game",
                 "A rule",
                 achievements,
                 List.of(Category.CARDGAME),
@@ -190,7 +191,8 @@ public class GetAchievementProgressByKeycloakIdTests {
                 "Game 1",
                 "Description",
                 Money.of(BigDecimal.valueOf(20.00)),
-                "http://test.com/service",
+                "/api/game",
+                "/game",
                 "A rule",
                 achievements,
                 List.of(Category.CARDGAME),
@@ -220,4 +222,6 @@ public class GetAchievementProgressByKeycloakIdTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
+
+    // TODO: Test when user does not exist
 }

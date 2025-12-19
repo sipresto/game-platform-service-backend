@@ -1,6 +1,5 @@
 package be.kdg.ipj3.lobbies.infrastructure.rest;
 
-import be.kdg.ipj3.lobbies.api.dto.GameCreatedResponseDto;
 import be.kdg.ipj3.lobbies.api.dto.GameStartRequestDto;
 import be.kdg.ipj3.shared.infrastructure.security.ServiceClientCredentials;
 import org.springframework.http.HttpHeaders;
@@ -17,14 +16,14 @@ public class GameClient {
         this.serviceClientCredentials = serviceClientCredentials;
     }
 
-    public GameCreatedResponseDto startGame(String serviceUrl, GameStartRequestDto request) {
+    public void startGame(String serviceUrl, GameStartRequestDto request) {
         String token = serviceClientCredentials.getAccessTokenForService();
-        return restClient
+        restClient
                 .post()
                 .uri(serviceUrl)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .body(request)
                 .retrieve()
-                .body(GameCreatedResponseDto.class);
+                .toBodilessEntity();
     }
 }
