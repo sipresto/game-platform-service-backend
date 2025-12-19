@@ -23,6 +23,8 @@ public interface UsersApi {
 
     List<GameId> findOwnedGamesById(UUID id);
 
+    List<GameId> findFavoriteGamesByUserId(UUID id);
+
     void addPoints(UUID id, int points);
 
     SmallUserDto findSmallUserDtoById(UUID id);

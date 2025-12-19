@@ -108,6 +108,12 @@ public class GameService implements GamesApi {
         return gameRepository.findGamesByIds(ownedGameIds);
     }
 
+    public List<Game> findFavoriteGamesByKeycloakId(String keycloakId) {
+        var userId = usersApi.findIdByKeycloakId(keycloakId);
+        var favoriteGamesIds = usersApi.findFavoriteGamesByUserId(userId.id());
+        return gameRepository.findGamesByIds(favoriteGamesIds);
+    }
+
     public void registerGame(RegisterGameDto dto) {
         Game game = gameRepository.findById(new GameId(dto.id()))
                 .orElse(null);

@@ -104,6 +104,10 @@ public class User {
         }
     }
 
+    public List<GameId> getFavoriteGames() {
+        return favoriteGames;
+    }
+
     public Visibility getVisibility() {
         return visibility;
     }

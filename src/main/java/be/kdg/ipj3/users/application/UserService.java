@@ -1,7 +1,5 @@
 package be.kdg.ipj3.users.application;
 
-import be.kdg.ipj3.catalog.api.dto.GameDto;
-import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.domain.Profile;
@@ -11,12 +9,8 @@ import be.kdg.ipj3.users.domain.Visibility;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +82,10 @@ public class UserService implements UsersApi {
     @Transactional(readOnly = true)
     public List<GameId> findOwnedGamesById(UUID id) {
         return userRepository.findOwnedGamesById(new UserId(id));
+    }
+
+    public List<GameId> findFavoriteGamesByUserId(UUID id){
+        return userRepository.findFavoriteGamesByUserId(new UserId(id));
     }
 
     @Transactional

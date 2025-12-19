@@ -15,6 +15,8 @@ public interface UserRepository {
 
     List<GameId> findOwnedGamesById(UserId id);
 
+    List<GameId> findFavoriteGamesByUserId(UserId id);
+
     void deleteAll();
 
     List<User> findAllPublicUsers();
