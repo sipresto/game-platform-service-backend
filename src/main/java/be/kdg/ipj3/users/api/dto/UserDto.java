@@ -1,8 +1,10 @@
 package be.kdg.ipj3.users.api.dto;
 
+import be.kdg.ipj3.users.domain.FriendRequest;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.shared.UserId;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +20,8 @@ public record UserDto(
         @Valid @NotNull ProfileDto profile,
         @NotNull Visibility visibility,
         @NotNull int points,
-        List<FriendRequestDto> friendRequests
+        List<FriendRequestDto> friendRequests,
+        List<UUID> friends
 ) {
     public static UserDto fromDomain(User user) {
         return new UserDto(
@@ -28,7 +31,8 @@ public record UserDto(
                 ProfileDto.fromDomain(user.getProfile()),
                 user.getVisibility(),
                 user.getPoints(),
-                user.getFriendRequests().stream().map(FriendRequestDto::fromDomain).toList()
+                user.getFriendRequests().stream().map(FriendRequestDto::fromDomain).toList(),
+                user.getFriends().stream().map(UserId::id).toList()
         );
     }
 
@@ -48,7 +52,7 @@ public record UserDto(
             @NotNull UUID senderId,
             @NotNull Instant createdAt
     ) {
-        public static FriendRequestDto fromDomain(be.kdg.ipj3.users.domain.FriendRequest friendRequest) {
+        public static FriendRequestDto fromDomain(FriendRequest friendRequest) {
             return new FriendRequestDto(
                     friendRequest.sender().id(),
                     friendRequest.createdAt()

@@ -22,7 +22,7 @@ public class User {
     private final String email;
     private final List<FriendRequest> friendRequests;
 
-    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, int points, Profile profile) {
+    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, int points, Profile profile, String email) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
@@ -31,9 +31,11 @@ public class User {
         this.profile = profile;
         this.friends = new ArrayList<>();
         this.visibility = Visibility.PUBLIC;
+        this.email = email;
+        this.friendRequests = new ArrayList<>();
     }
 
-    public User(UserId id, String keycloakId, String username, Profile profile, int points) {
+    public User(UserId id, String keycloakId, String username, Profile profile, int points, String email) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
@@ -42,10 +44,12 @@ public class User {
         this.profile = profile;
         this.visibility = Visibility.PUBLIC;
         this.friends = new ArrayList<>();
+        this.email = email;
+        this.friendRequests = new ArrayList<>();
     }
 
-    public static User createFromKeycloak(String keycloakId, String keycloakUsername) {
-        return new User(UserId.create(), keycloakId, keycloakUsername, List.of(), 0, new Profile(keycloakUsername, ""));
+    public static User createFromKeycloak(String keycloakId, String keycloakUsername, String email) {
+        return new User(UserId.create(), keycloakId, keycloakUsername, List.of(), 0, new Profile(keycloakUsername, ""), email);
     }
 
     public UserId getId() {

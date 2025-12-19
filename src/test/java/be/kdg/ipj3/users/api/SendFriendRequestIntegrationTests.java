@@ -42,7 +42,7 @@ class SendFriendRequestIntegrationTests {
     private JpaUserEntity createUser(String keycloakId, String username) {
         return userRepository.save(new JpaUserEntity(
                 UUID.randomUUID(), keycloakId, username,
-                new JpaProfile(username, "Bio"), 0, Visibility.PUBLIC
+                new JpaProfile(username, "Bio", null, null), 0, Visibility.PUBLIC, "Test@gmail.com"
         ));
     }
 

@@ -2,10 +2,7 @@ package be.kdg.ipj3.users.application;
 
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
-import be.kdg.ipj3.users.domain.Profile;
-import be.kdg.ipj3.users.domain.User;
-import be.kdg.ipj3.users.domain.UserRepository;
-import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
@@ -29,18 +26,19 @@ public class UserService implements UsersApi {
      * Register or get existing user fromDomain Keycloak JWT
      * This is called automatically on first login
      */
-    public User registerOrGetUser(String keycloakId, String keycloakUsername) {
+    public User registerOrGetUser(String keycloakId, String keycloakUsername, String email) {
         if (keycloakId == null || keycloakId.isBlank()) {
             throw new IllegalArgumentException("Keycloak id cannot be null or blank");
         }
 
         return userRepository.findByKeycloakId(keycloakId)
                 .orElseGet(() -> {
-                    User newUser = User.createFromKeycloak(keycloakId, keycloakUsername);
+                    User newUser = User.createFromKeycloak(keycloakId, keycloakUsername, email);
                     userRepository.save(newUser);
                     return newUser;
                 });
     }
+
 
     @Transactional(readOnly = true)
     public User findById(UUID id) {
