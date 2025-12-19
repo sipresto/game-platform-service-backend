@@ -164,4 +164,16 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    void addFavoriteGame_shouldReturnIllegalArgumentException_whenGameIsNotOwned() throws Exception {
+        // Arrange
+        createTestUser();
+        Game game = createTestGame();
+
+        // Act & Assert
+        mockMvc.perform(patch("/api/games/favorite/{gameId}", game.getId().id())
+                        .with(validJwt()))
+                .andExpect(status().isBadRequest());
+    }
+
 }
