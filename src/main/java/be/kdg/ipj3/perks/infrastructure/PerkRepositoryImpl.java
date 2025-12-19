@@ -8,6 +8,7 @@ import be.kdg.ipj3.perks.shared.PerkId;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,5 +24,24 @@ public class PerkRepositoryImpl implements PerkRepository {
     @Override
     public Optional<Perk> findById(PerkId id) {
         return jpaPerkRepository.findById(id.id()).map(JpaPerkEntity::toDomain);
+    }
+
+    @Override
+    public Optional<List<Perk>> findAllPerks() {
+        return Optional.of(jpaPerkRepository.findAll()
+                .stream()
+                .map(JpaPerkEntity::toDomain)
+                .toList());
+    }
+
+    @Override
+    public void save(Perk perk) {
+        JpaPerkEntity entity = JpaPerkEntity.fromDomain(perk);
+        jpaPerkRepository.save(entity);
+    }
+
+    @Override
+    public void deleteAll() {
+        jpaPerkRepository.deleteAll();
     }
 }
