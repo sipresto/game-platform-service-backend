@@ -100,7 +100,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
     }
 
     @Test
-    void addFavoriteGame_shouldReturnBadRequest_whenGameAlreadyFavorited() throws Exception {
+    void addFavoriteGame_shouldReturnBadRequest_whenGameIsAlreadyFavorited() throws Exception {
         // Arrange
         User user = createTestUser();
         Game game = createTestGame();
