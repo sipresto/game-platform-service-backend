@@ -165,7 +165,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
     }
 
     @Test
-    void addFavoriteGame_shouldReturnIllegalArgumentException_whenGameIsNotOwned() throws Exception {
+    void addFavoriteGame_shouldReturnBadRequest_whenGameIsNotOwned() throws Exception {
         // Arrange
         createTestUser();
         Game game = createTestGame();
