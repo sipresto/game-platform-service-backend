@@ -1,8 +1,8 @@
 package be.kdg.ipj3.lobbies.api.lobbyController;
 
-import be.kdg.ipj3.lobbies.domain.LobbyRepository;
-import be.kdg.ipj3.lobbies.domain.Lobby;
 import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.lobbies.domain.Lobby;
+import be.kdg.ipj3.lobbies.domain.LobbyRepository;
 import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

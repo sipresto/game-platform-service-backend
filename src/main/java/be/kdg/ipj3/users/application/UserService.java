@@ -1,7 +1,6 @@
 package be.kdg.ipj3.users.application;
 
 import be.kdg.ipj3.catalog.shared.GameId;
-import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
@@ -75,13 +74,14 @@ public class UserService implements UsersApi {
     public void addFavorite(String id, UUID gameId) {
         var user = findByKeycloakId(id);
         user.addFavorite(new GameId(gameId));
+        userRepository.save(user);
     }
 
     @Override
     public void removeFavorite(String id, UUID gameId) {
         var user = findByKeycloakId(id);
         user.removeFavorite(new GameId(gameId));
-
+        userRepository.save(user);
     }
 
 

@@ -43,7 +43,7 @@ class FindAllNotificationsTests {
                 new Notification("Notification 2", NotificationType.ACHIEVEMENT, userId)
         );
 
-        given(usersApi.findByKeycloakId(keycloakId)).willReturn(user);
+        given(usersApi.findIdByKeycloakId(keycloakId)).willReturn(userId);
         given(notificationRepository.findByUserId(userId)).willReturn(notifications);
 
         // Act
@@ -60,7 +60,7 @@ class FindAllNotificationsTests {
         UserId userId = new UserId(UUID.randomUUID());
         User user = new User(userId, keycloakId, "username", new Profile("username", "Bio"), 0, "Test@gmail.com");
 
-        given(usersApi.findByKeycloakId(keycloakId)).willReturn(user);
+        given(usersApi.findIdByKeycloakId(keycloakId)).willReturn(userId);
         given(notificationRepository.findByUserId(userId)).willReturn(List.of());
 
         // Act
@@ -74,7 +74,7 @@ class FindAllNotificationsTests {
     void findAllNotifications_shouldThrowExceptionWhenUserNotFound() {
         // Arrange
         String keycloakId = "nonExistentKeycloakId";
-        given(usersApi.findByKeycloakId(keycloakId)).willThrow(new RuntimeException("User not found"));
+        given(usersApi.findIdByKeycloakId(keycloakId)).willThrow(new RuntimeException("User not found"));
 
         // Act & Assert
         assertThatThrownBy(() -> notificationService.findAllNotifications(keycloakId))

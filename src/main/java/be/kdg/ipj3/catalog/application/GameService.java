@@ -115,6 +115,7 @@ public class GameService implements GamesApi {
         return gameRepository.findGamesByIds(ownedGameIds);
     }
 
+    @Transactional(readOnly = true)
     public List<Game> findFavoriteGamesByKeycloakId(String keycloakId) {
         var userId = usersApi.findIdByKeycloakId(keycloakId);
         var favoriteGamesIds = usersApi.findFavoriteGamesByUserId(userId.id());
@@ -122,16 +123,14 @@ public class GameService implements GamesApi {
     }
 
     public void favoriteGame(String id,UUID gameId){
-
-        if(existsById(gameId)){
+        if(!existsById(gameId)){
             throw GameId.notFound(gameId);
         }
         usersApi.addFavorite(id, gameId);
     }
 
     public void unfavoriteGame(String id,UUID gameId){
-
-        if(existsById(gameId)){
+        if(!existsById(gameId)){
             throw GameId.notFound(gameId);
         }
         usersApi.removeFavorite(id, gameId);

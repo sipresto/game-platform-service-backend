@@ -32,29 +32,6 @@ public class UserController {
         this.profileImageService = profileImageService;
     }
 
-    @PutMapping("/favorite/{gameId}")
-    public ResponseEntity<Void> favoriteGame(
-            @AuthenticationPrincipal Jwt jwt,
-            @PathVariable UUID gameId
-    ) {
-        String keycloakId = jwt.getSubject();
-
-        userService.addFavorite(keycloakId, gameId);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @PutMapping("/unfavorite/{gameId}")
-    public ResponseEntity<Void> unfavoriteGame(
-            @AuthenticationPrincipal Jwt jwt,
-            @PathVariable UUID gameId
-    ) {
-        String keycloakId = jwt.getSubject();
-
-        userService.removeFavorite(keycloakId, gameId);
-
-        return ResponseEntity.ok().build();
-    }
 
     /**
      * Get current user's profile

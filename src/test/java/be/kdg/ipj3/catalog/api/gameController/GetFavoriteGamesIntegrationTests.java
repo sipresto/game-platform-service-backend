@@ -7,7 +7,6 @@ import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +19,14 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
+import java.time.Instant;
+import java.util.List;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.time.Instant;
-import java.util.List;
-
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -39,9 +36,6 @@ public class GetFavoriteGamesIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private UserRepository userRepository;
@@ -90,12 +84,12 @@ public class GetFavoriteGamesIntegrationTests {
     void getFavoriteGames_shouldReturnListOfGames_whenUserHasFavorites() throws Exception {
         // Arrange
         User user = createTestUser();
-        Game game1 = createTestGame("Minecraft");
-        Game game2 = createTestGame("Fortnite");
-        Game game3 = createTestGame("Roblox");
+        Game game1 = createTestGame("TicTac");
+        Game game2 = createTestGame("Chess");
+        Game game3 = createTestGame("Quoridor");
 
-        user.addOrRemoveFavorite(game1.getId());
-        user.addOrRemoveFavorite(game3.getId());
+        user.addFavorite(game1.getId());
+        user.addFavorite(game3.getId());
         userRepository.save(user);
 
         // Act & Assert
@@ -105,8 +99,8 @@ public class GetFavoriteGamesIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is("Minecraft")))
-                .andExpect(jsonPath("$[1].name", is("Roblox")));
+                .andExpect(jsonPath("$[0].name", is("TicTac")))
+                .andExpect(jsonPath("$[1].name", is("Quoridor")));
     }
 
     @Test

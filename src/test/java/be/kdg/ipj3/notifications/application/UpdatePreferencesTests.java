@@ -1,6 +1,8 @@
 package be.kdg.ipj3.notifications.application;
 
-import be.kdg.ipj3.notifications.domain.*;
+import be.kdg.ipj3.notifications.domain.NotificationChannel;
+import be.kdg.ipj3.notifications.domain.NotificationRepository;
+import be.kdg.ipj3.notifications.domain.UserNotificationPreferences;
 import be.kdg.ipj3.notifications.shared.NotificationType;
 import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.Test;
@@ -15,10 +17,10 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class UpdatePreferencesTests {

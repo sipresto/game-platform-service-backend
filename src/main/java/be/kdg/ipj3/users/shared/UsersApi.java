@@ -1,7 +1,6 @@
 package be.kdg.ipj3.users.shared;
 
 import be.kdg.ipj3.catalog.shared.GameId;
-import be.kdg.ipj3.users.domain.User;
 import org.springframework.modulith.NamedInterface;
 
 import java.util.List;
