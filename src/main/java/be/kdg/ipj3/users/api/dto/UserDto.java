@@ -20,8 +20,9 @@ public record UserDto(
         @Valid @NotNull ProfileDto profile,
         @NotNull Visibility visibility,
         @NotNull int points,
-        List<FriendRequestDto> friendRequests,
-        List<UUID> friends
+        List<IncomingFriendRequestDto> incomingFriendRequests,
+        List<UUID> friends,
+        List<OutgoingFriendRequestDto> outgoingFriendRequests
 ) {
     public static UserDto fromDomain(User user) {
         return new UserDto(
@@ -31,8 +32,9 @@ public record UserDto(
                 ProfileDto.fromDomain(user.getProfile()),
                 user.getVisibility(),
                 user.getPoints(),
-                user.getFriendRequests().stream().map(FriendRequestDto::fromDomain).toList(),
-                user.getFriends().stream().map(UserId::id).toList()
+                user.getIncomingFriendRequests().stream().map(IncomingFriendRequestDto::fromDomain).toList(),
+                user.getFriends().stream().map(UserId::id).toList(),
+                user.getOutgoingFriendRequests().stream().map(OutgoingFriendRequestDto::fromDomain).toList()
         );
     }
 
@@ -48,13 +50,25 @@ public record UserDto(
         }
     }
 
-    public record FriendRequestDto(
+    public record IncomingFriendRequestDto(
             @NotNull UUID senderId,
             @NotNull Instant createdAt
     ) {
-        public static FriendRequestDto fromDomain(FriendRequest friendRequest) {
-            return new FriendRequestDto(
-                    friendRequest.sender().id(),
+        public static IncomingFriendRequestDto fromDomain(FriendRequest friendRequest) {
+            return new IncomingFriendRequestDto(
+                    friendRequest.otherUser().id(),
+                    friendRequest.createdAt()
+            );
+        }
+    }
+
+    public record OutgoingFriendRequestDto(
+            @NotNull UUID receiverId,
+            @NotNull Instant createdAt
+    ) {
+        public static OutgoingFriendRequestDto fromDomain(FriendRequest friendRequest) {
+            return new OutgoingFriendRequestDto(
+                    friendRequest.otherUser().id(),
                     friendRequest.createdAt()
             );
         }

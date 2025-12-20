@@ -11,8 +11,6 @@ import be.kdg.ipj3.users.shared.EmailUserDto;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -159,14 +157,11 @@ public class UserService implements UsersApi {
     public void sendFriendRequest(UUID receiver, String loggedInUserKeycloakId) {
         User receiverUser = findById(receiver);
         User senderUser = findByKeycloakId(loggedInUserKeycloakId);
-        if(receiverUser.getId().equals(senderUser.getId())) {
-            throw new IllegalArgumentException("You cannot send friend requests to yourself");
-        }
-        if(receiverUser.getFriendRequests().stream().anyMatch(friendRequest -> friendRequest.sender().equals(senderUser.getId()))) {
-            throw new IllegalArgumentException("Friend request already sent to this user");
-        }
-        receiverUser.addFriendRequest(new FriendRequest(senderUser.getId()));
+        receiverUser.validateFriendRequests(senderUser.getId());
+        receiverUser.addIncomingFriendRequest(new FriendRequest(senderUser.getId()));
+        senderUser.addOutgoingFriendRequest(new FriendRequest(receiverUser.getId()));
         userRepository.save(receiverUser);
+        userRepository.save(senderUser);
     }
 
     public void acceptFriendRequest(UUID receiver, UUID sender) {
@@ -174,6 +169,7 @@ public class UserService implements UsersApi {
         User senderUser = findById(sender);
         receiverUser.acceptFriendRequest(senderUser.getId());
         senderUser.addFriend(receiverUser.getId());
+        senderUser.removeOutgoingFriendRequest(receiverUser.getId());
         userRepository.save(receiverUser);
         userRepository.save(senderUser);
     }
@@ -181,7 +177,9 @@ public class UserService implements UsersApi {
     public void rejectFriendRequest(UUID receiver, UUID sender) {
         User receiverUser = findById(receiver);
         User senderUser = findById(sender);
-        receiverUser.removeFriendRequest(senderUser.getId());
+        receiverUser.removeIncomingFriendRequest(senderUser.getId());
+        senderUser.removeOutgoingFriendRequest(receiverUser.getId());
         userRepository.save(receiverUser);
+        userRepository.save(senderUser);
     }
 }

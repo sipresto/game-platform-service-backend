@@ -62,10 +62,17 @@ public class JpaUserEntity {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name = "friend_requests",
+            name = "friend_requests_incoming",
             joinColumns = @JoinColumn(name = "user_id")
     )
-    private final List<JpaFriendRequest> friendRequests = new ArrayList<>();
+    private final List<JpaFriendRequest> incomingFriendRequests = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "friend_requests_outgoing",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    private final List<JpaFriendRequest> outgoingFriendRequests = new ArrayList<>();
 
     protected JpaUserEntity() {
     } // for JPA
@@ -103,9 +110,13 @@ public class JpaUserEntity {
                 .map(UserId::id)
                 .forEach(jpaUserEntity::addFriend);
 
-        user.getFriendRequests().stream()
+        user.getIncomingFriendRequests().stream()
                 .map(JpaFriendRequest::fromDomain)
-                .forEach(jpaUserEntity.friendRequests::add);
+                .forEach(jpaUserEntity.incomingFriendRequests::add);
+
+        user.getOutgoingFriendRequests().stream()
+                .map(JpaFriendRequest::fromDomain)
+                .forEach(jpaUserEntity.outgoingFriendRequests::add);
 
         return jpaUserEntity;
     }
@@ -124,9 +135,13 @@ public class JpaUserEntity {
                 .map(UserId::new)
                 .forEach(user::addFriend);
 
-        friendRequests.stream()
+        incomingFriendRequests.stream()
                 .map(JpaFriendRequest::toDomain)
-                .forEach(user::addFriendRequest);
+                .forEach(user::addIncomingFriendRequest);
+
+        outgoingFriendRequests.stream()
+                .map(JpaFriendRequest::toDomain)
+                .forEach(user::addOutgoingFriendRequest);
 
         user.updateVisibility(this.visibility);
         return user;

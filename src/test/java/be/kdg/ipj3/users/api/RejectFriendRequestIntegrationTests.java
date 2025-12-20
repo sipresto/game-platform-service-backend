@@ -53,12 +53,12 @@ class RejectFriendRequestIntegrationTests {
     @Transactional
     void rejectFriendRequest_ShouldSucceed_WhenRequestExists() throws Exception {
         // Arrange
-        JpaUserEntity senderEntity = createUser("kc-sender", "sender");
+        JpaUserEntity senderEntity = createUser("kc-otherUser", "otherUser");
         JpaUserEntity receiverEntity = createUser("kc-receiver", "receiver");
 
         User receiverDomain = receiverEntity.toDomain();
         User senderDomain = senderEntity.toDomain();
-        receiverDomain.addFriendRequest(new FriendRequest(senderDomain.getId()));
+        receiverDomain.addIncomingFriendRequest(new FriendRequest(senderDomain.getId()));
         userRepository.save(JpaUserEntity.fromDomain(receiverDomain));
 
         // Act
@@ -70,7 +70,7 @@ class RejectFriendRequestIntegrationTests {
         JpaUserEntity updatedReceiver = userRepository.findById(receiverEntity.getId()).orElseThrow();
 
         assertThat(updatedReceiver.getFriends()).doesNotContain(senderEntity.getId());
-        assertThat(updatedReceiver.toDomain().getFriendRequests()).isEmpty();
+        assertThat(updatedReceiver.toDomain().getIncomingFriendRequests()).isEmpty();
     }
 
     @Test
@@ -86,7 +86,7 @@ class RejectFriendRequestIntegrationTests {
     @Transactional
     void rejectFriendRequest_ShouldNotFail_WhenNoRequestExists() throws Exception {
         // Arrange
-        JpaUserEntity sender = createUser("kc-sender", "sender");
+        JpaUserEntity sender = createUser("kc-otherUser", "otherUser");
         JpaUserEntity receiver = createUser("kc-receiver", "receiver");
 
         // Act

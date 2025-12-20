@@ -51,7 +51,7 @@ class SendFriendRequestIntegrationTests {
     @Transactional
     void sendFriendRequest_ShouldSucceed_WhenUsersExist() throws Exception {
         // Arrange
-        JpaUserEntity sender = createUser("kc-sender", "sender");
+        JpaUserEntity sender = createUser("kc-otherUser", "otherUser");
         JpaUserEntity receiver = createUser("kc-receiver", "receiver");
 
         // Act
@@ -61,16 +61,16 @@ class SendFriendRequestIntegrationTests {
 
         // Assert
         JpaUserEntity updatedReceiver = userRepository.findById(receiver.getId()).orElseThrow();
-        assertThat(updatedReceiver.toDomain().getFriendRequests())
+        assertThat(updatedReceiver.toDomain().getIncomingFriendRequests())
                 .hasSize(1)
-                .extracting(req -> req.sender().id())
+                .extracting(req -> req.otherUser().id())
                 .contains(sender.getId());
     }
 
     @Test
     void sendFriendRequest_ShouldFail_WhenReceiverNotFound() throws Exception {
         // Arrange
-        JpaUserEntity sender = createUser("kc-sender", "sender");
+        JpaUserEntity sender = createUser("kc-otherUser", "otherUser");
 
         // Act & Assert
         mockMvc.perform(post("/api/user/{receiverId}/send-friend-request", UUID.randomUUID())

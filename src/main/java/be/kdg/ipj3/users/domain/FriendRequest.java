@@ -6,8 +6,8 @@ import org.jmolecules.ddd.annotation.ValueObject;
 import java.time.Instant;
 
 @ValueObject
-public record FriendRequest(UserId sender, Instant createdAt) {
-    public FriendRequest(UserId sender) {
-        this(sender, Instant.now());
+public record FriendRequest(UserId otherUser, Instant createdAt) {
+    public FriendRequest(UserId otherUser) {
+        this(otherUser, Instant.now());
     }
 }

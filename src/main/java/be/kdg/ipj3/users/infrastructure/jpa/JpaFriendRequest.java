@@ -25,7 +25,7 @@ public class JpaFriendRequest {
     }
 
     public static JpaFriendRequest fromDomain(FriendRequest friendRequest) {
-        return new JpaFriendRequest(friendRequest.sender().id(), friendRequest.createdAt());
+        return new JpaFriendRequest(friendRequest.otherUser().id(), friendRequest.createdAt());
     }
 
     public FriendRequest toDomain() {
