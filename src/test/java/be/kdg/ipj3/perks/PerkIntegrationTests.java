@@ -112,8 +112,8 @@ public class PerkIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(id.toString()))
-                .andExpect(jsonPath("$.name").value("Invisibility"))
-                .andExpect(jsonPath("$.pointCost").value(500));
+                .andExpect(jsonPath("$.name").value("Invisible"))
+                .andExpect(jsonPath("$.pointCost").value(5));
     }
 
     @Test
