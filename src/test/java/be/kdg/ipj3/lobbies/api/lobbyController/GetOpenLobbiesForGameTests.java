@@ -3,13 +3,13 @@ package be.kdg.ipj3.lobbies.api.lobbyController;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.GameRepository;
-import be.kdg.ipj3.lobbies.domain.LobbyRepository;
-import be.kdg.ipj3.lobbies.domain.Lobby;
 import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.lobbies.domain.Lobby;
+import be.kdg.ipj3.lobbies.domain.LobbyRepository;
 import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.users.shared.UserId;
-import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.UserRepository;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +74,8 @@ public class GetOpenLobbiesForGameTests {
                 "Game",
                 "Description",
                 Money.of(BigDecimal.valueOf(19.99)),
-                "https://test.com/service",
+                "/api/game",
+                "/game",
                 "A rule",
                 List.of(),
                 List.of(Category.NATIVE),

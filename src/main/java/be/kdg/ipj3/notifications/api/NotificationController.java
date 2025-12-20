@@ -52,9 +52,9 @@ public class NotificationController {
     public ResponseEntity<Map<NotificationType, Map<NotificationChannel, Boolean>>> getPreferences(
             @AuthenticationPrincipal Jwt jwt) {
         String keycloakId = jwt.getSubject();
-        var user = usersApi.findByKeycloakId(keycloakId);
+        var user = usersApi.findIdByKeycloakId(keycloakId);
 
-        UserNotificationPreferences prefs = notificationService.getPreferences(user.getId().id());
+        UserNotificationPreferences prefs = notificationService.getPreferences(user.id());
         return ResponseEntity.ok(prefs.getAllPreferences());
     }
 
@@ -65,9 +65,9 @@ public class NotificationController {
             @PathVariable NotificationChannel channel,
             @RequestParam boolean enabled) {
         String keycloakId = jwt.getSubject();
-        var user = usersApi.findByKeycloakId(keycloakId);
+        var user = usersApi.findIdByKeycloakId(keycloakId);
 
-        notificationService.updatePreferences(user.getId().id(), notificationType, channel, enabled);
+        notificationService.updatePreferences(user.id(), notificationType, channel, enabled);
         return ResponseEntity.ok().build();
     }
 }

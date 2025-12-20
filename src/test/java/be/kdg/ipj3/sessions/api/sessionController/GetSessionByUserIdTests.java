@@ -1,13 +1,13 @@
 package be.kdg.ipj3.sessions.api.sessionController;
 
-import be.kdg.ipj3.lobbies.shared.Difficulty;
-import be.kdg.ipj3.sessions.domain.SessionRepository;
-import be.kdg.ipj3.sessions.domain.Session;
-import be.kdg.ipj3.sessions.shared.SessionResult;
 import be.kdg.ipj3.catalog.shared.GameId;
-import be.kdg.ipj3.users.shared.UserId;
-import be.kdg.ipj3.users.domain.UserRepository;
+import be.kdg.ipj3.lobbies.shared.Difficulty;
+import be.kdg.ipj3.sessions.domain.Session;
+import be.kdg.ipj3.sessions.domain.SessionRepository;
+import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.UserRepository;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -60,16 +60,16 @@ public class GetSessionByUserIdTests {
                 GameId.create(),
                 List.of(userId),
                 Difficulty.EASY,
-                userId,
-                SessionResult.PLAYER_WIN
+                SessionStatus.PLAYER_WIN,
+                userId
         );
 
         Session session2 = new Session(
                 GameId.create(),
                 List.of(userId),
                 Difficulty.HARD,
-                null,
-                SessionResult.AI_WIN
+                SessionStatus.AI_WIN,
+                null
         );
 
         sessionRepository.save(session1);

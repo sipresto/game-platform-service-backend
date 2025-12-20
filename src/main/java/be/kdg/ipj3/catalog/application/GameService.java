@@ -34,9 +34,16 @@ public class GameService implements GamesApi {
     }
 
     @Transactional(readOnly = true)
-    public String findServiceByGameId(UUID id) {
+    public String findBackendUrlByGameId(UUID id) {
         var gameId = new GameId(id);
-        return gameRepository.findServiceUrlByGameId(gameId)
+        return gameRepository.findBackendUrlByGameId(gameId)
+                .orElseThrow(gameId::notFound);
+    }
+
+    @Transactional(readOnly = true)
+    public String findFrontendUrlByGameId(UUID id) {
+        var gameId = new GameId(id);
+        return gameRepository.findFrontendUrlByGameId(gameId)
                 .orElseThrow(gameId::notFound);
     }
 
@@ -89,8 +96,8 @@ public class GameService implements GamesApi {
     }
 
     @Transactional(readOnly = true)
-    public Optional<AchievementDto> findAchievementDtoByCode(String code) {
-        return gameRepository.findAchievementByCode(code)
+    public Optional<AchievementDto> findAchievementDtoByGameIdAndCode(GameId gameId, String code) {
+        return gameRepository.findAchievementByGameIdAndCode(gameId, code)
                 .map(AchievementDto::fromDomain);
     }
 
@@ -106,6 +113,27 @@ public class GameService implements GamesApi {
         UserId userId = usersApi.findIdByKeycloakId(keycloakId);
         List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id());
         return gameRepository.findGamesByIds(ownedGameIds);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Game> findFavoriteGamesByKeycloakId(String keycloakId) {
+        var userId = usersApi.findIdByKeycloakId(keycloakId);
+        var favoriteGamesIds = usersApi.findFavoriteGamesByUserId(userId.id());
+        return gameRepository.findGamesByIds(favoriteGamesIds);
+    }
+
+    public void favoriteGame(String id,UUID gameId){
+        if(!existsById(gameId)){
+            throw GameId.notFound(gameId);
+        }
+        usersApi.addFavorite(id, gameId);
+    }
+
+    public void unfavoriteGame(String id,UUID gameId){
+        if(!existsById(gameId)){
+            throw GameId.notFound(gameId);
+        }
+        usersApi.removeFavorite(id, gameId);
     }
 
     public void registerGame(RegisterGameDto dto) {

@@ -3,14 +3,14 @@ package be.kdg.ipj3.lobbies.api.lobbyController;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
 import be.kdg.ipj3.catalog.domain.GameRepository;
-import be.kdg.ipj3.lobbies.api.dto.CreateLobbyDto;
-import be.kdg.ipj3.lobbies.domain.LobbyRepository;
-import be.kdg.ipj3.lobbies.domain.Lobby;
-import be.kdg.ipj3.lobbies.domain.LobbyStatus;
 import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.lobbies.api.dto.CreateLobbyDto;
+import be.kdg.ipj3.lobbies.domain.Lobby;
+import be.kdg.ipj3.lobbies.domain.LobbyRepository;
+import be.kdg.ipj3.lobbies.domain.LobbyStatus;
 import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,7 +76,8 @@ public class CreateLobbyTests {
                 "Game",
                 "Description",
                 Money.of(new java.math.BigDecimal("19.99")),
-                "https://test.com/service",
+                "/api/game",
+                "/game",
                 "A rule",
                 List.of(),
                 List.of(Category.NATIVE),

@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -41,14 +40,14 @@ public class AchievementProgressService {
     }
 
     public void evaluateAchievementsAfterGame(GameContext context) {
-        List<AchievementDto> gameAchievements = gamesApi.findAchievementDtosByGameId(context.game());
+        List<AchievementDto> gameAchievements = gamesApi.findAchievementDtosByGameId(context.game().id());
 
-        if (!usersApi.existsById(context.player())) {
+        if (!usersApi.existsById(context.player().id())) {
             return;
         }
 
         for (AchievementDto achievement : gameAchievements) {
-            AchievementProgress progress = getProgress(new UserId(context.player()), achievement.id());
+            AchievementProgress progress = getProgress(new UserId(context.player().id()), achievement.id());
 
             if (progress.isCompleted() || !achievement.isCountedAfterGame()) {
                 continue;
@@ -69,7 +68,7 @@ public class AchievementProgressService {
 
             if (updatedProgress.isCompleted()) {
                 usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
-                notificationsApi.addNotification(achievement.name(), NotificationType.ACHIEVEMENT, context.player());
+                notificationsApi.addNotification(achievement.name(), NotificationType.ACHIEVEMENT, context.player().id());
             }
 
             if (updatedProgress != progress) {
@@ -78,14 +77,13 @@ public class AchievementProgressService {
         }
     }
 
-    public void completeAchievement(UUID userId, UUID gameSessionId, String code, Instant timestamp) {
-        // TODO: haal gameId uit lobby via gameSessionId -> zoek met die gameId en code de achievementId
-        AchievementDto achievement = gamesApi.findAchievementDtoByCode(code).orElse(null);
-        if (achievement == null || !usersApi.existsById(userId)) {
+    public void completeAchievement(UserId userId, GameId gameId, String code, Instant timestamp) {
+        AchievementDto achievement = gamesApi.findAchievementDtoByGameIdAndCode(gameId, code).orElse(null);
+        if (achievement == null || !usersApi.existsById(userId.id())) {
             return;
         }
 
-        AchievementProgress progress = getProgress(new UserId(userId), achievement.id());
+        AchievementProgress progress = getProgress(userId, achievement.id());
 
         if (progress.isCompleted()) {
             return;
@@ -94,7 +92,7 @@ public class AchievementProgressService {
         AchievementProgress updatedProgress = progress.markCompleted(timestamp);
         if (updatedProgress.isCompleted()) {
             usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
-            notificationsApi.addNotification(achievement.name(), NotificationType.ACHIEVEMENT, userId);
+            notificationsApi.addNotification(achievement.name(), NotificationType.ACHIEVEMENT, userId.id());
         }
 
         if (updatedProgress != progress) {
@@ -109,8 +107,8 @@ public class AchievementProgressService {
     }
 
     public List<AchievementProgressDto> findAllAchievementsByKeycloakId(String keycloakId) {
-        var user = usersApi.findByKeycloakId(keycloakId);
-        var userGameIds = usersApi.findOwnedGamesById(user.getId().id());
+        var userId = usersApi.findIdByKeycloakId(keycloakId);
+        var userGameIds = usersApi.findOwnedGamesById(userId.id());
         if (userGameIds.isEmpty()) {
             return List.of();
         }
@@ -124,7 +122,7 @@ public class AchievementProgressService {
 
         for (List<GameAchievementDto> gameAchievementDtos : achievements) {
             for (GameAchievementDto gameAchievementDto : gameAchievementDtos) {
-                var ap = progressRepository.findByUserIdAndAchievementId(user.getId(), gameAchievementDto.achievementId());
+                var ap = progressRepository.findByUserIdAndAchievementId(userId, gameAchievementDto.achievementId());
                 if (ap.isPresent()) {
                     var progress = ap.get();
                     achievementProgressDtos.add(new AchievementProgressDto(

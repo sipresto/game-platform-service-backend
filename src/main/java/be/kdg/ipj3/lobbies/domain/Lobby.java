@@ -76,7 +76,7 @@ public class Lobby {
         }
     }
 
-    public void markAsInGame(String gameUrl) {
+    public void startGame(String gameUrl) {
         this.status = LobbyStatus.IN_GAME;
         this.activeGameUrl = gameUrl;
     }

@@ -6,6 +6,8 @@ import be.kdg.ipj3.catalog.api.dto.LibraryGameDto;
 import be.kdg.ipj3.catalog.application.GameService;
 import be.kdg.ipj3.shared.domain.Money;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,6 +51,41 @@ public class GameController {
         GameDto gameDto = GameDto.fromDomain(gameService.findGameById(id));
 
         return ResponseEntity.ok(gameDto);
+    }
+
+    @GetMapping("/favorites")
+    public ResponseEntity<List<GameDto>> getFavoriteGames(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        String keycloakId = jwt.getSubject();
+        List<GameDto> favorites = gameService.findFavoriteGamesByKeycloakId(keycloakId).stream()
+        .map(GameDto::fromDomain)
+                .toList();
+        return ResponseEntity.ok(favorites);
+    }
+
+    @PatchMapping("/favorite/{gameId}")
+    public ResponseEntity<Void> favoriteGame(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID gameId
+    ) {
+        String keycloakId = jwt.getSubject();
+
+        gameService.favoriteGame(keycloakId, gameId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/unfavorite/{gameId}")
+    public ResponseEntity<Void> unfavoriteGame(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID gameId
+    ) {
+        String keycloakId = jwt.getSubject();
+
+        gameService.unfavoriteGame(keycloakId, gameId);
+
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/user/{keycloakId}")

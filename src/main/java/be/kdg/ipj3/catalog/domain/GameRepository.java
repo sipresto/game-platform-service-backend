@@ -15,7 +15,9 @@ public interface GameRepository {
 
     List<Game> findAllGames();
 
-    Optional<String> findServiceUrlByGameId(GameId id);
+    Optional<String> findBackendUrlByGameId(GameId id);
+
+    Optional<String> findFrontendUrlByGameId(GameId id);
 
     List<Game> filterGames(Money minPrice, Money maxPrice, List<Category> categories);
 
@@ -27,7 +29,7 @@ public interface GameRepository {
 
     List<Achievement> findAchievementsByGameId(GameId id);
 
-    Optional<Achievement> findAchievementByCode(String code);
+    Optional<Achievement> findAchievementByGameIdAndCode(GameId gameId, String code);
 
     Optional<Game> findByIdWithAchievements(GameId id);
 }

@@ -58,6 +58,7 @@ public class GetNotificationPreferencesTests {
                 "keycloakId",
                 "username",
                 List.of(),
+                List.of(),
                 0,
                 new Profile("username", "Bio"),
                 "Test@gmail.com"

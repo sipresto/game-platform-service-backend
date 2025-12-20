@@ -44,6 +44,14 @@ public class JpaUserEntity {
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
+            name = "favorite_games",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "game_id")
+    private final List<UUID> favoriteGames = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
             name = "user_friends",
             joinColumns = @JoinColumn(name = "user_id")
     )
@@ -87,6 +95,10 @@ public class JpaUserEntity {
                 .map(GameId::id)
                 .forEach(jpaUserEntity::addGame);
 
+        user.getFavoriteGames().stream()
+                .map(GameId::id)
+                .forEach(jpaUserEntity::addFavoriteGame);
+
         user.getFriends().stream()
                 .map(UserId::id)
                 .forEach(jpaUserEntity::addFriend);
@@ -104,6 +116,10 @@ public class JpaUserEntity {
                 .map(GameId::new)
                 .forEach(user::addGame);
 
+        favoriteGames.stream()
+                .map(GameId::new)
+                .forEach(user::addFavorite);
+
         friends.stream()
                 .map(UserId::new)
                 .forEach(user::addFriend);
@@ -118,6 +134,9 @@ public class JpaUserEntity {
 
     private void addGame(UUID gameId) {
         this.ownedGames.add(gameId);
+    }
+    private void addFavoriteGame(UUID gameId){
+        this.favoriteGames.add(gameId);
     }
 
     private void addFriend(UUID friendId) {

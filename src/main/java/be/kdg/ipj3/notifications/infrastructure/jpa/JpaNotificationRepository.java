@@ -1,6 +1,5 @@
 package be.kdg.ipj3.notifications.infrastructure.jpa;
 
-import be.kdg.ipj3.notifications.domain.Notification;
 import be.kdg.ipj3.notifications.shared.NotificationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

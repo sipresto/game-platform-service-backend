@@ -19,5 +19,7 @@ public interface LobbyRepository {
 
     List<Lobby> findAll();
 
+    void deleteById(LobbyId id);
+
     void deleteAll();
 }

@@ -62,6 +62,7 @@ public class GetAllNotificationsTests {
                 "keycloakId",
                 "username",
                 List.of(),
+                List.of(),
                 0,
                 new Profile("username", "Bio"),
                 "Test@gmail.com"
@@ -127,4 +128,6 @@ public class GetAllNotificationsTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
+
+    // TODO: Test when user does not exist
 }

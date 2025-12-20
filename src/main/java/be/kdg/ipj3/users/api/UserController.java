@@ -32,6 +32,7 @@ public class UserController {
         this.profileImageService = profileImageService;
     }
 
+
     /**
      * Get current user's profile
      * Automatically registers user on first login

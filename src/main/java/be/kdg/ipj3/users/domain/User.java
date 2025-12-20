@@ -15,6 +15,7 @@ public class User {
     private final String keycloakId;
     private String username;
     private final List<GameId> ownedGames;
+    private final List<GameId> favoriteGames;
     private int points;
     private Profile profile;
     private Visibility visibility;
@@ -22,11 +23,12 @@ public class User {
     private final String email;
     private final List<FriendRequest> friendRequests;
 
-    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, int points, Profile profile, String email) {
+    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, List<GameId> favoriteGames, int points, Profile profile, String email) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
-        this.ownedGames = ownedGames;
+        this.ownedGames = ownedGames != null ? new ArrayList<>(ownedGames) : new ArrayList<>();
+        this.favoriteGames = favoriteGames != null ? new ArrayList<>(favoriteGames) : new ArrayList<>();
         this.points = points;
         this.profile = profile;
         this.friends = new ArrayList<>();
@@ -40,6 +42,7 @@ public class User {
         this.keycloakId = keycloakId;
         this.username = username;
         this.ownedGames = new ArrayList<>();
+        this.favoriteGames = new ArrayList<>();
         this.points = points;
         this.profile = profile;
         this.visibility = Visibility.PUBLIC;
@@ -49,7 +52,10 @@ public class User {
     }
 
     public static User createFromKeycloak(String keycloakId, String keycloakUsername, String email) {
-        return new User(UserId.create(), keycloakId, keycloakUsername, List.of(), 0, new Profile(keycloakUsername, ""), email);
+        return new User(UserId.create(), keycloakId, keycloakUsername,
+                List.of(),
+                List.of(),
+                0, new Profile(keycloakUsername, ""), email);
     }
 
     public UserId getId() {
@@ -95,6 +101,25 @@ public class User {
         } else {
             throw new IllegalArgumentException("Game already owned by this user");
         }
+    }
+    public void addFavorite(GameId gameId){
+        if (!favoriteGames.contains(gameId)){
+            favoriteGames.add(gameId);
+        } else {
+            throw new IllegalArgumentException("Game already favorited by this user");
+        }
+    }
+    public void removeFavorite(GameId gameId){
+        if (favoriteGames.contains(gameId)){
+            favoriteGames.remove(gameId);
+        } else {
+            throw new IllegalArgumentException("Game not favorited by this user");
+        }
+    }
+
+
+    public List<GameId> getFavoriteGames() {
+        return favoriteGames;
     }
 
     public Visibility getVisibility() {
