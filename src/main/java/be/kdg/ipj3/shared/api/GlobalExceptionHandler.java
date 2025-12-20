@@ -17,6 +17,18 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<ApiError> handleNotCorrectUserLoggedIn(SecurityException ex) {
+        ApiError body = new ApiError(
+                HttpStatus.BAD_REQUEST.value(),
+                "Invalid user",
+                ex.getMessage(),
+                List.of(),
+                Instant.now()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    }
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ApiError> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
         ApiError body = new ApiError(

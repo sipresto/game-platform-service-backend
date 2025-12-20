@@ -94,7 +94,7 @@ public class UserController {
     @GetMapping("/friends")
     public ResponseEntity<List<UserDto>> findFriendsForUser(@AuthenticationPrincipal Jwt jwt) {
         var user = userService.findByKeycloakId(jwt.getSubject());
-        var friends = userService.findFriendsAndSelf(user).stream().map(UserDto::fromDomain).toList();
+        var friends = userService.findFriends(user).stream().map(UserDto::fromDomain).toList();
         return ResponseEntity.ok(friends);
     }
 
@@ -152,6 +152,44 @@ public class UserController {
         String keycloakId = jwt.getSubject();
         profileImageService.removeProfileImage(keycloakId);
 
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Sends a friend request from one user to another
+     */
+    @PostMapping("/user/{receiverId}/send-friend-request")
+    public ResponseEntity<Void> sendFriendRequest(
+            @PathVariable UUID receiverId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        userService.sendFriendRequest(receiverId, jwt.getSubject());
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Accepts a friend request
+     */
+    @PutMapping("/user/{senderId}/friend-request/accept")
+    public ResponseEntity<Void> acceptFriendRequest(
+            @PathVariable UUID senderId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        var receiverId = userService.findIdByKeycloakId(jwt.getSubject());
+        userService.acceptFriendRequest(receiverId.id(), senderId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Rejects a friend request
+     */
+    @PutMapping("/user/{senderId}/friend-request/reject")
+    public ResponseEntity<Void> rejectFriendRequest(
+            @PathVariable UUID senderId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        var receiverId = userService.findIdByKeycloakId(jwt.getSubject());
+        userService.rejectFriendRequest(receiverId.id(), senderId);
         return ResponseEntity.noContent().build();
     }
 }

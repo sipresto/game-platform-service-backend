@@ -21,6 +21,8 @@ public class User {
     private Visibility visibility;
     private final List<UserId> friends;
     private final String email;
+    private final List<FriendRequest> incomingFriendRequests;
+    private final List<FriendRequest> outgoingFriendRequests;
 
     public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, List<GameId> favoriteGames, int points, Profile profile, String email) {
         this.id = id;
@@ -30,22 +32,26 @@ public class User {
         this.favoriteGames = favoriteGames != null ? new ArrayList<>(favoriteGames) : new ArrayList<>();
         this.points = points;
         this.profile = profile;
-        this.email = email;
         this.friends = new ArrayList<>();
         this.visibility = Visibility.PUBLIC;
+        this.email = email;
+        this.incomingFriendRequests = new ArrayList<>();
+        this.outgoingFriendRequests = new ArrayList<>();
     }
 
     public User(UserId id, String keycloakId, String username, Profile profile, int points, String email) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
-        this.email = email;
         this.ownedGames = new ArrayList<>();
         this.favoriteGames = new ArrayList<>();
         this.points = points;
         this.profile = profile;
         this.visibility = Visibility.PUBLIC;
         this.friends = new ArrayList<>();
+        this.email = email;
+        this.incomingFriendRequests = new ArrayList<>();
+        this.outgoingFriendRequests = new ArrayList<>();
     }
 
     public static User createFromKeycloak(String keycloakId, String keycloakUsername, String email) {
@@ -84,7 +90,7 @@ public class User {
                 ? profile.bio()
                 : newProfile.bio();
 
-        this.profile = new Profile(displayName, bio, profile.profileImage(), profile.imageMimeType());
+        this.profile = new Profile(displayName, bio);
         this.username = displayName;
     }
 
@@ -143,6 +149,42 @@ public class User {
         this.points += points;
     }
 
+    public void addIncomingFriendRequest(FriendRequest friendRequest) {
+        this.incomingFriendRequests.add(friendRequest);
+    }
+
+    public void addOutgoingFriendRequest(FriendRequest friendRequest) {
+        this.outgoingFriendRequests.add(friendRequest);
+    }
+
+    public void removeOutgoingFriendRequest(UserId userId) {
+        this.outgoingFriendRequests.remove(outgoingFriendRequests.stream().filter(friendRequest -> friendRequest.otherUser().equals(userId)).findFirst().orElse(null));
+    }
+
+    public void removeIncomingFriendRequest(UserId userId) {
+        this.incomingFriendRequests.remove(incomingFriendRequests.stream().filter(friendRequest -> friendRequest.otherUser().equals(userId)).findFirst().orElse(null));
+    }
+
+    public List<FriendRequest> getIncomingFriendRequests() {
+        return incomingFriendRequests;
+    }
+
+    public void acceptFriendRequest(UserId userId) {
+        FriendRequest request = incomingFriendRequests.stream()
+                .filter(friendRequest -> friendRequest.otherUser().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No friend request from this user"));
+
+        this.addFriend(request.otherUser());
+        this.removeIncomingFriendRequest(userId);
+    }
+
+    public void validateFriendRequests(UserId userId) {
+        if(this.id.equals(userId) || this.outgoingFriendRequests.stream().anyMatch(friendRequest -> friendRequest.otherUser().equals(userId))) {
+            throw new IllegalArgumentException("You cannot send friend requests to yourself nor to users you have already sent a request to");
+        }
+    }
+
     public String getEmail() {
         return email;
     }
@@ -163,5 +205,9 @@ public class User {
                 null,
                 null
         );
+    }
+
+    public List<FriendRequest> getOutgoingFriendRequests() {
+        return outgoingFriendRequests;
     }
 }

@@ -2,6 +2,7 @@ package be.kdg.ipj3.users.application;
 
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
+import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;
@@ -124,11 +125,8 @@ public class UserService implements UsersApi {
     }
 
     @Transactional(readOnly = true)
-    public List<User> findFriendsAndSelf(User user) {
-        List<User> usersReturn = new ArrayList<>();
-        usersReturn.add(user);
-        usersReturn.addAll(userRepository.findFriends(user.getId()));
-        return usersReturn;
+    public List<User> findFriends(User user) {
+        return new ArrayList<>(userRepository.findFriends(user.getId()));
     }
 
     @Transactional(readOnly = true)
@@ -154,5 +152,34 @@ public class UserService implements UsersApi {
     @Override
     public String findEmailByUserId(UserId id) {
         return userRepository.findById(id).orElseThrow(id::notFound).getEmail();
+    }
+
+    public void sendFriendRequest(UUID receiver, String loggedInUserKeycloakId) {
+        User receiverUser = findById(receiver);
+        User senderUser = findByKeycloakId(loggedInUserKeycloakId);
+        receiverUser.validateFriendRequests(senderUser.getId());
+        receiverUser.addIncomingFriendRequest(new FriendRequest(senderUser.getId()));
+        senderUser.addOutgoingFriendRequest(new FriendRequest(receiverUser.getId()));
+        userRepository.save(receiverUser);
+        userRepository.save(senderUser);
+    }
+
+    public void acceptFriendRequest(UUID receiver, UUID sender) {
+        User receiverUser = findById(receiver);
+        User senderUser = findById(sender);
+        receiverUser.acceptFriendRequest(senderUser.getId());
+        senderUser.addFriend(receiverUser.getId());
+        senderUser.removeOutgoingFriendRequest(receiverUser.getId());
+        userRepository.save(receiverUser);
+        userRepository.save(senderUser);
+    }
+
+    public void rejectFriendRequest(UUID receiver, UUID sender) {
+        User receiverUser = findById(receiver);
+        User senderUser = findById(sender);
+        receiverUser.removeIncomingFriendRequest(senderUser.getId());
+        senderUser.removeOutgoingFriendRequest(receiverUser.getId());
+        userRepository.save(receiverUser);
+        userRepository.save(senderUser);
     }
 }
