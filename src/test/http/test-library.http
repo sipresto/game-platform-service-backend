@@ -1,4 +1,4 @@
-@baseUrl = http://localhost/api/platform
+@baseUrl = http://localhost:8095/api/platform
 @userId = 5041ef49-f46c-4083-993f-10780835bef8
 
 ### GET all owned games of a user
