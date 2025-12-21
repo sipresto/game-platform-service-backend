@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .securityMatcher(request -> {
                     String path = request.getServletPath();
                     return (path.startsWith("/api/platform/public/") ||
-                            path.startsWith("/api/platform/games/") ||
+                            path.startsWith("/api/platform/games") ||
                             path.startsWith("/api/platform/session/") ||
                             path.equals("/api/platform/users") ||
                             (path.matches("/api/platform/users/[0-9a-fA-F-]{36}/profile-image.*") &&
