@@ -9,7 +9,7 @@ public interface PerkRepository {
 
     Optional<Perk> findById(PerkId id);
 
-    Optional<List<Perk>> findAllPerks();
+    List<Perk> findAllPerks();
 
     void deleteAll();
 

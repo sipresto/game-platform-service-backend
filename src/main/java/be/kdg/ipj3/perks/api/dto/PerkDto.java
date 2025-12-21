@@ -1,12 +1,13 @@
 package be.kdg.ipj3.perks.api.dto;
 
 import be.kdg.ipj3.perks.domain.Perk;
+import be.kdg.ipj3.perks.domain.PerkType;
 
 import java.util.UUID;
 
 public record PerkDto(
         UUID id,
-        String type,
+        PerkType type,
         String name,
         String description,
         int pointCost
@@ -14,7 +15,7 @@ public record PerkDto(
     public static PerkDto fromDomain(Perk perk) {
         return new PerkDto(
                 perk.getId().id(),
-                perk.getType().toString(),
+                perk.getType(),
                 perk.getName(),
                 perk.getDescription(),
                 perk.getPointCost()

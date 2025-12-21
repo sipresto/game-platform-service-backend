@@ -27,11 +27,11 @@ public class PerkRepositoryImpl implements PerkRepository {
     }
 
     @Override
-    public Optional<List<Perk>> findAllPerks() {
-        return Optional.of(jpaPerkRepository.findAll()
+    public List<Perk> findAllPerks() {
+        return jpaPerkRepository.findAll()
                 .stream()
                 .map(JpaPerkEntity::toDomain)
-                .toList());
+                .toList();
     }
 
     @Override

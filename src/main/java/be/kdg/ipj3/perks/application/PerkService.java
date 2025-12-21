@@ -18,7 +18,7 @@ public class PerkService {
     }
 
     public List<Perk> findAllPerks() {
-        return perkRepository.findAllPerks().orElseThrow();
+        return perkRepository.findAllPerks();
     }
 
     public Perk findPerkById(UUID id){
