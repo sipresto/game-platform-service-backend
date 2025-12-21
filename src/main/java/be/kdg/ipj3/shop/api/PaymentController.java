@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping("/api/platform/payment")
 public class PaymentController {
     private final StripeService stripeService;
 

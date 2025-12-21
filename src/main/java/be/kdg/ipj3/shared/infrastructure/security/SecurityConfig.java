@@ -42,13 +42,15 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain publicFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher(
-                        "/api/public/**",
-                        "/api/games/**",
-                        "/api/session/**",
-                        "/api/users",
-                        "/api/*/profile-image"
-                )
+                .securityMatcher(request -> {
+                    String path = request.getServletPath();
+                    return (path.startsWith("/api/platform/public/") ||
+                            path.startsWith("/api/platform/games/") ||
+                            path.startsWith("/api/platform/session/") ||
+                            path.equals("/api/platform/users") ||
+                            (path.matches("/api/platform/users/[0-9a-fA-F-]{36}/profile-image.*") &&
+                                    !path.contains("/me/")));
+                })
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
@@ -68,11 +70,11 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/user/**").hasRole("PLAYER")
-                        .requestMatchers("/api/games/manage/**").hasRole("GAME_DEVELOPER")
-                        .requestMatchers("/api/purchases/**").hasRole("PLAYER")
-                        .requestMatchers("/api/achievements").hasRole("PLAYER")
+                        .requestMatchers("/api/platform/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/platform/users/**").hasRole("PLAYER")
+                        .requestMatchers("/api/platform/games/manage/**").hasRole("GAME_DEVELOPER")
+                        .requestMatchers("/api/platform/purchases/**").hasRole("PLAYER")
+                        .requestMatchers("/api/platform/achievements").hasRole("PLAYER")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
