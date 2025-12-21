@@ -92,13 +92,12 @@ services:
   # AI PLAYER SERVICE
   # ---------------------
   ai_player:
-    image: matthiastruyzelaerekdg/integratieproject:ai-player
-    platform: linux/amd64
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team4/ai-player
+    pull_policy: always
     ports:
       - "8000:8000"
     networks:
       - dev
-    restart: unless-stopped
 
   # ---------------------
   # Chess B and F
