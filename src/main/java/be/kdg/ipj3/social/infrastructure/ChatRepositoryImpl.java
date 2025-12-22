@@ -24,7 +24,7 @@ public class ChatRepositoryImpl implements ChatRepository {
 
     @Override
     public Optional<Chat> findById(ChatId id) {
-        return jpaChatRepository.findById(id.id())
+        return jpaChatRepository.findByIdWithMessages(id.id())
                 .map(JpaChatEntity::toDomain);
     }
 
@@ -51,7 +51,14 @@ public class ChatRepositoryImpl implements ChatRepository {
                 .map(UserId::id)
                 .collect(Collectors.toSet());
 
-        return jpaChatRepository.findByExactParticipants(participantIds, participantIds.size())
-                .map(JpaChatEntity::toDomain);
+        return jpaChatRepository.findAll().stream()
+                .map(JpaChatEntity::toDomain)
+                .filter(chat -> {
+                    Set<UUID> chatParticipantIds = chat.getParticipants().stream()
+                            .map(UserId::id)
+                            .collect(Collectors.toSet());
+                    return chatParticipantIds.equals(participantIds);
+                })
+                .findFirst();
     }
 }

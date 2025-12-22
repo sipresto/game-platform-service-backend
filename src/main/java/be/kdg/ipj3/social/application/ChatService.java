@@ -5,6 +5,7 @@ import be.kdg.ipj3.social.api.dto.ChatListDto;
 import be.kdg.ipj3.social.domain.Chat;
 import be.kdg.ipj3.social.domain.ChatId;
 import be.kdg.ipj3.social.domain.ChatRepository;
+import be.kdg.ipj3.social.shared.InvalidChatRequestException;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.security.access.AccessDeniedException;
@@ -68,7 +69,7 @@ public class ChatService {
         participantIds.removeIf(u -> !usersApi.existsById(u.id()));
 
         if (participantIds.size() < 2) {
-            throw new IllegalStateException("Not enough participants");
+            throw new InvalidChatRequestException("Not enough participants");
         }
 
         Chat chat = chatRepository.findByExactParticipants(participantIds)
