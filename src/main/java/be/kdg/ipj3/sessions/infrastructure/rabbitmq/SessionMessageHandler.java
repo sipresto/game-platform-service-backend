@@ -2,6 +2,7 @@ package be.kdg.ipj3.sessions.infrastructure.rabbitmq;
 
 import be.kdg.ipj3.sessions.application.SessionService;
 import be.kdg.ipj3.sessions.infrastructure.rabbitmq.config.RabbitMQTopologySessions;
+import be.kdg.ipj3.sessions.infrastructure.rabbitmq.dto.GameRematchDto;
 import be.kdg.ipj3.sessions.shared.SessionId;
 import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.shared.infrastructure.rabbitmq.dto.GameResultMessageDto;
@@ -33,5 +34,10 @@ public class SessionMessageHandler {
                 winnerId,
                 dto.completedAt()
         );
+    }
+
+    @RabbitListener(queues = RabbitMQTopologySessions.SESSION_GAME_REMATCH_QUEUE)
+    void onGameRematchMessageReceived(GameRematchDto dto) {
+        sessionService.createRematchSession(dto.oldGameId(), dto.newGameId());
     }
 }

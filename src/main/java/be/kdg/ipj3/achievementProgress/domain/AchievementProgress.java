@@ -6,6 +6,7 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @AggregateRoot
 public class AchievementProgress {
@@ -15,6 +16,9 @@ public class AchievementProgress {
     private final Instant completedAt;
 
     public AchievementProgress(UserId player, AchievementId achievement, Integer currentProgress, Instant completedAt) {
+        Objects.requireNonNull(player, "UserId cannot be null");
+        Objects.requireNonNull(achievement, "AchievementId cannot be null");
+
         this.id = new AchievementProgressId(player, achievement);
         this.currentProgress = currentProgress;
         this.completedAt = completedAt;
@@ -42,6 +46,18 @@ public class AchievementProgress {
 
     public Instant getCompletedAt() {
         return completedAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AchievementProgress that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 
     public AchievementProgress incrementProgress(int amount, int requiredValue) {
