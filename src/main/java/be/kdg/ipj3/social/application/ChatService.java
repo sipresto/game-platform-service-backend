@@ -1,13 +1,23 @@
 package be.kdg.ipj3.social.application;
 
+import be.kdg.ipj3.social.api.dto.ChatDto;
+import be.kdg.ipj3.social.api.dto.ChatListDto;
 import be.kdg.ipj3.social.domain.Chat;
+import be.kdg.ipj3.social.domain.ChatId;
 import be.kdg.ipj3.social.domain.ChatRepository;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+@Service
+@Transactional
 public class ChatService {
     private final ChatRepository chatRepository;
     private final UsersApi usersApi;
@@ -17,10 +27,42 @@ public class ChatService {
         this.usersApi = usersApi;
     }
 
-    public Chat createChat(String callerKeycloakId, Set<UserId> participants) {
+    public List<ChatListDto> findChatListByKeycloakId(String keycloakId) {
+        UserId userId = usersApi.findIdByKeycloakId(keycloakId);
+
+        return chatRepository.findChatsByUserId(userId).stream()
+                .map(chat -> {
+                    String chatName = buildChatName(chat, userId);
+                    return ChatListDto.fromDomain(chat, chatName);
+                })
+                .toList();
+    }
+
+    public ChatDto findChatById(String keycloakId, ChatId chatId) {
+        UserId currentUser = usersApi.findIdByKeycloakId(keycloakId);
+
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(chatId::notFound);
+
+        if (!chat.getParticipants().contains(currentUser)) {
+            throw new AccessDeniedException("User is not a participant of this chat");
+        }
+
+        Set<UserId> participantIds = chat.getParticipants();
+
+        var usernames = participantIds.stream()
+                .collect(Collectors.toMap(
+                        userId -> userId,
+                        usersApi::findDisplayNameById
+                ));
+
+        return ChatDto.fromDomain(chat, currentUser, usernames);
+    }
+
+    public Chat createChat(String keycloakId, Set<UserId> participants) {
         Set<UserId> participantIds = new HashSet<>();
 
-        UserId userId = usersApi.findIdByKeycloakId(callerKeycloakId);
+        UserId userId = usersApi.findIdByKeycloakId(keycloakId);
         participantIds.add(userId);
 
         for (UserId participantId : participants) {
@@ -38,5 +80,23 @@ public class ChatService {
         chatRepository.save(chat);
 
         return chat;
+    }
+
+    public void sendMessage(String keycloakId, ChatId chatId, String content) {
+        UserId userId = usersApi.findIdByKeycloakId(keycloakId);
+
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(chatId::notFound);
+
+        chat.sendMessage(userId, content);
+
+        chatRepository.save(chat);
+    }
+
+    private String buildChatName(Chat chat, UserId currentUser) {
+        return chat.getParticipants().stream()
+                .filter(userId -> !userId.equals(currentUser))
+                .map(usersApi::findDisplayNameById)
+                .collect(Collectors.joining(", "));
     }
 }

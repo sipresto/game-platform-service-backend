@@ -28,4 +28,6 @@ public interface UsersApi {
     EmailUserDto findEmailUserDtoByKeycloakId(UUID id);
 
     String findEmailByUserId(UserId id);
+
+    String findDisplayNameById(UserId id);
 }

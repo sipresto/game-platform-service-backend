@@ -44,4 +44,9 @@ public class Chat {
     public void addMessage(Message message) {
         messages.add(message);
     }
+
+    public void sendMessage(UserId senderId, String content) {
+        Message message = new Message(senderId, content);
+        messages.add(message);
+    }
 }

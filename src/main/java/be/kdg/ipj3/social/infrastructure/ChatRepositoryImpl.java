@@ -6,10 +6,12 @@ import be.kdg.ipj3.social.domain.ChatRepository;
 import be.kdg.ipj3.social.infrastructure.jpa.JpaChatEntity;
 import be.kdg.ipj3.social.infrastructure.jpa.JpaChatRepository;
 import be.kdg.ipj3.users.shared.UserId;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class ChatRepositoryImpl implements ChatRepository {
     private final JpaChatRepository jpaChatRepository;
 

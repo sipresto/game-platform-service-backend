@@ -3,10 +3,6 @@ package be.kdg.ipj3.users.application;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.domain.*;
-import be.kdg.ipj3.users.domain.Profile;
-import be.kdg.ipj3.users.domain.User;
-import be.kdg.ipj3.users.domain.UserRepository;
-import be.kdg.ipj3.users.domain.Visibility;
 import be.kdg.ipj3.users.shared.EmailUserDto;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
@@ -152,6 +148,14 @@ public class UserService implements UsersApi {
     @Override
     public String findEmailByUserId(UserId id) {
         return userRepository.findById(id).orElseThrow(id::notFound).getEmail();
+    }
+
+    @Override
+    public String findDisplayNameById(UserId id) {
+        return userRepository.findById(id)
+                .orElseThrow(id::notFound)
+                .getProfile()
+                .displayName();
     }
 
     public void sendFriendRequest(UUID receiver, String loggedInUserKeycloakId) {
