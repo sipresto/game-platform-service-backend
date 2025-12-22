@@ -59,27 +59,32 @@ public class ChatService {
         return ChatDto.fromDomain(chat, currentUser, usernames);
     }
 
-    public Chat createChat(String keycloakId, Set<UserId> participants) {
-        Set<UserId> participantIds = new HashSet<>();
+    public ChatDto createChat(String keycloakId, Set<UserId> participants) {
+        UserId currentUser = usersApi.findIdByKeycloakId(keycloakId);
 
-        UserId userId = usersApi.findIdByKeycloakId(keycloakId);
-        participantIds.add(userId);
+        Set<UserId> participantIds = new HashSet<>(participants);
+        participantIds.add(currentUser);
 
-        for (UserId participantId : participants) {
-            if (usersApi.existsById(participantId.id())) {
-                participantIds.add(participantId);
-            }
-        }
+        participantIds.removeIf(u -> !usersApi.existsById(u.id()));
 
         if (participantIds.size() < 2) {
             throw new IllegalStateException("Not enough participants");
         }
 
-        Chat chat = new Chat(participants);
+        Chat chat = chatRepository.findByExactParticipants(participantIds)
+                .orElseGet(() -> {
+                    Chat newChat = new Chat(participantIds);
+                    chatRepository.save(newChat);
+                    return newChat;
+                });
 
-        chatRepository.save(chat);
+        var usernames = chat.getParticipants().stream()
+                .collect(Collectors.toMap(
+                        userId -> userId,
+                        usersApi::findDisplayNameById
+                ));
 
-        return chat;
+        return ChatDto.fromDomain(chat, currentUser, usernames);
     }
 
     public void sendMessage(String keycloakId, ChatId chatId, String content) {

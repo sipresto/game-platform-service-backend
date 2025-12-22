@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Repository
 public class ChatRepositoryImpl implements ChatRepository {
@@ -27,7 +30,7 @@ public class ChatRepositoryImpl implements ChatRepository {
 
     @Override
     public List<Chat> findChatsByUserId(UserId id) {
-        return jpaChatRepository.findByParticipantIdsContaining(id.id()).stream()
+        return jpaChatRepository.findByParticipantIdsContainingAndLastMessageAtIsNotNullOrderByLastMessageAtDesc(id.id()).stream()
                 .map(JpaChatEntity::toDomain)
                 .toList();
     }
@@ -40,5 +43,15 @@ public class ChatRepositoryImpl implements ChatRepository {
     @Override
     public void deleteAll() {
         jpaChatRepository.deleteAll();
+    }
+
+    @Override
+    public Optional<Chat> findByExactParticipants(Set<UserId> participants) {
+        Set<UUID> participantIds = participants.stream()
+                .map(UserId::id)
+                .collect(Collectors.toSet());
+
+        return jpaChatRepository.findByExactParticipants(participantIds, participantIds.size())
+                .map(JpaChatEntity::toDomain);
     }
 }

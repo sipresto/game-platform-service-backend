@@ -5,6 +5,7 @@ import be.kdg.ipj3.social.domain.ChatId;
 import be.kdg.ipj3.users.shared.UserId;
 import jakarta.persistence.*;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,12 +33,15 @@ public class JpaChatEntity {
     @OrderBy("sentAt ASC")
     private List<JpaMessageEntity> messages = new ArrayList<>();
 
+    private Instant lastMessageAt;
+
     protected JpaChatEntity() {
     } // for JPA
 
-    public JpaChatEntity(UUID id, Set<UUID> participantIds) {
+    public JpaChatEntity(UUID id, Set<UUID> participantIds, Instant lastMessageAt) {
         this.id = id;
         this.participantIds = participantIds;
+        this.lastMessageAt = lastMessageAt;
     }
 
     public static JpaChatEntity fromDomain(Chat chat) {
@@ -45,7 +49,7 @@ public class JpaChatEntity {
                 .map(UserId::id)
                 .collect(Collectors.toSet());
 
-        JpaChatEntity jpaChat = new JpaChatEntity(chat.getId().id(), participantIds);
+        JpaChatEntity jpaChat = new JpaChatEntity(chat.getId().id(), participantIds, chat.getLastMessageAt());
 
         chat.getMessages().stream()
                 .map(msg -> JpaMessageEntity.fromDomain(msg, jpaChat))
@@ -55,7 +59,7 @@ public class JpaChatEntity {
     }
 
     public Chat toDomain() {
-        Chat chat = new Chat(new ChatId(id));
+        Chat chat = new Chat(new ChatId(id), lastMessageAt);
 
         participantIds.stream()
                 .map(UserId::new)
@@ -78,6 +82,10 @@ public class JpaChatEntity {
 
     public List<JpaMessageEntity> getMessages() {
         return List.copyOf(messages);
+    }
+
+    public Instant getLastMessageAt() {
+        return lastMessageAt;
     }
 
     public void addMessage(JpaMessageEntity message) {

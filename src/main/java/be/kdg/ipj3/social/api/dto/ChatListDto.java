@@ -24,9 +24,7 @@ public record ChatListDto(
     }
 
     public static ChatListDto fromDomain(Chat chat, String name) {
-        MessageListDto lastMessage = chat.getMessages().isEmpty()
-                ? null
-                : MessageListDto.fromDomain(chat.getMessages().getLast());
+        MessageListDto lastMessage = MessageListDto.fromDomain(chat.getMessages().getLast());
 
         return new ChatListDto(
                 chat.getId().id(),

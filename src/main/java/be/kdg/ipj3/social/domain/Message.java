@@ -21,8 +21,8 @@ public class Message {
         this.sentAt = sentAt;
     }
 
-    public Message(UserId sender, String content) {
-        this(MessageId.create(), sender, content, Instant.now());
+    public Message(UserId sender, String content, Instant sentAt) {
+        this(MessageId.create(), sender, content, sentAt);
     }
 
     public MessageId getId() {

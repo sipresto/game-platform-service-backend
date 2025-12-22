@@ -5,7 +5,6 @@ import be.kdg.ipj3.social.api.dto.ChatListDto;
 import be.kdg.ipj3.social.api.dto.CreateChatDto;
 import be.kdg.ipj3.social.api.dto.SendMessageDto;
 import be.kdg.ipj3.social.application.ChatService;
-import be.kdg.ipj3.social.domain.Chat;
 import be.kdg.ipj3.social.domain.ChatId;
 import be.kdg.ipj3.users.shared.UserId;
 import org.springframework.http.ResponseEntity;
@@ -52,10 +51,10 @@ public class ChatController {
                 .map(UserId::new)
                 .collect(Collectors.toSet());
 
-        Chat chat = chatService.createChat(token.getSubject(), participants);
+        ChatDto chatDto = chatService.createChat(token.getSubject(), participants);
 
-        return ResponseEntity.created(URI.create("/api/chats/" + chat.getId().id()))
-                .body(ChatDto.fromDomain(chat));
+        return ResponseEntity.created(URI.create("/api/chats/" + chatDto.id()))
+                .body(chatDto);
     }
 
     @PostMapping("/{id}/messages")

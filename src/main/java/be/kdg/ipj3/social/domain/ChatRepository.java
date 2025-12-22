@@ -4,6 +4,7 @@ import be.kdg.ipj3.users.shared.UserId;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface ChatRepository {
     Optional<Chat> findById(ChatId id);
@@ -13,4 +14,6 @@ public interface ChatRepository {
     void save(Chat chat);
 
     void deleteAll();
+
+    Optional<Chat> findByExactParticipants(Set<UserId> participants);
 }
