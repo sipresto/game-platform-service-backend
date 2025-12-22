@@ -74,7 +74,7 @@ public class Session {
             return;
         }
 
-        if (!players.contains(winnerId)) {
+        if (winnerId == null || !players.contains(winnerId)) {
             this.winner = null;
         }
         else {
