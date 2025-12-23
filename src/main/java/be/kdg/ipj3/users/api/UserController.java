@@ -128,7 +128,7 @@ public class UserController {
     /**
      * Retrieves the profile image for a user
      */
-    @GetMapping("/{userId}/profile-image")
+    @GetMapping("/profile-image/{userId}")
     public ResponseEntity<byte[]> getProfileImage(@PathVariable UUID userId) {
         try {
             byte[] image = profileImageService.getProfileImage(new UserId(userId));

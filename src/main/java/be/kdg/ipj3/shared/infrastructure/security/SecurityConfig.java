@@ -46,8 +46,7 @@ public class SecurityConfig {
                         "/api/platform/games/**",
                         "/api/platform/session/**",
                         "/api/platform/users",
-                        "/api/platform/users/*/profile-image",
-                        "/api/platform/users/*/profile-image/**")
+                        "/api/platform/users/profile-image/**")
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->

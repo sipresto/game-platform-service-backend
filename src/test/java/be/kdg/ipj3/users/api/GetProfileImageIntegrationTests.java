@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -66,7 +67,8 @@ public class GetProfileImageIntegrationTests {
                 .jwt(builder -> builder
                         .subject(testKeycloakId)
                         .claim("preferred_username", "testuser")
-                        .claim("email", testEmail));
+                        .claim("email", testEmail))
+                .authorities(new SimpleGrantedAuthority("ROLE_PLAYER"));
     }
 
     private MockMultipartFile createTestImageFile(String filename, String contentType, byte[] content) {
@@ -112,7 +114,7 @@ public class GetProfileImageIntegrationTests {
     void getProfileImage_shouldReturnImage_whenUserHasImage() throws Exception {
         uploadTestImage();
 
-        mockMvc.perform(get("/api/platform/users/{userId}/profile-image", testUserId)
+        mockMvc.perform(get("/api/platform/users/profile-image/{userId}", testUserId)
                         .with(validJwt())
                         .accept(MediaType.ALL))
                 .andExpect(status().isOk())
@@ -122,7 +124,7 @@ public class GetProfileImageIntegrationTests {
 
     @Test
     void getProfileImage_shouldReturnDefaultImage_whenUserHasNoImage() throws Exception {
-        mockMvc.perform(get("/api/platform/users/{userId}/profile-image", testUserId)
+        mockMvc.perform(get("/api/platform/users/profile-image/{userId}", testUserId)
                         .with(validJwt())
                         .accept(MediaType.ALL))
                 .andExpect(status().isOk())
@@ -135,7 +137,7 @@ public class GetProfileImageIntegrationTests {
     void getProfileImage_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
         UUID nonExistentUserId = UUID.randomUUID();
 
-        mockMvc.perform(get("/api/platform/users/{userId}/profile-image", nonExistentUserId)
+        mockMvc.perform(get("/api/platform/users/profile-image/{userId}", nonExistentUserId)
                         .with(validJwt())
                         .accept(MediaType.ALL))
                 .andExpect(status().isNotFound());
@@ -155,7 +157,7 @@ public class GetProfileImageIntegrationTests {
         userRepository.save(privateUser);
         uploadTestImage();
 
-        mockMvc.perform(get("/api/platform/users/{userId}/profile-image", testUserId)
+        mockMvc.perform(get("/api/platform/users/profile-image/{userId}", testUserId)
                         .with(validJwt())
                         .accept(MediaType.ALL))
                 .andExpect(status().isOk())

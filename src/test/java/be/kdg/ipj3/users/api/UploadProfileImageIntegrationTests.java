@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -67,7 +68,8 @@ public class UploadProfileImageIntegrationTests {
                 .jwt(builder -> builder
                         .subject(testKeycloakId)
                         .claim("preferred_username", "testuser")
-                        .claim("email", testEmail));
+                        .claim("email", testEmail))
+                .authorities(new SimpleGrantedAuthority("ROLE_PLAYER"));
     }
 
     private MockMultipartFile createTestImageFile(String filename, byte[] content) {
