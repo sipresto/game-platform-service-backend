@@ -66,7 +66,7 @@ public class FindAllPublicUsersIntegrationTests {
         createTestUsers();
 
         // Act & Assert
-        mockMvc.perform(get("/api/users"))
+        mockMvc.perform(get("/api/platform/users"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -76,7 +76,7 @@ public class FindAllPublicUsersIntegrationTests {
 
     @Test
     void getAllPublicUsers_shouldReturnEmptyList_whenNoUsersExist() throws Exception {
-        mockMvc.perform(get("/api/users"))
+        mockMvc.perform(get("/api/platform/users"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));

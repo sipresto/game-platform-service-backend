@@ -87,7 +87,7 @@ public class FindFriendsForUserIntegrationTests {
         String mainKeycloakId = "kc-main-" + mainId;
 
         // Act & Assert
-        mockMvc.perform(get("/api/friends")
+        mockMvc.perform(get("/api/platform/users/friends")
                         .with(validJwt(mainKeycloakId, "main-user")))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -103,7 +103,7 @@ public class FindFriendsForUserIntegrationTests {
         createUserWithFriend(friendId);
 
         // Act & Assert
-        mockMvc.perform(get("/api/friends"))
+        mockMvc.perform(get("/api/platform/users/friends"))
                 .andExpect(status().isUnauthorized());
     }
 }

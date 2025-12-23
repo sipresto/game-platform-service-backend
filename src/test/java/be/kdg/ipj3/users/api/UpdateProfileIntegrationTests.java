@@ -72,7 +72,7 @@ public class UpdateProfileIntegrationTests {
         String keycloakId = createUser("kc-id1", "testuser");
         UserDto.ProfileDto profileDto = new UserDto.ProfileDto("Updated Display Name", "Updated bio");
 
-        mockMvc.perform(put("/api/user/profile")
+        mockMvc.perform(put("/api/platform/users/profile")
                         .with(validJwt(keycloakId, "testuser"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(profileDto)))
@@ -94,7 +94,7 @@ public class UpdateProfileIntegrationTests {
         String keycloakId = createUser("kc-id2", "testuser");
         UserDto.ProfileDto profileDto = new UserDto.ProfileDto("", "Updated bio");
 
-        mockMvc.perform(put("/api/user/profile")
+        mockMvc.perform(put("/api/platform/users/profile")
                         .with(validJwt(keycloakId, "testuser"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(profileDto)))
@@ -105,7 +105,7 @@ public class UpdateProfileIntegrationTests {
     void updateProfile_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
         UserDto.ProfileDto profileDto = new UserDto.ProfileDto("Display Name", "Bio");
 
-        mockMvc.perform(put("/api/user/profile")
+        mockMvc.perform(put("/api/platform/users/profile")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(profileDto)))
                 .andExpect(status().isUnauthorized());
@@ -116,7 +116,7 @@ public class UpdateProfileIntegrationTests {
         String keycloakId = createUser("kc-id3", "testuser");
         UserDto.ProfileDto profileDto = new UserDto.ProfileDto("Display Name", "Bio");
 
-        mockMvc.perform(put("/api/user/profile")
+        mockMvc.perform(put("/api/platform/users/profile")
                         .with(jwt()
                                 .jwt(builder -> builder
                                         .subject(keycloakId)

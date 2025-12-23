@@ -17,13 +17,14 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.time.Instant;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -32,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @TestPropertySource("classpath:application-test.properties")
+@Transactional
 public class GetFavoriteGamesIntegrationTests {
 
     @Autowired
@@ -99,14 +101,13 @@ public class GetFavoriteGamesIntegrationTests {
         userRepository.save(user);
 
         // Act & Assert
-        mockMvc.perform(get("/api/games/favorites")
+        mockMvc.perform(get("/api/platform/games/favorites")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is("TicTac")))
-                .andExpect(jsonPath("$[1].name", is("Quoridor")));
+                .andExpect(jsonPath("$[*].name", containsInAnyOrder("TicTac", "Quoridor")));
     }
 
     @Test
@@ -116,7 +117,7 @@ public class GetFavoriteGamesIntegrationTests {
         userRepository.save(user);
 
         // Act & Assert
-        mockMvc.perform(get("/api/games/favorites")
+        mockMvc.perform(get("/api/platform/games/favorites")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

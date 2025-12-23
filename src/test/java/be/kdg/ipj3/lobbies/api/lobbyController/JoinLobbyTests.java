@@ -86,7 +86,7 @@ public class JoinLobbyTests {
         JoinLobbyDto dto = new JoinLobbyDto("password");
 
         // Act
-        mockMvc.perform(post("/api/lobbies/{id}/join", lobbyId.id())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/join", lobbyId.id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -107,7 +107,7 @@ public class JoinLobbyTests {
         LobbyId lobbyId = createTestLobby(2, false);
         JoinLobbyDto dto = new JoinLobbyDto("password");
 
-        mockMvc.perform(post("/api/lobbies/{id}/join", lobbyId.id())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/join", lobbyId.id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -120,7 +120,7 @@ public class JoinLobbyTests {
         LobbyId lobbyId = createTestLobby(1, true);
         JoinLobbyDto dto = new JoinLobbyDto("password");
 
-        mockMvc.perform(post("/api/lobbies/{id}/join", lobbyId.id())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/join", lobbyId.id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -133,7 +133,7 @@ public class JoinLobbyTests {
         LobbyId lobbyId = createTestLobby(2, true);
         JoinLobbyDto dto = new JoinLobbyDto("wrong-password");
 
-        mockMvc.perform(post("/api/lobbies/{id}/join", lobbyId.id())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/join", lobbyId.id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -145,7 +145,7 @@ public class JoinLobbyTests {
         createTestUserAndReturnId();
         JoinLobbyDto dto = new JoinLobbyDto("password");
 
-        mockMvc.perform(post("/api/lobbies/{id}/join", UUID.randomUUID())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/join", UUID.randomUUID())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -157,7 +157,7 @@ public class JoinLobbyTests {
         LobbyId lobbyId = createTestLobby(2, true);
         JoinLobbyDto dto = new JoinLobbyDto("password");
 
-        mockMvc.perform(post("/api/lobbies/{id}/join", lobbyId.id())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/join", lobbyId.id())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isUnauthorized());

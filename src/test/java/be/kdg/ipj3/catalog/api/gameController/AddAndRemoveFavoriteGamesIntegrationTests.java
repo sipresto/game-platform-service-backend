@@ -89,7 +89,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         userRepository.save(user);
 
         // Act
-        mockMvc.perform(patch("/api/games/favorite/{gameId}", game.getId().id())
+        mockMvc.perform(patch("/api/platform/games/favorite/{gameId}", game.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isOk());
 
@@ -112,7 +112,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         userRepository.save(user);
 
         // Act & Assert
-        mockMvc.perform(patch("/api/games/favorite/{gameId}", game.getId().id())
+        mockMvc.perform(patch("/api/platform/games/favorite/{gameId}", game.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isBadRequest());
     }
@@ -130,7 +130,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         userRepository.save(user);
 
         // Act
-        mockMvc.perform(patch("/api/games/unfavorite/{gameId}", game.getId().id())
+        mockMvc.perform(patch("/api/platform/games/unfavorite/{gameId}", game.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isOk());
 
@@ -147,7 +147,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         Game game = createTestGame();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/games/unfavorite/{gameId}", game.getId().id())
+        mockMvc.perform(patch("/api/platform/games/unfavorite/{gameId}", game.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isBadRequest());
     }
@@ -159,7 +159,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         UUID nonExistentId = UUID.randomUUID();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/games/favorite/{gameId}", nonExistentId)
+        mockMvc.perform(patch("/api/platform/games/favorite/{gameId}", nonExistentId)
                         .with(validJwt()))
                 .andExpect(status().isNotFound());
     }
@@ -171,7 +171,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         Game game = createTestGame();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/games/favorite/{gameId}", game.getId().id())
+        mockMvc.perform(patch("/api/platform/games/favorite/{gameId}", game.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isBadRequest());
     }

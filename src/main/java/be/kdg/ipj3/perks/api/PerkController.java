@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/perks")
+@RequestMapping("/api/platform/perks")
 public class PerkController {
 
     private final PerkService perkService;

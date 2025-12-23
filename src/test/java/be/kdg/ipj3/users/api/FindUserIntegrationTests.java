@@ -68,7 +68,7 @@ public class FindUserIntegrationTests {
         UUID userId = createUser(keycloakId, username);
 
         // Act & Assert
-        mockMvc.perform(get("/api/user")
+        mockMvc.perform(get("/api/platform/users/find-by-keycloak-id")
                         .with(validJwt(keycloakId, username))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -83,7 +83,7 @@ public class FindUserIntegrationTests {
     @Test
     void findUser_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/api/user")
+        mockMvc.perform(get("/api/platform/users/find-by-keycloak-id")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -95,7 +95,7 @@ public class FindUserIntegrationTests {
         createUser(keycloakId, username);
 
         // Act & Assert
-        mockMvc.perform(get("/api/user")
+        mockMvc.perform(get("/api/platform/users/find-by-keycloak-id")
                         .with(jwt()
                                 .jwt(builder -> builder
                                         .subject(keycloakId)

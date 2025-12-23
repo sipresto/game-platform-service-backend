@@ -69,7 +69,7 @@ public class UpdatePrivacyIntegrationTests {
         String visibility = "FRIENDS_ONLY";
 
         // Act
-        mockMvc.perform(put("/api/user/privacy")
+        mockMvc.perform(put("/api/platform/users/privacy")
                         .with(validJwt(keycloakId, "testuser"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("\"" + visibility + "\""))
@@ -87,7 +87,7 @@ public class UpdatePrivacyIntegrationTests {
         String keycloakId = createUser("kc-id2", "testuser");
         String invalidVisibility = "INVALID_VISIBILITY";
 
-        mockMvc.perform(put("/api/user/privacy")
+        mockMvc.perform(put("/api/platform/users/privacy")
                         .with(validJwt(keycloakId, "testuser"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("\"" + invalidVisibility + "\""))
@@ -98,7 +98,7 @@ public class UpdatePrivacyIntegrationTests {
     void updatePrivacy_shouldReturnBadRequest_whenEmptyVisibility() throws Exception {
         String keycloakId = createUser("kc-id3", "testuser");
 
-        mockMvc.perform(put("/api/user/privacy")
+        mockMvc.perform(put("/api/platform/users/privacy")
                         .with(validJwt(keycloakId, "testuser"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("\"\""))
@@ -109,7 +109,7 @@ public class UpdatePrivacyIntegrationTests {
     void updatePrivacy_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
         String visibility = "FRIENDS_ONLY";
 
-        mockMvc.perform(put("/api/user/privacy")
+        mockMvc.perform(put("/api/platform/users/privacy")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("\"" + visibility + "\""))
                 .andExpect(status().isUnauthorized());
@@ -120,7 +120,7 @@ public class UpdatePrivacyIntegrationTests {
         String keycloakId = createUser("kc-id4", "testuser");
         String visibility = "FRIENDS_ONLY";
 
-        mockMvc.perform(put("/api/user/privacy")
+        mockMvc.perform(put("/api/platform/users/privacy")
                         .with(jwt()
                                 .jwt(builder -> builder
                                         .subject(keycloakId)
@@ -136,7 +136,7 @@ public class UpdatePrivacyIntegrationTests {
         String keycloakId = createUser("kc-id5", "testuser");
         String visibility = "FRIENDS_ONLY";
 
-        mockMvc.perform(put("/api/user/privacy")
+        mockMvc.perform(put("/api/platform/users/privacy")
                         .with(jwt()
                                 .jwt(builder -> builder
                                         .subject(keycloakId)
@@ -150,7 +150,7 @@ public class UpdatePrivacyIntegrationTests {
     void updatePrivacy_shouldReturnBadRequest_whenMissingRequestBody() throws Exception {
         String keycloakId = createUser("kc-id6", "testuser");
 
-        mockMvc.perform(put("/api/user/privacy")
+        mockMvc.perform(put("/api/platform/users/privacy")
                         .with(validJwt(keycloakId, "testuser"))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -160,7 +160,7 @@ public class UpdatePrivacyIntegrationTests {
     void updatePrivacy_shouldReturnBadRequest_whenNullRequestBody() throws Exception {
         String keycloakId = createUser("kc-id7", "testuser");
 
-        mockMvc.perform(put("/api/user/privacy")
+        mockMvc.perform(put("/api/platform/users/privacy")
                         .with(validJwt(keycloakId, "testuser"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("null"))
