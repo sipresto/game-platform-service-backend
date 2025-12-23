@@ -79,7 +79,7 @@ public class GetChatByIdTests {
         chatRepository.save(chat);
 
         // Act & Assert
-        mockMvc.perform(get("/api/chats/" + chat.getId().id())
+        mockMvc.perform(get("/api/platform/chats/" + chat.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
@@ -109,7 +109,7 @@ public class GetChatByIdTests {
         chatRepository.save(chat);
 
         // Act & Assert
-        mockMvc.perform(get("/api/chats/" + chat.getId().id())
+        mockMvc.perform(get("/api/platform/chats/" + chat.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.messages", hasSize(0)));
@@ -126,7 +126,7 @@ public class GetChatByIdTests {
         chatRepository.save(chat);
 
         // Act & Assert
-        mockMvc.perform(get("/api/chats/" + chat.getId().id())
+        mockMvc.perform(get("/api/platform/chats/" + chat.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isForbidden());
     }
@@ -137,7 +137,7 @@ public class GetChatByIdTests {
         createTestUser1();
 
         // Act & Assert
-        mockMvc.perform(get("/api/chats/" + UUID.randomUUID())
+        mockMvc.perform(get("/api/platform/chats/" + UUID.randomUUID())
                         .with(validJwt()))
                 .andExpect(status().isNotFound());
     }
@@ -152,7 +152,7 @@ public class GetChatByIdTests {
         chatRepository.save(chat);
 
         // Act & Assert
-        mockMvc.perform(get("/api/chats/" + chat.getId().id()))
+        mockMvc.perform(get("/api/platform/chats/" + chat.getId().id()))
                 .andExpect(status().isUnauthorized());
     }
 }

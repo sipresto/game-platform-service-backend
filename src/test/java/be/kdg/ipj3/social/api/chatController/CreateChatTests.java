@@ -79,7 +79,7 @@ public class CreateChatTests {
         CreateChatDto dto = new CreateChatDto(Set.of(userId2.id()));
 
         // Act
-        var result = mockMvc.perform(post("/api/chats")
+        var result = mockMvc.perform(post("/api/platform/chats")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -113,7 +113,7 @@ public class CreateChatTests {
         CreateChatDto dto = new CreateChatDto(Set.of(userId2.id()));
 
         // Act & Assert
-        mockMvc.perform(post("/api/chats")
+        mockMvc.perform(post("/api/platform/chats")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isUnauthorized());
@@ -128,7 +128,7 @@ public class CreateChatTests {
         CreateChatDto dto = new CreateChatDto(Set.of(userId2.id()));
 
         // Act & Assert
-        mockMvc.perform(post("/api/chats")
+        mockMvc.perform(post("/api/platform/chats")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -147,7 +147,7 @@ public class CreateChatTests {
         CreateChatDto dto = new CreateChatDto(Set.of(userId2.id()));
 
         // Act & Assert
-        mockMvc.perform(post("/api/chats")
+        mockMvc.perform(post("/api/platform/chats")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))

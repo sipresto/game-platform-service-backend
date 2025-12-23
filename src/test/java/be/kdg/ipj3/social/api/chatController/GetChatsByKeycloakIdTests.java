@@ -71,7 +71,7 @@ public class GetChatsByKeycloakIdTests {
         createTestUser1();
 
         // Act & Assert
-        mockMvc.perform(get("/api/chats")
+        mockMvc.perform(get("/api/platform/chats")
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
@@ -95,7 +95,7 @@ public class GetChatsByKeycloakIdTests {
         chatRepository.save(chat2);
 
         // Act & Assert
-        mockMvc.perform(get("/api/chats")
+        mockMvc.perform(get("/api/platform/chats")
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -126,7 +126,7 @@ public class GetChatsByKeycloakIdTests {
         chatRepository.save(chatWithoutUser);
 
         // Act & Assert
-        mockMvc.perform(get("/api/chats")
+        mockMvc.perform(get("/api/platform/chats")
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -136,7 +136,7 @@ public class GetChatsByKeycloakIdTests {
     @Test
     void getChatsByKeycloakId_shouldReturnUnauthorized_whenUserNotLoggedIn() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/api/chats"))
+        mockMvc.perform(get("/api/platform/chats"))
                 .andExpect(status().isUnauthorized());
     }
 }

@@ -20,7 +20,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/chats")
+@RequestMapping("/api/platform/chats")
 public class ChatController {
     private final ChatService chatService;
 
@@ -54,7 +54,7 @@ public class ChatController {
 
         ChatDto chatDto = chatService.createChat(token.getSubject(), participants);
 
-        return ResponseEntity.created(URI.create("/api/chats/" + chatDto.id()))
+        return ResponseEntity.created(URI.create("/api/platform/chats/" + chatDto.id()))
                 .body(chatDto);
     }
 

@@ -92,19 +92,19 @@ public class SendMessageTests {
         SendMessageDto message3 = new SendMessageDto("Third message");
 
         // Act
-        mockMvc.perform(post("/api/chats/" + chat.getId().id() + "/message")
+        mockMvc.perform(post("/api/platform/chats/" + chat.getId().id() + "/message")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(message1)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/chats/" + chat.getId().id() + "/message")
+        mockMvc.perform(post("/api/platform/chats/" + chat.getId().id() + "/message")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(message2)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/chats/" + chat.getId().id() + "/message")
+        mockMvc.perform(post("/api/platform/chats/" + chat.getId().id() + "/message")
                         .with(validJwt2())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(message3)))
@@ -134,7 +134,7 @@ public class SendMessageTests {
         SendMessageDto dto = new SendMessageDto("Unauthorized message");
 
         // Act & Assert
-        mockMvc.perform(post("/api/chats/" + chat.getId().id() + "/message")
+        mockMvc.perform(post("/api/platform/chats/" + chat.getId().id() + "/message")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -152,7 +152,7 @@ public class SendMessageTests {
         SendMessageDto dto = new SendMessageDto("Message to non-existent chat");
 
         // Act & Assert
-        mockMvc.perform(post("/api/chats/" + UUID.randomUUID() + "/message")
+        mockMvc.perform(post("/api/platform/chats/" + UUID.randomUUID() + "/message")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -171,7 +171,7 @@ public class SendMessageTests {
         SendMessageDto dto = new SendMessageDto("Unauthenticated message");
 
         // Act & Assert
-        mockMvc.perform(post("/api/chats/" + chat.getId().id() + "/message")
+        mockMvc.perform(post("/api/platform/chats/" + chat.getId().id() + "/message")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isUnauthorized());
@@ -189,7 +189,7 @@ public class SendMessageTests {
         SendMessageDto dto = new SendMessageDto("Message from user 2");
 
         // Act
-        mockMvc.perform(post("/api/chats/" + chat.getId().id() + "/message")
+        mockMvc.perform(post("/api/platform/chats/" + chat.getId().id() + "/message")
                         .with(validJwt2()) // User 2 sending
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
