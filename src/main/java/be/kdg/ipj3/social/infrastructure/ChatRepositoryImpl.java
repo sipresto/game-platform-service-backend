@@ -51,14 +51,7 @@ public class ChatRepositoryImpl implements ChatRepository {
                 .map(UserId::id)
                 .collect(Collectors.toSet());
 
-        return jpaChatRepository.findAll().stream()
-                .map(JpaChatEntity::toDomain)
-                .filter(chat -> {
-                    Set<UUID> chatParticipantIds = chat.getParticipants().stream()
-                            .map(UserId::id)
-                            .collect(Collectors.toSet());
-                    return chatParticipantIds.equals(participantIds);
-                })
-                .findFirst();
+        return jpaChatRepository.findByExactParticipants(participantIds, participantIds.size())
+                .map(JpaChatEntity::toDomain);
     }
 }
