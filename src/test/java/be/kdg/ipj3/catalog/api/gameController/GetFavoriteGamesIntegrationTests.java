@@ -107,8 +107,8 @@ public class GetFavoriteGamesIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[1].name", is("TicTac")))
-                .andExpect(jsonPath("$[0].name", is("Quoridor")));
+                .andExpect(jsonPath("$[0].name", is("TicTac")))
+                .andExpect(jsonPath("$[1].name", is("Quoridor")));
     }
 
     @Test
