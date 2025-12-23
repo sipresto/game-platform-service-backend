@@ -69,7 +69,7 @@ public class GetAllOpenLobbiesTests {
         createTestLobbies();
 
         // Act & Assert
-        mockMvc.perform(get("/api/lobbies")
+        mockMvc.perform(get("/api/platform/lobbies")
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -82,7 +82,7 @@ public class GetAllOpenLobbiesTests {
     @Test
     void getAllOpenLobbies_shouldReturnEmptyList_whenNoLobbiesExist() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/api/lobbies")
+        mockMvc.perform(get("/api/platform/lobbies")
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -96,7 +96,7 @@ public class GetAllOpenLobbiesTests {
         createTestLobbies();
 
         // Act & Assert
-        mockMvc.perform(get("/api/lobbies")
+        mockMvc.perform(get("/api/platform/lobbies")
                         .with(validJwt()))
                 .andExpect(status().isNotFound());
     }*/
@@ -107,7 +107,7 @@ public class GetAllOpenLobbiesTests {
         createTestLobbies();
 
         // Act & Assert
-        mockMvc.perform(get("/api/lobbies"))
+        mockMvc.perform(get("/api/platform/lobbies"))
                 .andExpect(status().isUnauthorized());
     }
 }

@@ -77,7 +77,7 @@ public class GetAllGamesTests {
         gameRepository.save(game2);
 
         // Act & Assert
-        mockMvc.perform(get("/api/games"))
+        mockMvc.perform(get("/api/platform/games"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -93,7 +93,7 @@ public class GetAllGamesTests {
     @Test
     void getAllGames_shouldReturnEmptyList_whenNoGamesExist() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/api/games"))
+        mockMvc.perform(get("/api/platform/games"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));

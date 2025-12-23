@@ -42,15 +42,12 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain publicFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher(request -> {
-                    String path = request.getServletPath();
-                    return (path.startsWith("/api/platform/public/") ||
-                            path.startsWith("/api/platform/games") ||
-                            path.startsWith("/api/platform/session/") ||
-                            path.equals("/api/platform/users") ||
-                            (path.matches("/api/platform/users/[0-9a-fA-F-]{36}/profile-image.*") &&
-                                    !path.contains("/me/")));
-                })
+                .securityMatcher("/api/platform/public/**",
+                        "/api/platform/games/**",
+                        "/api/platform/session/**",
+                        "/api/platform/users",
+                        "/api/platform/users/*/profile-image",
+                        "/api/platform/users/*/profile-image/**")
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
@@ -70,7 +67,6 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/platform/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/platform/users/**").hasRole("PLAYER")
                         .requestMatchers("/api/platform/games/manage/**").hasRole("GAME_DEVELOPER")
                         .requestMatchers("/api/platform/purchases/**").hasRole("PLAYER")

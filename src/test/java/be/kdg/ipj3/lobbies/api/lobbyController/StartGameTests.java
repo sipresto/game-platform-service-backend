@@ -144,7 +144,7 @@ public class StartGameTests {
         GameStartDto dto = new GameStartDto(Difficulty.EASY);
 
         // Act & Assert
-        mockMvc.perform(post("/api/lobbies/{id}/start", lobbyId.id())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/start", lobbyId.id())
                         .with(validJwt())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
@@ -178,7 +178,7 @@ public class StartGameTests {
         GameStartDto dto = new GameStartDto(Difficulty.EASY);
 
         // Act & Assert
-        mockMvc.perform(post("/api/lobbies/{id}/start", lobbyId.id())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/start", lobbyId.id())
                         .with(validJwt())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
@@ -197,7 +197,7 @@ public class StartGameTests {
         GameStartDto dto = new GameStartDto(Difficulty.EASY);
 
         // Act & Assert
-        mockMvc.perform(post("/api/lobbies/{id}/start", UUID.randomUUID())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/start", UUID.randomUUID())
                         .with(validJwt())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
@@ -218,7 +218,7 @@ public class StartGameTests {
         GameStartDto dto = new GameStartDto(Difficulty.EASY);
 
         // Act & Assert
-        mockMvc.perform(post("/api/lobbies/{id}/start", lobbyId.id())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/start", lobbyId.id())
                         .with(validJwt())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
@@ -236,7 +236,7 @@ public class StartGameTests {
         GameStartDto dto = new GameStartDto(gameId.id(), List.of(), Difficulty.EASY);
 
         // Act & Assert
-        mockMvc.perform(post("/api/lobbies/{id}/start", lobbyId.id())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/start", lobbyId.id())
                         .with(validJwt())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
@@ -253,7 +253,7 @@ public class StartGameTests {
         GameStartDto dto = new GameStartDto(Difficulty.EASY);
 
         // Act & Assert
-        mockMvc.perform(post("/api/lobbies/{id}/start", lobbyId.id())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/start", lobbyId.id())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isUnauthorized());

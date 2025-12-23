@@ -73,7 +73,7 @@ public class PerkIntegrationTests {
         createTestPerks();
 
         // Act & Assert
-        mockMvc.perform(get("/api/perks")
+        mockMvc.perform(get("/api/platform/perks")
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -86,7 +86,7 @@ public class PerkIntegrationTests {
     @Test
     void getAllPerks_shouldReturnEmptyList_whenNoPerksExist() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/api/perks")
+        mockMvc.perform(get("/api/platform/perks")
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -107,7 +107,7 @@ public class PerkIntegrationTests {
         perkRepository.save(perk);
 
         // Act & Assert
-        mockMvc.perform(get("/api/perks/{perkId}", id)
+        mockMvc.perform(get("/api/platform/perks/{perkId}", id)
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -119,7 +119,7 @@ public class PerkIntegrationTests {
     @Test
     void getPerkById_shouldReturnNotFound_whenPerkDoesNotExist() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/api/perks/{perkId}", UUID.randomUUID())
+        mockMvc.perform(get("/api/platform/perks/{perkId}", UUID.randomUUID())
                         .with(validJwt()))
                 .andExpect(status().isNotFound());
     }

@@ -117,7 +117,7 @@ public class UploadProfileImageIntegrationTests {
     void uploadProfileImage_shouldSucceed_whenValidImage() throws Exception {
         MockMultipartFile imageFile = createValidTestImage();
 
-        mockMvc.perform(multipart("/api/me/profile-image")
+        mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(imageFile)
                         .with(request -> {
                             request.setMethod("PUT");
@@ -140,7 +140,7 @@ public class UploadProfileImageIntegrationTests {
     void uploadProfileImage_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
         MockMultipartFile imageFile = createValidTestImage();
 
-        mockMvc.perform(multipart("/api/me/profile-image")
+        mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(imageFile)
                         .with(request -> {
                             request.setMethod("PUT");
@@ -158,7 +158,7 @@ public class UploadProfileImageIntegrationTests {
     void uploadProfileImage_shouldReturnBadRequest_whenFileTooLarge() throws Exception {
         MockMultipartFile largeImageFile = createLargeTestImage();
 
-        mockMvc.perform(multipart("/api/me/profile-image")
+        mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(largeImageFile)
                         .with(request -> {
                             request.setMethod("PUT");
@@ -177,7 +177,7 @@ public class UploadProfileImageIntegrationTests {
     void uploadProfileImage_shouldReturnBadRequest_whenInvalidFileType() throws Exception {
         MockMultipartFile invalidImageFile = createInvalidImageFile();
 
-        mockMvc.perform(multipart("/api/me/profile-image")
+        mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(invalidImageFile)
                         .with(request -> {
                             request.setMethod("PUT");
@@ -195,7 +195,7 @@ public class UploadProfileImageIntegrationTests {
     @Test
     void uploadProfileImage_shouldOverwriteExistingImage() throws Exception {
         MockMultipartFile firstImage = createValidTestImage();
-        mockMvc.perform(multipart("/api/me/profile-image")
+        mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(firstImage)
                         .with(request -> {
                             request.setMethod("PUT");

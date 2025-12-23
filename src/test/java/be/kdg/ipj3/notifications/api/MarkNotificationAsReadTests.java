@@ -90,7 +90,7 @@ public class MarkNotificationAsReadTests {
         notificationRepository.save(notification);
 
         // Act & Assert
-        mockMvc.perform(patch("/api/notifications/{id}/read", notificationId.id().toString())
+        mockMvc.perform(patch("/api/platform/notifications/{id}/read", notificationId.id().toString())
                         .with(validJwt()))
                 .andExpect(status().isOk());
 
@@ -106,7 +106,7 @@ public class MarkNotificationAsReadTests {
         UUID nonExistentNotificationId = UUID.randomUUID();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/notifications/{id}/read", nonExistentNotificationId.toString())
+        mockMvc.perform(patch("/api/platform/notifications/{id}/read", nonExistentNotificationId.toString())
                         .with(validJwt()))
                 .andExpect(status().isNotFound());
     }

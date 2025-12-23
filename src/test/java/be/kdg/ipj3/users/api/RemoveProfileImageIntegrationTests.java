@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -64,7 +66,7 @@ public class RemoveProfileImageIntegrationTests {
     }
 
     private JwtRequestPostProcessor validJwt() {
-        return jwt()
+        return jwt().authorities(() -> "ROLE_PLAYER")
                 .jwt(builder -> builder
                         .subject(testKeycloakId)
                         .claim("preferred_username", "testuser")
@@ -72,7 +74,7 @@ public class RemoveProfileImageIntegrationTests {
     }
 
     private JwtRequestPostProcessor jwtForUser(String keycloakId) {
-        return jwt()
+        return jwt().authorities(() -> "ROLE_PLAYER")
                 .jwt(builder -> builder
                         .subject(keycloakId)
                         .claim("preferred_username", "someuser")
@@ -107,7 +109,7 @@ public class RemoveProfileImageIntegrationTests {
 
     private void uploadTestImage() throws Exception {
         MockMultipartFile imageFile = createValidTestImage();
-        mockMvc.perform(multipart("/api/me/profile-image")
+        mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(imageFile)
                         .with(request -> {
                             request.setMethod("PUT");
@@ -126,7 +128,7 @@ public class RemoveProfileImageIntegrationTests {
         assertThat(userBefore).isPresent();
         assertThat(userBefore.get().getProfile().getProfileImage()).isNotNull();
 
-        mockMvc.perform(delete("/api/me/delete/profile-image")
+        mockMvc.perform(delete("/api/platform/users/me/delete/profile-image")
                         .with(validJwt()))
                 .andExpect(status().isNoContent());
 
@@ -138,7 +140,7 @@ public class RemoveProfileImageIntegrationTests {
 
     @Test
     void removeProfileImage_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
-        mockMvc.perform(delete("/api/me/delete/profile-image"))
+        mockMvc.perform(delete("/api/platform/users/me/delete/profile-image"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -148,7 +150,7 @@ public class RemoveProfileImageIntegrationTests {
         assertThat(userBefore).isPresent();
         assertThat(userBefore.get().getProfile().getProfileImage()).isNull();
 
-        mockMvc.perform(delete("/api/me/delete/profile-image")
+        mockMvc.perform(delete("/api/platform/users/me/delete/profile-image")
                         .with(validJwt()))
                 .andExpect(status().isNoContent());
 
@@ -174,7 +176,7 @@ public class RemoveProfileImageIntegrationTests {
         );
         userRepository.save(differentUser);
 
-        mockMvc.perform(delete("/api/me/delete/profile-image")
+        mockMvc.perform(delete("/api/platform/users/me/delete/profile-image")
                         .with(jwtForUser(differentKeycloakId)))
                 .andExpect(status().isNoContent());
 

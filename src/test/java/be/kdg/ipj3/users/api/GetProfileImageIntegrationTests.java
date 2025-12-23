@@ -97,7 +97,7 @@ public class GetProfileImageIntegrationTests {
 
     private void uploadTestImage() throws Exception {
         MockMultipartFile imageFile = createValidTestImage();
-        mockMvc.perform(multipart("/api/me/profile-image")
+        mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(imageFile)
                         .with(request -> {
                             request.setMethod("PUT");
@@ -112,7 +112,7 @@ public class GetProfileImageIntegrationTests {
     void getProfileImage_shouldReturnImage_whenUserHasImage() throws Exception {
         uploadTestImage();
 
-        mockMvc.perform(get("/api/{userId}/profile-image", testUserId)
+        mockMvc.perform(get("/api/platform/users/{userId}/profile-image", testUserId)
                         .with(validJwt())
                         .accept(MediaType.ALL))
                 .andExpect(status().isOk())
@@ -122,7 +122,7 @@ public class GetProfileImageIntegrationTests {
 
     @Test
     void getProfileImage_shouldReturnDefaultImage_whenUserHasNoImage() throws Exception {
-        mockMvc.perform(get("/api/{userId}/profile-image", testUserId)
+        mockMvc.perform(get("/api/platform/users/{userId}/profile-image", testUserId)
                         .with(validJwt())
                         .accept(MediaType.ALL))
                 .andExpect(status().isOk())
@@ -135,7 +135,7 @@ public class GetProfileImageIntegrationTests {
     void getProfileImage_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
         UUID nonExistentUserId = UUID.randomUUID();
 
-        mockMvc.perform(get("/api/{userId}/profile-image", nonExistentUserId)
+        mockMvc.perform(get("/api/platform/users/{userId}/profile-image", nonExistentUserId)
                         .with(validJwt())
                         .accept(MediaType.ALL))
                 .andExpect(status().isNotFound());
@@ -155,7 +155,7 @@ public class GetProfileImageIntegrationTests {
         userRepository.save(privateUser);
         uploadTestImage();
 
-        mockMvc.perform(get("/api/{userId}/profile-image", testUserId)
+        mockMvc.perform(get("/api/platform/users/{userId}/profile-image", testUserId)
                         .with(validJwt())
                         .accept(MediaType.ALL))
                 .andExpect(status().isOk())

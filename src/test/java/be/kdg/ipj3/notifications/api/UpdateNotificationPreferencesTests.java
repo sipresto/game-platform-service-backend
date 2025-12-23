@@ -78,7 +78,7 @@ public class UpdateNotificationPreferencesTests {
         UserId userId = createUser();
 
         // Act & Assert
-        mockMvc.perform(put("/api/notifications/preferences/FRIEND_REQUEST/EMAIL")
+        mockMvc.perform(put("/api/platform/notifications/preferences/FRIEND_REQUEST/EMAIL")
                         .param("enabled", "false")
                         .with(validJwt()))
                 .andExpect(status().isOk());
@@ -94,7 +94,7 @@ public class UpdateNotificationPreferencesTests {
         createUser();
 
         // Act & Assert
-        mockMvc.perform(put("/api/notifications/preferences/INVALID_TYPE/EMAIL")
+        mockMvc.perform(put("/api/platform/notifications/preferences/INVALID_TYPE/EMAIL")
                         .param("enabled", "false")
                         .with(validJwt()))
                 .andExpect(status().isBadRequest());
@@ -106,7 +106,7 @@ public class UpdateNotificationPreferencesTests {
         createUser();
 
         // Act & Assert
-        mockMvc.perform(put("/api/notifications/preferences/FRIEND_REQUEST/INVALID_CHANNEL")
+        mockMvc.perform(put("/api/platform/notifications/preferences/FRIEND_REQUEST/INVALID_CHANNEL")
                         .param("enabled", "false")
                         .with(validJwt()))
                 .andExpect(status().isBadRequest());

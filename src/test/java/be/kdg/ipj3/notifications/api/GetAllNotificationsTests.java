@@ -103,7 +103,7 @@ public class GetAllNotificationsTests {
         notificationRepository.saveAll(notifications);
 
         // Act && Assert
-        mockMvc.perform(get("/api/notifications")
+        mockMvc.perform(get("/api/platform/notifications")
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].notificationId").value(notificationIds.get(0).id().toString()))
@@ -123,7 +123,7 @@ public class GetAllNotificationsTests {
         createUser();
 
         // Act && Assert
-        mockMvc.perform(get("/api/notifications")
+        mockMvc.perform(get("/api/platform/notifications")
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());

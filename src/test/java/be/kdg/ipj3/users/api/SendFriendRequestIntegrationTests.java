@@ -55,7 +55,7 @@ class SendFriendRequestIntegrationTests {
         JpaUserEntity receiver = createUser("kc-receiver", "receiver");
 
         // Act
-        mockMvc.perform(post("/api/user/{receiverId}/send-friend-request", receiver.getId())
+        mockMvc.perform(post("/api/platform/users/{receiverId}/send-friend-request", receiver.getId())
                         .with(jwtForUser(sender.getKeycloakId())))
                 .andExpect(status().isNoContent());
 
@@ -73,7 +73,7 @@ class SendFriendRequestIntegrationTests {
         JpaUserEntity sender = createUser("kc-otherUser", "otherUser");
 
         // Act & Assert
-        mockMvc.perform(post("/api/user/{receiverId}/send-friend-request", UUID.randomUUID())
+        mockMvc.perform(post("/api/platform/users/{receiverId}/send-friend-request", UUID.randomUUID())
                         .with(jwtForUser(sender.getKeycloakId())))
                 .andExpect(status().isNotFound());
     }
@@ -82,7 +82,7 @@ class SendFriendRequestIntegrationTests {
     void sendFriendRequest_ShouldFail_WhenUnauthorized() throws Exception {
         JpaUserEntity receiver = createUser("kc-receiver", "receiver");
 
-        mockMvc.perform(post("/api/user/{receiverId}/send-friend-request", receiver.getId()))
+        mockMvc.perform(post("/api/platform/users/{receiverId}/send-friend-request", receiver.getId()))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -93,7 +93,7 @@ class SendFriendRequestIntegrationTests {
         JpaUserEntity user = createUser("kc-user", "user");
 
         // Act & Assert
-        mockMvc.perform(post("/api/user/{receiverId}/send-friend-request", user.getId())
+        mockMvc.perform(post("/api/platform/users/{receiverId}/send-friend-request", user.getId())
                         .with(jwtForUser(user.getKeycloakId())))
                 .andExpect(status().isBadRequest());
     }

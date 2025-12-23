@@ -96,7 +96,7 @@ public class CreateLobbyTests {
         CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
 
         // Act & Assert
-        String responseContent = mockMvc.perform(post("/api/lobbies")
+        String responseContent = mockMvc.perform(post("/api/platform/lobbies")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -128,7 +128,7 @@ public class CreateLobbyTests {
         GameId gameId = GameId.create();  // not persisted
         CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
 
-        mockMvc.perform(post("/api/lobbies")
+        mockMvc.perform(post("/api/platform/lobbies")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -144,7 +144,7 @@ public class CreateLobbyTests {
         CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
 
         // Act & Assert
-        mockMvc.perform(post("/api/lobbies")
+        mockMvc.perform(post("/api/platform/lobbies")
                         .with(validJwt())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
@@ -157,7 +157,7 @@ public class CreateLobbyTests {
         GameId gameId = createTestGame();
         CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
 
-        mockMvc.perform(post("/api/lobbies")
+        mockMvc.perform(post("/api/platform/lobbies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isUnauthorized());
@@ -176,7 +176,7 @@ public class CreateLobbyTests {
                 }
                 """.formatted(gameId.id());
 
-        mockMvc.perform(post("/api/lobbies")
+        mockMvc.perform(post("/api/platform/lobbies")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidDto))

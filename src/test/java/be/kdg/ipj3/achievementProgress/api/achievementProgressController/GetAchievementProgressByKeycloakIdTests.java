@@ -158,7 +158,7 @@ public class GetAchievementProgressByKeycloakIdTests {
         achievementProgressRepository.save(achievementProgress);
 
         // Act && Assert
-        mockMvc.perform(get("/api/achievements/user/" + user.getKeycloakId())
+        mockMvc.perform(get("/api/platform/achievements/user/" + user.getKeycloakId())
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].achievementId").value(achievementIds.get(0).id().toString()))
@@ -217,7 +217,7 @@ public class GetAchievementProgressByKeycloakIdTests {
 
 
         // Act && Assert
-        mockMvc.perform(get("/api/achievements/user/" + user.getKeycloakId())
+        mockMvc.perform(get("/api/platform/achievements/user/" + user.getKeycloakId())
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
