@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQTopologySessions {
 
     public static final String SESSION_GAME_RESULTS_QUEUE = "sessions-game-results-queue";
+    public static final String SESSION_GAME_REMATCH_QUEUE = "session-game-rematch-queue";
 
     @Bean
     Queue sessionsGameResultsQueue() {
@@ -15,10 +16,22 @@ public class RabbitMQTopologySessions {
     }
 
     @Bean
-    Binding sessionsBinding(Queue sessionsGameResultsQueue, TopicExchange gameEventsExchange) {
+    Binding sessionsResultBinding(Queue sessionsGameResultsQueue, TopicExchange gameEventsExchange) {
         return BindingBuilder.bind(sessionsGameResultsQueue)
                 .to(gameEventsExchange)
                 .with("game.result.*");
+    }
+
+    @Bean
+    Queue sessionsGameRematchQueue() {
+        return QueueBuilder.durable(SESSION_GAME_REMATCH_QUEUE).build();
+    }
+
+    @Bean
+    Binding sessionsRematchBinding(Queue sessionsGameRematchQueue, TopicExchange gameEventsExchange) {
+        return BindingBuilder.bind(sessionsGameRematchQueue)
+                .to(gameEventsExchange)
+                .with("game.rematch.*");
     }
 }
 

@@ -72,4 +72,18 @@ public class SessionService implements SessionsApi {
     public Optional<Session> findById(SessionId id) {
         return sessionRepository.findById(id);
     }
+
+    public void createRematchSession(UUID oldSessionId, UUID newSessionId) {
+        Optional<Session> optionalSession = sessionRepository.findById(new SessionId(oldSessionId));
+        if (optionalSession.isEmpty()) {
+            return;
+        }
+
+        Session oldSession = optionalSession.get();
+
+        Session newSession = new Session(new SessionId(newSessionId), oldSession.getGame(),
+                oldSession.getPlayers(), oldSession.getDifficulty());
+
+        sessionRepository.save(newSession);
+    }
 }
