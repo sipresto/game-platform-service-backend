@@ -57,7 +57,7 @@ public class ChatController {
                 .body(chatDto);
     }
 
-    @PostMapping("/{id}/messages")
+    @PostMapping("/{id}/message")
     public ResponseEntity<Void> sendMessage(
             @PathVariable UUID id,
             @RequestBody SendMessageDto dto,
