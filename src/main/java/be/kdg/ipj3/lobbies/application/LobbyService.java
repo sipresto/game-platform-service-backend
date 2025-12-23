@@ -9,7 +9,7 @@ import be.kdg.ipj3.lobbies.domain.Lobby;
 import be.kdg.ipj3.lobbies.domain.LobbyId;
 import be.kdg.ipj3.lobbies.domain.LobbyRepository;
 import be.kdg.ipj3.lobbies.domain.LobbyStatus;
-import be.kdg.ipj3.lobbies.domain.exceptions.GameServiceUnavailableException;
+import be.kdg.ipj3.lobbies.shared.GameServiceUnavailableException;
 import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.sessions.shared.SessionId;
