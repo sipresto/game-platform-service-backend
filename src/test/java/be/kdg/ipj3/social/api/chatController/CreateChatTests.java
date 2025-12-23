@@ -141,7 +141,7 @@ public class CreateChatTests {
         UserId userId1 = createTestUser1();
         UserId userId2 = createTestUser2();
 
-        Chat chat = new Chat(Set.of(userId1, userId2));
+        Chat chat = new Chat(null, Set.of(userId1, userId2));
         chatRepository.save(chat);
 
         CreateChatDto dto = new CreateChatDto(Set.of(userId2.id()));

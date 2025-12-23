@@ -5,6 +5,7 @@ import be.kdg.ipj3.social.api.dto.ChatListDto;
 import be.kdg.ipj3.social.domain.Chat;
 import be.kdg.ipj3.social.domain.ChatId;
 import be.kdg.ipj3.social.domain.ChatRepository;
+import be.kdg.ipj3.social.domain.Message;
 import be.kdg.ipj3.social.shared.InvalidChatRequestException;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
@@ -33,8 +34,12 @@ public class ChatService {
 
         return chatRepository.findChatsByUserId(userId).stream()
                 .map(chat -> {
-                    String chatName = buildChatName(chat, userId);
-                    return ChatListDto.fromDomain(chat, chatName);
+                    String chatName = buildChatName(chat.getParticipants(), userId);
+
+                    Message lastMessage = chat.getMessages().getLast();
+                    String senderName = usersApi.findDisplayNameById(lastMessage.getSender());
+
+                    return ChatListDto.fromDomain(chat, chatName, userId, senderName);
                 })
                 .toList();
     }
@@ -51,13 +56,15 @@ public class ChatService {
 
         Set<UserId> participantIds = chat.getParticipants();
 
+        String chatName = buildChatName(participantIds, currentUser);
+
         var usernames = participantIds.stream()
                 .collect(Collectors.toMap(
                         userId -> userId,
                         usersApi::findDisplayNameById
                 ));
 
-        return ChatDto.fromDomain(chat, currentUser, usernames);
+        return ChatDto.fromDomain(chat, chatName, currentUser, usernames);
     }
 
     public ChatDto createChat(String keycloakId, Set<UserId> participants) {
@@ -74,10 +81,12 @@ public class ChatService {
 
         Chat chat = chatRepository.findByExactParticipants(participantIds)
                 .orElseGet(() -> {
-                    Chat newChat = new Chat(participantIds);
+                    Chat newChat = new Chat(null, participantIds);
                     chatRepository.save(newChat);
                     return newChat;
                 });
+
+        String chatName = buildChatName(participantIds, currentUser);
 
         var usernames = chat.getParticipants().stream()
                 .collect(Collectors.toMap(
@@ -85,7 +94,7 @@ public class ChatService {
                         usersApi::findDisplayNameById
                 ));
 
-        return ChatDto.fromDomain(chat, currentUser, usernames);
+        return ChatDto.fromDomain(chat, chatName, currentUser, usernames);
     }
 
     public ChatDto sendMessage(String keycloakId, ChatId chatId, String content) {
@@ -103,11 +112,13 @@ public class ChatService {
                         usersApi::findDisplayNameById
                 ));
 
-        return ChatDto.fromDomain(chat, currentUser, usernames);
+        String chatName = buildChatName(chat.getParticipants(), currentUser);
+
+        return ChatDto.fromDomain(chat, chatName, currentUser, usernames);
     }
 
-    private String buildChatName(Chat chat, UserId currentUser) {
-        return chat.getParticipants().stream()
+    private String buildChatName(Set<UserId> participants, UserId currentUser) {
+        return participants.stream()
                 .filter(userId -> !userId.equals(currentUser))
                 .map(usersApi::findDisplayNameById)
                 .collect(Collectors.joining(", "));

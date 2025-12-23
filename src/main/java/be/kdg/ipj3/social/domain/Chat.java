@@ -15,22 +15,29 @@ import java.util.Set;
 public class Chat {
     @Identity
     private final ChatId id;
+    private final String name;
     private final Set<UserId> participants = new HashSet<>();
     private final List<Message> messages = new ArrayList<>();
     private Instant lastMessageAt;
 
-    public Chat(ChatId id, Instant lastMessageAt) {
+    public Chat(ChatId id, String name, Instant lastMessageAt) {
         this.id = id;
+        this.name = name;
         this.lastMessageAt = lastMessageAt;
     }
 
-    public Chat(Set<UserId> participants) {
+    public Chat(String name, Set<UserId> participants) {
         this.id = ChatId.create();
+        this.name = name;
         participants.forEach(this::addParticipant);
     }
 
     public ChatId getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Set<UserId> getParticipants() {

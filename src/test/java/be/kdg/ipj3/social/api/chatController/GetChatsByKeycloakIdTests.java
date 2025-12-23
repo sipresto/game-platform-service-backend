@@ -85,11 +85,11 @@ public class GetChatsByKeycloakIdTests {
         UserId userId2 = createTestUser2();
         UserId userId3 = createTestUser3();
 
-        Chat chat1 = new Chat(Set.of(userId1, userId2));
+        Chat chat1 = new Chat(null, Set.of(userId1, userId2));
         chat1.sendMessage(userId1, "Hello in chat 1");
         chatRepository.save(chat1);
 
-        Chat chat2 = new Chat(Set.of(userId1, userId3));
+        Chat chat2 = new Chat(null, Set.of(userId1, userId3));
         chat2.sendMessage(userId1, "Hello in chat 2");
         chat2.sendMessage(userId3, "Hi");
         chatRepository.save(chat2);
@@ -113,15 +113,15 @@ public class GetChatsByKeycloakIdTests {
         UserId userId3 = createTestUser3();
 
         // Chat without messages
-        Chat chatWithoutMessages = new Chat(Set.of(userId1, userId2));
+        Chat chatWithoutMessages = new Chat(null, Set.of(userId1, userId2));
         chatRepository.save(chatWithoutMessages);
 
         // Chat with messages
-        Chat chatWithMessages = new Chat(Set.of(userId1, userId3));
+        Chat chatWithMessages = new Chat(null, Set.of(userId1, userId3));
         chatWithMessages.sendMessage(userId1, "Hello");
         chatRepository.save(chatWithMessages);
 
-        Chat chatWithoutUser = new Chat(Set.of(userId2, userId3));
+        Chat chatWithoutUser = new Chat(null, Set.of(userId2, userId3));
         chatWithoutUser.sendMessage(userId2, "Hi");
         chatRepository.save(chatWithoutUser);
 

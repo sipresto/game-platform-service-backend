@@ -73,7 +73,7 @@ public class GetChatByIdTests {
         UserId userId1 = createTestUser1();
         UserId userId2 = createTestUser2();
 
-        Chat chat = new Chat(Set.of(userId1, userId2));
+        Chat chat = new Chat(null, Set.of(userId1, userId2));
         chat.sendMessage(userId1, "Hello!");
         chat.sendMessage(userId2, "Hi there!");
         chatRepository.save(chat);
@@ -105,7 +105,7 @@ public class GetChatByIdTests {
         UserId userId1 = createTestUser1();
         UserId userId2 = createTestUser2();
 
-        Chat chat = new Chat(Set.of(userId1, userId2));
+        Chat chat = new Chat(null, Set.of(userId1, userId2));
         chatRepository.save(chat);
 
         // Act & Assert
@@ -122,7 +122,7 @@ public class GetChatByIdTests {
         UserId userId2 = createTestUser2();
         UserId userId3 = createTestUser3();
 
-        Chat chat = new Chat(Set.of(userId2, userId3));
+        Chat chat = new Chat(null, Set.of(userId2, userId3));
         chatRepository.save(chat);
 
         // Act & Assert
@@ -148,7 +148,7 @@ public class GetChatByIdTests {
         UserId userId1 = createTestUser1();
         UserId userId2 = createTestUser2();
 
-        Chat chat = new Chat(Set.of(userId1, userId2));
+        Chat chat = new Chat(null, Set.of(userId1, userId2));
         chatRepository.save(chat);
 
         // Act & Assert

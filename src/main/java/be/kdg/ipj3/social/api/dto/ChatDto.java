@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 public record ChatDto(
         UUID id,
+        String name,
         Set<ParticipantDto> participants,
         List<MessageDto> messages
 ) {
@@ -31,6 +32,7 @@ public record ChatDto(
 
     public static ChatDto fromDomain(
             Chat chat,
+            String chatName,
             UserId currentUser,
             Map<UserId, String> usernames
     ) {
@@ -58,6 +60,7 @@ public record ChatDto(
 
         return new ChatDto(
                 chat.getId().id(),
+                chat.getName() != null ? chat.getName() : chatName,
                 participants,
                 messageDtos
         );

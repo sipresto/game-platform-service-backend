@@ -7,6 +7,7 @@ import be.kdg.ipj3.social.api.dto.SendMessageDto;
 import be.kdg.ipj3.social.application.ChatService;
 import be.kdg.ipj3.social.domain.ChatId;
 import be.kdg.ipj3.users.shared.UserId;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -60,7 +61,7 @@ public class ChatController {
     @PostMapping("/{id}/message")
     public ResponseEntity<ChatDto> sendMessage(
             @PathVariable UUID id,
-            @RequestBody SendMessageDto dto,
+            @Valid @RequestBody SendMessageDto dto,
             @AuthenticationPrincipal Jwt token
     ) {
         ChatDto chatDto = chatService.sendMessage(token.getSubject(), new ChatId(id), dto.content());

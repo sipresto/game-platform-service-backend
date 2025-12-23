@@ -16,6 +16,8 @@ public class JpaChatEntity {
     @Column(name = "chat_id")
     private UUID id;
 
+    private String name;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "chat_participants",
@@ -38,8 +40,9 @@ public class JpaChatEntity {
     protected JpaChatEntity() {
     } // for JPA
 
-    public JpaChatEntity(UUID id, Set<UUID> participantIds, Instant lastMessageAt) {
+    public JpaChatEntity(UUID id, String name, Set<UUID> participantIds, Instant lastMessageAt) {
         this.id = id;
+        this.name = name;
         this.participantIds = participantIds;
         this.lastMessageAt = lastMessageAt;
     }
@@ -49,7 +52,7 @@ public class JpaChatEntity {
                 .map(UserId::id)
                 .collect(Collectors.toSet());
 
-        JpaChatEntity jpaChat = new JpaChatEntity(chat.getId().id(), participantIds, chat.getLastMessageAt());
+        JpaChatEntity jpaChat = new JpaChatEntity(chat.getId().id(), chat.getName(), participantIds, chat.getLastMessageAt());
 
         chat.getMessages().stream()
                 .map(msg -> JpaMessageEntity.fromDomain(msg, jpaChat))
@@ -59,7 +62,7 @@ public class JpaChatEntity {
     }
 
     public Chat toDomain() {
-        Chat chat = new Chat(new ChatId(id), lastMessageAt);
+        Chat chat = new Chat(new ChatId(id), name, lastMessageAt);
 
         participantIds.stream()
                 .map(UserId::new)
@@ -74,6 +77,10 @@ public class JpaChatEntity {
 
     public UUID getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Set<UUID> getParticipantIds() {

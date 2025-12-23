@@ -84,7 +84,7 @@ public class SendMessageTests {
         UserId userId1 = createTestUser1();
         UserId userId2 = createTestUser2();
 
-        Chat chat = new Chat(Set.of(userId1, userId2));
+        Chat chat = new Chat(null, Set.of(userId1, userId2));
         chatRepository.save(chat);
 
         SendMessageDto message1 = new SendMessageDto("First message");
@@ -128,7 +128,7 @@ public class SendMessageTests {
         UserId userId2 = createTestUser2();
         UserId userId3 = createTestUser3();
 
-        Chat chat = new Chat(Set.of(userId2, userId3));
+        Chat chat = new Chat(null, Set.of(userId2, userId3));
         chatRepository.save(chat);
 
         SendMessageDto dto = new SendMessageDto("Unauthorized message");
@@ -165,7 +165,7 @@ public class SendMessageTests {
         UserId userId1 = createTestUser1();
         UserId userId2 = createTestUser2();
 
-        Chat chat = new Chat(Set.of(userId1, userId2));
+        Chat chat = new Chat(null, Set.of(userId1, userId2));
         chatRepository.save(chat);
 
         SendMessageDto dto = new SendMessageDto("Unauthenticated message");
@@ -183,7 +183,7 @@ public class SendMessageTests {
         UserId userId1 = createTestUser1();
         UserId userId2 = createTestUser2();
 
-        Chat chat = new Chat(Set.of(userId1, userId2));
+        Chat chat = new Chat(null, Set.of(userId1, userId2));
         chatRepository.save(chat);
 
         SendMessageDto dto = new SendMessageDto("Message from user 2");
