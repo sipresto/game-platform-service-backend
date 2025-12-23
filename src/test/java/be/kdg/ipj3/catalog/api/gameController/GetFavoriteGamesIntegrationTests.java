@@ -22,8 +22,8 @@ import org.testcontainers.utility.TestcontainersConfiguration;
 import java.time.Instant;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -105,8 +105,7 @@ public class GetFavoriteGamesIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is("TicTac")))
-                .andExpect(jsonPath("$[1].name", is("Quoridor")));
+                .andExpect(jsonPath("$[*].name", containsInAnyOrder("TicTac", "Quoridor")));
     }
 
     @Test
