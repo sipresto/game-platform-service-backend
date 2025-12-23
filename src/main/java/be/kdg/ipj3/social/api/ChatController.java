@@ -58,13 +58,13 @@ public class ChatController {
     }
 
     @PostMapping("/{id}/message")
-    public ResponseEntity<Void> sendMessage(
+    public ResponseEntity<ChatDto> sendMessage(
             @PathVariable UUID id,
             @RequestBody SendMessageDto dto,
             @AuthenticationPrincipal Jwt token
     ) {
-        chatService.sendMessage(token.getSubject(), new ChatId(id), dto.content());
+        ChatDto chatDto = chatService.sendMessage(token.getSubject(), new ChatId(id), dto.content());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(chatDto);
     }
 }

@@ -88,15 +88,22 @@ public class ChatService {
         return ChatDto.fromDomain(chat, currentUser, usernames);
     }
 
-    public void sendMessage(String keycloakId, ChatId chatId, String content) {
-        UserId userId = usersApi.findIdByKeycloakId(keycloakId);
+    public ChatDto sendMessage(String keycloakId, ChatId chatId, String content) {
+        UserId currentUser = usersApi.findIdByKeycloakId(keycloakId);
 
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(chatId::notFound);
 
-        chat.sendMessage(userId, content);
-
+        chat.sendMessage(currentUser, content);
         chatRepository.save(chat);
+
+        var usernames = chat.getParticipants().stream()
+                .collect(Collectors.toMap(
+                        userId -> userId,
+                        usersApi::findDisplayNameById
+                ));
+
+        return ChatDto.fromDomain(chat, currentUser, usernames);
     }
 
     private String buildChatName(Chat chat, UserId currentUser) {
