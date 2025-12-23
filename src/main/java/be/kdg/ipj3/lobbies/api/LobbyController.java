@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/lobbies")
+@RequestMapping("/api/platform/lobbies")
 public class LobbyController {
     private final LobbyService lobbyService;
 

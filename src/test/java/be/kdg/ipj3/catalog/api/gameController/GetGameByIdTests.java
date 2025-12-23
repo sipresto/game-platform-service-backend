@@ -61,7 +61,7 @@ public class GetGameByIdTests {
         gameRepository.save(game);
 
         // Act & Assert
-        mockMvc.perform(get("/api/games/" + game.getId().id()))
+        mockMvc.perform(get("/api/platform/games/" + game.getId().id()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.name").value("Test Game"))
@@ -78,7 +78,7 @@ public class GetGameByIdTests {
         GameId gameId = GameId.create();
 
         // Act & Assert
-        mockMvc.perform(get("/api/games/" + gameId.id()))
+        mockMvc.perform(get("/api/platform/games/" + gameId.id()))
                 .andExpect(status().isNotFound());
     }
 }

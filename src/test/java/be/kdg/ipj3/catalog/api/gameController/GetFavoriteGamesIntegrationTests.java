@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.time.Instant;
@@ -32,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @TestPropertySource("classpath:application-test.properties")
+@Transactional
 public class GetFavoriteGamesIntegrationTests {
 
     @Autowired
@@ -99,7 +101,7 @@ public class GetFavoriteGamesIntegrationTests {
         userRepository.save(user);
 
         // Act & Assert
-        mockMvc.perform(get("/api/games/favorites")
+        mockMvc.perform(get("/api/platform/games/favorites")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -115,7 +117,7 @@ public class GetFavoriteGamesIntegrationTests {
         userRepository.save(user);
 
         // Act & Assert
-        mockMvc.perform(get("/api/games/favorites")
+        mockMvc.perform(get("/api/platform/games/favorites")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-// TODO: change session to sessions (in frontend as well)
 @RestController
-@RequestMapping("/api/session")
+@RequestMapping("/api/platform/sessions")
 public class SessionController {
     private final SessionService sessionService;
 
@@ -20,8 +19,7 @@ public class SessionController {
         this.sessionService = sessionService;
     }
 
-    // TODO: change to /user/{userId}
-    @GetMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     public ResponseEntity<List<SessionDto>> getSessionsByUserId(
             @PathVariable String userId
     ) {

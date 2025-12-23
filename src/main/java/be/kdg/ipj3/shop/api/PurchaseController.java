@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/purchases")
+@RequestMapping("/api/platform/purchases")
 public class PurchaseController {
     private final PurchaseService purchaseService;
     private final StripeService stripeService;

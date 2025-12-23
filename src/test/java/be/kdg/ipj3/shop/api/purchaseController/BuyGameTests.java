@@ -109,7 +109,7 @@ class BuyGameTests {
         String requestBody = "{\"chargeId\": \"ch_test_12345\"}";
 
         // Act & Assert
-        mockMvc.perform(post("/api/purchases/" + gameId.id())
+        mockMvc.perform(post("/api/platform/purchases/" + gameId.id())
                         .with(validJwt())
                         .contentType("application/json")
                         .content(requestBody))
@@ -125,7 +125,7 @@ class BuyGameTests {
         String requestBody = "{\"chargeId\": \"ch_test_12345\"}";
 
         // Act & Assert
-        mockMvc.perform(post("/api/purchases/" + UUID.randomUUID())
+        mockMvc.perform(post("/api/platform/purchases/" + UUID.randomUUID())
                         .with(validJwt())
                         .contentType("application/json")
                         .content(requestBody))
@@ -140,7 +140,7 @@ class BuyGameTests {
         String requestBody = "{}";
 
         // Act & Assert
-        mockMvc.perform(post("/api/purchases/" + gameId.id())
+        mockMvc.perform(post("/api/platform/purchases/" + gameId.id())
                         .with(validJwt())
                         .contentType("application/json")
                         .content(requestBody))
@@ -154,7 +154,7 @@ class BuyGameTests {
         String requestBody = "{\"chargeId\": \"ch_test_12345\"}";
 
         // Act & Assert
-        mockMvc.perform(post("/api/purchases/" + gameId.id())
+        mockMvc.perform(post("/api/platform/purchases/" + gameId.id())
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isUnauthorized());

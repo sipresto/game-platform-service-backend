@@ -63,7 +63,7 @@ class AcceptFriendRequestIntegrationTests {
         userRepository.save(JpaUserEntity.fromDomain(receiverDomain));
 
         // Act
-        mockMvc.perform(put("/api/user/{senderId}/friend-request/accept", senderEntity.getId())
+        mockMvc.perform(put("/api/platform/users/{senderId}/friend-request/accept", senderEntity.getId())
                         .with(jwtForUser(receiverEntity.getKeycloakId())))
                 .andExpect(status().isNoContent());
 
@@ -84,7 +84,7 @@ class AcceptFriendRequestIntegrationTests {
         JpaUserEntity receiver = createUser("kc-receiver", "receiver");
 
         // Act & Assert
-        mockMvc.perform(put("/api/user/{senderId}/friend-request/accept", sender.getId())
+        mockMvc.perform(put("/api/platform/users/{senderId}/friend-request/accept", sender.getId())
                         .with(jwtForUser(receiver.getKeycloakId())))
                 .andExpect(status().isBadRequest());
     }
@@ -95,14 +95,14 @@ class AcceptFriendRequestIntegrationTests {
         JpaUserEntity receiver = createUser("kc-receiver", "receiver");
 
         // Act
-        mockMvc.perform(put("/api/user/{senderId}/friend-request/accept", UUID.randomUUID())
+        mockMvc.perform(put("/api/platform/users/{senderId}/friend-request/accept", UUID.randomUUID())
                         .with(jwtForUser(receiver.getKeycloakId())))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void acceptFriendRequest_ShouldFail_WhenUnauthorized() throws Exception {
-        mockMvc.perform(put("/api/user/{senderId}/friend-request/accept", UUID.randomUUID()))
+        mockMvc.perform(put("/api/platform/users/{senderId}/friend-request/accept", UUID.randomUUID()))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -113,7 +113,7 @@ class AcceptFriendRequestIntegrationTests {
         JpaUserEntity user = createUser("kc-user", "user");
 
         // Act & Assert
-        mockMvc.perform(put("/api/user/{senderId}/friend-request/accept", user.getId())
+        mockMvc.perform(put("/api/platform/users/{senderId}/friend-request/accept", user.getId())
                         .with(jwtForUser(user.getKeycloakId())))
                 .andExpect(status().isBadRequest());
     }

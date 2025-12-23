@@ -74,7 +74,7 @@ public class LeaveLobbyTests {
         LobbyId lobbyId = createTestLobbyWithUser(userId);
 
         // Act
-        mockMvc.perform(post("/api/lobbies/{id}/leave", lobbyId.id())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/leave", lobbyId.id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -93,7 +93,7 @@ public class LeaveLobbyTests {
     void leaveLobby_shouldReturnNotFound_whenLobbyDoesNotExist() throws Exception {
         UserId userId = createTestUser();
 
-        mockMvc.perform(post("/api/lobbies/{id}/leave", java.util.UUID.randomUUID())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/leave", java.util.UUID.randomUUID())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -104,7 +104,7 @@ public class LeaveLobbyTests {
     void leaveLobby_shouldReturnNotFound_whenUserNotRegistered() throws Exception {
         LobbyId lobbyId = createTestLobbyWithUser(UserId.create());
 
-        mockMvc.perform(post("/api/lobbies/{id}/leave", lobbyId.id())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/leave", lobbyId.id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON))
                .andExpect(status().isOk());
@@ -115,7 +115,7 @@ public class LeaveLobbyTests {
         UserId someUserId = UserId.create();
         LobbyId lobbyId = createTestLobbyWithUser(someUserId);
 
-        mockMvc.perform(post("/api/lobbies/{id}/leave", lobbyId.id())
+        mockMvc.perform(post("/api/platform/lobbies/{id}/leave", lobbyId.id())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }

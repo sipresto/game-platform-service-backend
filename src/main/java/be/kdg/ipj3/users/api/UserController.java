@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/platform/users")
 public class UserController {
     private final UserService userService;
     private final ProfileImageService profileImageService;
@@ -37,7 +37,7 @@ public class UserController {
      * Get current user's profile
      * Automatically registers user on first login
      */
-    @GetMapping("/user")
+    @GetMapping("/find-by-keycloak-id")
     public ResponseEntity<UserDto> findUser(
             @AuthenticationPrincipal Jwt jwt
     ) {
@@ -53,7 +53,7 @@ public class UserController {
     /**
      * Update current user's profile
      */
-    @PutMapping("/user/profile")
+    @PutMapping("/profile")
     public ResponseEntity<Map<String, String>> updateProfile(
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody @Valid UserDto.ProfileDto profileDto
@@ -66,9 +66,9 @@ public class UserController {
     }
 
     /**
-     * Updates the visibility settings of the user
+     * Updates the global visibility settings of the user
      */
-    @PutMapping("/user/privacy")
+    @PutMapping("/privacy")
     public ResponseEntity<Void> updatePrivacySettings(
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody Visibility visibility
@@ -82,7 +82,7 @@ public class UserController {
     /**
      * Unsecured endpoint that gets all users whose accounts are public
      */
-    @GetMapping("/users")
+    @GetMapping
     public ResponseEntity<List<UserDto>> findAllPublicUsers() {
         var publicUsers = userService.findAllPublicUsers().stream().map(UserDto::fromDomain).toList();
         return ResponseEntity.ok(publicUsers);
@@ -101,7 +101,7 @@ public class UserController {
     /**
      * Gets a user by their ID
      */
-    @GetMapping("/user/{userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<UserDto> findUserById(@PathVariable UUID userId) {
         User user = userService.findById(userId);
         return ResponseEntity.ok(UserDto.fromDomain(user));
@@ -128,7 +128,7 @@ public class UserController {
     /**
      * Retrieves the profile image for a user
      */
-    @GetMapping("/{userId}/profile-image")
+    @GetMapping("/profile-image/{userId}")
     public ResponseEntity<byte[]> getProfileImage(@PathVariable UUID userId) {
         try {
             byte[] image = profileImageService.getProfileImage(new UserId(userId));
@@ -158,7 +158,7 @@ public class UserController {
     /**
      * Sends a friend request from one user to another
      */
-    @PostMapping("/user/{receiverId}/send-friend-request")
+    @PostMapping("{receiverId}/send-friend-request")
     public ResponseEntity<Void> sendFriendRequest(
             @PathVariable UUID receiverId,
             @AuthenticationPrincipal Jwt jwt
@@ -170,7 +170,7 @@ public class UserController {
     /**
      * Accepts a friend request
      */
-    @PutMapping("/user/{senderId}/friend-request/accept")
+    @PutMapping("/{senderId}/friend-request/accept")
     public ResponseEntity<Void> acceptFriendRequest(
             @PathVariable UUID senderId,
             @AuthenticationPrincipal Jwt jwt
@@ -183,7 +183,7 @@ public class UserController {
     /**
      * Rejects a friend request
      */
-    @PutMapping("/user/{senderId}/friend-request/reject")
+    @PutMapping("/{senderId}/friend-request/reject")
     public ResponseEntity<Void> rejectFriendRequest(
             @PathVariable UUID senderId,
             @AuthenticationPrincipal Jwt jwt

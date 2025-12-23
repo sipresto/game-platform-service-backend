@@ -72,7 +72,7 @@ public class GetNotificationPreferencesTests {
         createUser();
 
         // Act & Assert
-        mockMvc.perform(get("/api/notifications/preferences")
+        mockMvc.perform(get("/api/platform/notifications/preferences")
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.FRIEND_REQUEST.IN_APP").value(true))
