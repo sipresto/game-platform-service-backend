@@ -99,7 +99,9 @@ public class UserService implements UsersApi {
     public void addPoints(UUID id, int points) {
         var userId = new UserId(id);
 
-        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        User user = userRepository.findByIdForUpdate(userId)
+                .orElseThrow(userId::notFound);
+
         user.addPoints(points);
         userRepository.save(user);
     }

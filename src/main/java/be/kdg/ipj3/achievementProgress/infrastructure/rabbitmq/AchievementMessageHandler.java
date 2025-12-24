@@ -48,12 +48,6 @@ public class AchievementMessageHandler {
 
     @RabbitListener(queues = RabbitMQTopologyAchievements.ACHIEVEMENT_COMPLETED_QUEUE)
     void onAchievementCompletedMessageReceived(AchievementCompletedDto dto) {
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
         UserId userId = usersApi.findIdByKeycloakId(dto.userId());
         GameId gameId = sessionsApi.findGameIdBySessionId(dto.gameId());
 

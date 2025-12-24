@@ -28,6 +28,11 @@ public class UserRepositoryImpl implements UserRepository {
                 .map(JpaUserEntity::toDomain);
     }
 
+    public Optional<User> findByIdForUpdate(UserId userId) {
+        return jpaUserRepository.findByIdForUpdate(userId.id())
+                .map(JpaUserEntity::toDomain);
+    }
+
     @Override
     public void save(User user) {
         jpaUserRepository.save(JpaUserEntity.fromDomain(user));

@@ -9,6 +9,8 @@ import java.util.Optional;
 public interface UserRepository {
     Optional<User> findById(UserId userId);
 
+    Optional<User> findByIdForUpdate(UserId userId);
+
     void save(User user);
 
     Optional<User> findByKeycloakId(String keycloakId);
