@@ -13,8 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -37,15 +37,15 @@ class AddNotificationTests {
         // Arrange
         String description = "Test notification";
         NotificationType type = NotificationType.FRIEND_REQUEST;
-        UUID userId = UUID.randomUUID();
-        UserNotificationPreferences preferences = new UserNotificationPreferences(new UserId(userId));
+        UserId userId = UserId.create();
+        UserNotificationPreferences preferences = new UserNotificationPreferences(userId);
         preferences.updatePreference(type, NotificationChannel.IN_APP, true);
         preferences.updatePreference(type, NotificationChannel.EMAIL, false);
 
-        given(notificationRepository.findPreferencesByUserId(new UserId(userId))).willReturn(Optional.of(preferences));
+        given(notificationRepository.findPreferencesByUserId(userId)).willReturn(Optional.of(preferences));
 
         // Act
-        notificationService.addNotification(description, type, userId);
+        notificationService.addNotification(null, description, type, Instant.now(), userId, null);
 
         // Assert
         ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -54,7 +54,7 @@ class AddNotificationTests {
         Notification savedNotification = notificationCaptor.getValue();
         assertThat(savedNotification.getDescription()).isEqualTo(description);
         assertThat(savedNotification.getType()).isEqualTo(type);
-        assertThat(savedNotification.getUser()).isEqualTo(new UserId(userId));
+        assertThat(savedNotification.getUser()).isEqualTo(userId);
         assertThat(savedNotification.shouldSendViaChannel(NotificationChannel.IN_APP)).isTrue();
         assertThat(savedNotification.shouldSendViaChannel(NotificationChannel.EMAIL)).isFalse();
     }
@@ -64,12 +64,12 @@ class AddNotificationTests {
         // Arrange
         String description = "Test notification";
         NotificationType type = NotificationType.FRIEND_REQUEST;
-        UUID userId = UUID.randomUUID();
+        UserId userId = UserId.create();
 
-        given(notificationRepository.findPreferencesByUserId(new UserId(userId))).willReturn(Optional.empty());
+        given(notificationRepository.findPreferencesByUserId(userId)).willReturn(Optional.empty());
 
         // Act
-        notificationService.addNotification(description, type, userId);
+        notificationService.addNotification(null, description, type, Instant.now(), userId, null);
 
         // Assert
         ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
@@ -78,7 +78,7 @@ class AddNotificationTests {
         Notification savedNotification = notificationCaptor.getValue();
         assertThat(savedNotification.getDescription()).isEqualTo(description);
         assertThat(savedNotification.getType()).isEqualTo(type);
-        assertThat(savedNotification.getUser()).isEqualTo(new UserId(userId));
+        assertThat(savedNotification.getUser()).isEqualTo(userId);
         assertThat(savedNotification.shouldSendViaChannel(NotificationChannel.IN_APP)).isTrue();
         assertThat(savedNotification.shouldSendViaChannel(NotificationChannel.EMAIL)).isTrue();
     }
@@ -88,9 +88,9 @@ class AddNotificationTests {
         // Arrange
         String description = "Test notification";
         NotificationType type = NotificationType.FRIEND_REQUEST;
-        UUID userId = UUID.randomUUID();
+        UserId userId = UserId.create();
 
-        given(notificationRepository.findPreferencesByUserId(new UserId(userId)))
+        given(notificationRepository.findPreferencesByUserId(userId))
                 .willReturn(Optional.empty());
 
         doThrow(new RuntimeException("Save failed"))
@@ -99,7 +99,7 @@ class AddNotificationTests {
 
         // Act & Assert
         assertThatThrownBy(() ->
-                notificationService.addNotification(description, type, userId)
+                notificationService.addNotification(null, description, type, Instant.now(), userId, null)
         )
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Save failed");

@@ -6,11 +6,11 @@ import be.kdg.ipj3.achievementProgress.domain.AchievementProgressRepository;
 import be.kdg.ipj3.achievementProgress.domain.GameContext;
 import be.kdg.ipj3.achievementProgress.domain.TriggerEvaluator;
 import be.kdg.ipj3.achievementProgress.domain.strategies.CountingStrategyHandler;
+import be.kdg.ipj3.achievementProgress.shared.AchievementEarnedEvent;
 import be.kdg.ipj3.catalog.shared.*;
-import be.kdg.ipj3.notifications.shared.NotificationType;
-import be.kdg.ipj3.notifications.shared.NotificationsApi;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,17 +26,17 @@ public class AchievementProgressService {
     private final AchievementProgressRepository progressRepository;
     private final GamesApi gamesApi;
     private final UsersApi usersApi;
-    private final NotificationsApi notificationsApi;
+    private final ApplicationEventPublisher eventPublisher;
 
     public AchievementProgressService(TriggerEvaluator triggerEvaluator, List<CountingStrategyHandler> strategyHandlers,
-                                      AchievementProgressRepository progressRepository, GamesApi gamesApi, UsersApi usersApi,
-                                      NotificationsApi notificationsApi) {
+                                      AchievementProgressRepository progressRepository, GamesApi gamesApi,
+                                      UsersApi usersApi, ApplicationEventPublisher eventPublisher) {
         this.triggerEvaluator = triggerEvaluator;
         this.strategyHandlers = strategyHandlers;
         this.progressRepository = progressRepository;
         this.gamesApi = gamesApi;
         this.usersApi = usersApi;
-        this.notificationsApi = notificationsApi;
+        this.eventPublisher = eventPublisher;
     }
 
     public void evaluateAchievementsAfterGame(GameContext context) {
@@ -46,8 +46,10 @@ public class AchievementProgressService {
             return;
         }
 
+        UserId userId = new UserId(context.player().id());
+
         for (AchievementDto achievement : gameAchievements) {
-            AchievementProgress progress = getProgress(new UserId(context.player().id()), achievement.id());
+            AchievementProgress progress = getProgress(userId, achievement.id());
 
             if (progress.isCompleted() || !achievement.isCountedAfterGame()) {
                 continue;
@@ -68,12 +70,17 @@ public class AchievementProgressService {
 
             if (updatedProgress.isCompleted()) {
                 usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
-                notificationsApi.addNotification(null, achievement.name(), NotificationType.ACHIEVEMENT, Instant.now(), context.player().id(), null);
             }
 
             if (updatedProgress != progress) {
                 progressRepository.save(updatedProgress);
             }
+
+            eventPublisher.publishEvent(new AchievementEarnedEvent(
+                    userId,
+                    achievement.name(),
+                    Instant.now()
+            ));
         }
     }
 
@@ -92,12 +99,17 @@ public class AchievementProgressService {
         AchievementProgress updatedProgress = progress.markCompleted(timestamp);
         if (updatedProgress.isCompleted()) {
             usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
-            notificationsApi.addNotification(null, achievement.name(), NotificationType.ACHIEVEMENT, Instant.now(), userId.id(), null);
         }
 
         if (updatedProgress != progress) {
             progressRepository.save(updatedProgress);
         }
+
+        eventPublisher.publishEvent(new AchievementEarnedEvent(
+                userId,
+                achievement.name(),
+                Instant.now()
+        ));
     }
 
     private AchievementProgress getProgress(UserId userId, AchievementId achievementId) {

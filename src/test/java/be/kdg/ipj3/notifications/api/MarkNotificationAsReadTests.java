@@ -81,11 +81,13 @@ public class MarkNotificationAsReadTests {
         NotificationId notificationId = NotificationId.create();
         Notification notification = new Notification(
                 notificationId,
+                "Test title",
                 "Test notification",
                 NotificationType.FRIEND_REQUEST,
                 Instant.now(),
                 false,
-                userId
+                userId,
+                null
         );
         notificationRepository.save(notification);
 

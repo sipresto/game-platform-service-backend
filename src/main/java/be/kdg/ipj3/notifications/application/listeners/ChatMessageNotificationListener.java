@@ -34,7 +34,7 @@ class ChatMessageNotificationListener {
                     preview,
                     NotificationType.CHAT_MESSAGE,
                     event.sentAt(),
-                    recipient.id(),
+                    recipient,
                     event.chatId().id()
             );
         }

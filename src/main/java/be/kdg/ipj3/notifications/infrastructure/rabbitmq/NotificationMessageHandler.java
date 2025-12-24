@@ -25,6 +25,7 @@ public class NotificationMessageHandler {
     @RabbitListener(queues = RabbitMQTopologyNotifications.TURN_NOTIFICATIONS_QUEUE)
     void onNotificationMessageReceived(TurnNotificationDto dto) {
         UserId userId = usersApi.findIdByKeycloakId(dto.userId());
-        notificationService.addNotification(null, dto.description(), NotificationType.YOUR_TURN, Instant.now(), userId.id(), null);
+        notificationService.addNotification(null, dto.description(), NotificationType.YOUR_TURN, Instant.now(),
+                userId, null);
     }
 }

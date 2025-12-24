@@ -2,7 +2,6 @@ package be.kdg.ipj3.notifications.application;
 
 import be.kdg.ipj3.notifications.domain.*;
 import be.kdg.ipj3.notifications.shared.NotificationType;
-import be.kdg.ipj3.notifications.shared.NotificationsApi;
 import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
@@ -16,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class NotificationService implements NotificationsApi {
+public class NotificationService {
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
     private final NotificationRepository notificationRepository;
@@ -36,18 +35,15 @@ public class NotificationService implements NotificationsApi {
         return notificationRepository.findByUserId(userId);
     }
 
-    @Override
-    public void addNotification(String title, String description, NotificationType type, Instant sentAt, UUID id, 
+    public void addNotification(String title, String description, NotificationType type, Instant sentAt, UserId userId,
                                 UUID referenceId) {
-        UserId userId = new UserId(id);
-
         Notification notification = new Notification(title, description, type, sentAt, userId, referenceId);
 
         notificationRepository.findPreferencesByUserId(userId)
                 .ifPresent(notification::setPreferences);
 
         if (notification.shouldSendViaChannel(NotificationChannel.IN_APP)) {
-            handleInAppNotification(description, type, id, notification);
+            handleInAppNotification(description, type, userId.id(), notification);
         }
 
         if (notification.shouldSendViaChannel(NotificationChannel.EMAIL)) {
