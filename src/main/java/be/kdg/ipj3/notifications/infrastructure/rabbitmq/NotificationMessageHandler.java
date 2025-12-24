@@ -9,6 +9,8 @@ import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+
 @Component
 public class NotificationMessageHandler {
 
@@ -23,6 +25,6 @@ public class NotificationMessageHandler {
     @RabbitListener(queues = RabbitMQTopologyNotifications.TURN_NOTIFICATIONS_QUEUE)
     void onNotificationMessageReceived(TurnNotificationDto dto) {
         UserId userId = usersApi.findIdByKeycloakId(dto.userId());
-        notificationService.addNotification(dto.description(), NotificationType.YOUR_TURN, userId.id());
+        notificationService.addNotification(null, dto.description(), NotificationType.YOUR_TURN, Instant.now(), userId.id(), null);
     }
 }

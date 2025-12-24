@@ -6,5 +6,6 @@ import org.jmolecules.ddd.annotation.ValueObject;
 public enum NotificationType {
     FRIEND_REQUEST,
     ACHIEVEMENT,
-    YOUR_TURN
+    YOUR_TURN,
+    CHAT_MESSAGE
 }

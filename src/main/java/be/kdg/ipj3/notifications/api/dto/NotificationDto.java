@@ -9,19 +9,23 @@ import java.util.UUID;
 public record NotificationDto(
         UUID notificationId,
         UUID userId,
+        String title,
         String description,
         NotificationType notificationType,
         Instant createdAt,
-        boolean read
+        boolean read,
+        UUID referenceId
 ) {
     public static NotificationDto fromDomain(Notification notification) {
         return new NotificationDto(
                 notification.getId().id(),
                 notification.getUser().id(),
+                notification.getTitle(),
                 notification.getDescription(),
                 notification.getType(),
                 notification.getCreatedAt(),
-                notification.isRead()
+                notification.isRead(),
+                notification.getReferenceId()
         );
     }
 }

@@ -68,7 +68,7 @@ public class AchievementProgressService {
 
             if (updatedProgress.isCompleted()) {
                 usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
-                notificationsApi.addNotification(achievement.name(), NotificationType.ACHIEVEMENT, context.player().id());
+                notificationsApi.addNotification(null, achievement.name(), NotificationType.ACHIEVEMENT, Instant.now(), context.player().id(), null);
             }
 
             if (updatedProgress != progress) {
@@ -92,7 +92,7 @@ public class AchievementProgressService {
         AchievementProgress updatedProgress = progress.markCompleted(timestamp);
         if (updatedProgress.isCompleted()) {
             usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
-            notificationsApi.addNotification(achievement.name(), NotificationType.ACHIEVEMENT, userId.id());
+            notificationsApi.addNotification(null, achievement.name(), NotificationType.ACHIEVEMENT, Instant.now(), userId.id(), null);
         }
 
         if (updatedProgress != progress) {

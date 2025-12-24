@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,10 +37,11 @@ public class NotificationService implements NotificationsApi {
     }
 
     @Override
-    public void addNotification(String description, NotificationType type, UUID id) {
+    public void addNotification(String title, String description, NotificationType type, Instant sentAt, UUID id, 
+                                UUID referenceId) {
         UserId userId = new UserId(id);
 
-        Notification notification = new Notification(description, type, userId);
+        Notification notification = new Notification(title, description, type, sentAt, userId, referenceId);
 
         notificationRepository.findPreferencesByUserId(userId)
                 .ifPresent(notification::setPreferences);
