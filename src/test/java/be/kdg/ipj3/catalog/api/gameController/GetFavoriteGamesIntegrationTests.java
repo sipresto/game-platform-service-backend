@@ -101,7 +101,7 @@ public class GetFavoriteGamesIntegrationTests {
         userRepository.save(user);
 
         // Act & Assert
-        mockMvc.perform(get("/api/platform/games/favorites")
+        mockMvc.perform(get("/api/platform/games/library/favorites")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -117,7 +117,7 @@ public class GetFavoriteGamesIntegrationTests {
         userRepository.save(user);
 
         // Act & Assert
-        mockMvc.perform(get("/api/platform/games/favorites")
+        mockMvc.perform(get("/api/platform/games/library/favorites")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

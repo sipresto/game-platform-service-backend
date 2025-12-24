@@ -10,14 +10,16 @@ public record LibraryGameDto(
         UUID gameId,
         String name,
         String description,
-        List<Category> categories
+        List<Category> categories,
+        boolean isFavorited
 ) {
-    public static LibraryGameDto from(Game game) {
+    public static LibraryGameDto fromDomain(Game game) {
         return new LibraryGameDto(
                 game.getId().id(),
                 game.getName(),
                 game.getDescription(),
-                game.getCategories()
+                game.getCategories(),
+                true
         );
     }
 }

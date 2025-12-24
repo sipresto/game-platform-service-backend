@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -43,7 +42,7 @@ public class SecurityConfig {
     public SecurityFilterChain publicFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/platform/public/**",
-                        "/api/platform/games/**",
+                        "/api/platform/games/filter",
                         "/api/platform/session/**",
                         "/api/platform/users",
                         "/api/platform/users/profile-image/**")
@@ -68,6 +67,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/platform/users/**").hasRole("PLAYER")
                         .requestMatchers("/api/platform/games/manage/**").hasRole("GAME_DEVELOPER")
+                        .requestMatchers("/api/platform/games/**").hasRole("PLAYER")
                         .requestMatchers("/api/platform/purchases/**").hasRole("PLAYER")
                         .requestMatchers("/api/platform/achievements").hasRole("PLAYER")
                         .anyRequest().authenticated()

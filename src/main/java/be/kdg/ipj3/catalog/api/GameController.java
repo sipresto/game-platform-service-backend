@@ -4,6 +4,8 @@ import be.kdg.ipj3.catalog.api.dto.GameDto;
 import be.kdg.ipj3.catalog.api.dto.GameFilterRequestDto;
 import be.kdg.ipj3.catalog.api.dto.LibraryGameDto;
 import be.kdg.ipj3.catalog.application.GameService;
+import be.kdg.ipj3.catalog.domain.Game;
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,7 +13,9 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/platform/games")
@@ -53,18 +57,7 @@ public class GameController {
         return ResponseEntity.ok(gameDto);
     }
 
-    @GetMapping("/favorites")
-    public ResponseEntity<List<GameDto>> getFavoriteGames(
-            @AuthenticationPrincipal Jwt jwt
-    ) {
-        String keycloakId = jwt.getSubject();
-        List<GameDto> favorites = gameService.findFavoriteGamesByKeycloakId(keycloakId).stream()
-        .map(GameDto::fromDomain)
-                .toList();
-        return ResponseEntity.ok(favorites);
-    }
-
-    @PatchMapping("/favorite/{gameId}")
+    @PatchMapping("/library/favorite/{gameId}")
     public ResponseEntity<Void> favoriteGame(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID gameId
@@ -76,7 +69,7 @@ public class GameController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/unfavorite/{gameId}")
+    @PatchMapping("/library/unfavorite/{gameId}")
     public ResponseEntity<Void> unfavoriteGame(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID gameId
@@ -92,8 +85,20 @@ public class GameController {
     public ResponseEntity<List<LibraryGameDto>> getOwnedGamesByKeycloakId(
             @PathVariable String keycloakId
     ) {
+        Set<GameId> favoriteIds = gameService
+                .findFavoriteGamesByKeycloakId(keycloakId)
+                .stream()
+                .map(Game::getId)
+                .collect(Collectors.toSet());
+
         List<LibraryGameDto> dtos = gameService.findOwnedGamesByKeycloakId(keycloakId).stream()
-                .map(LibraryGameDto::from)
+                .map(game -> new LibraryGameDto(
+                        game.getId().id(),
+                        game.getName(),
+                        game.getDescription(),
+                        game.getCategories(),
+                        favoriteIds.contains(game.getId())
+                ))
                 .toList();
 
         return ResponseEntity.ok(dtos);
