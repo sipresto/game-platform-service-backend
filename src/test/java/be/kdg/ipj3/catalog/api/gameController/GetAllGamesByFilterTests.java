@@ -71,7 +71,7 @@ public class GetAllGamesByFilterTests {
         );
 
         // Act & Assert
-        mockMvc.perform(post("/api/platform/games/filter")
+        mockMvc.perform(post("/api/platform/games/browse/filter")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(filter)))
                 .andExpect(status().isOk())
@@ -93,7 +93,7 @@ public class GetAllGamesByFilterTests {
         );
 
         // Act & Assert
-        mockMvc.perform(post("/api/platform/games/filter")
+        mockMvc.perform(post("/api/platform/games/browse/filter")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(filter)))
                 .andExpect(status().isOk())

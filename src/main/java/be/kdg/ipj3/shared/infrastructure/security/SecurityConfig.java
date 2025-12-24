@@ -42,7 +42,7 @@ public class SecurityConfig {
     public SecurityFilterChain publicFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/platform/public/**",
-                        "/api/platform/games/filter",
+                        "/api/platform/games/browse/**",
                         "/api/platform/session/**",
                         "/api/platform/users",
                         "/api/platform/users/profile-image/**")

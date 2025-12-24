@@ -50,9 +50,10 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
     }
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor validJwt() {
-        return jwt().jwt(builder -> builder
-                .subject("keycloak-id")
-                .claim("preferred_username", "test-user"));
+        return jwt().authorities(() -> "ROLE_PLAYER")
+                .jwt(builder -> builder
+                        .subject("keycloak-id")
+                        .claim("preferred_username", "test-user"));
     }
 
     private User createTestUser() {
@@ -89,7 +90,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         userRepository.save(user);
 
         // Act
-        mockMvc.perform(patch("/api/platform/games/library/favorite/{gameId}", game.getId().id())
+        mockMvc.perform(patch("/api/platform/games/favorite/{gameId}", game.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isOk());
 
@@ -112,7 +113,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         userRepository.save(user);
 
         // Act & Assert
-        mockMvc.perform(patch("/api/platform/games/library/favorite/{gameId}", game.getId().id())
+        mockMvc.perform(patch("/api/platform/games/favorite/{gameId}", game.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isBadRequest());
     }
@@ -159,7 +160,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         UUID nonExistentId = UUID.randomUUID();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/platform/games/library/favorite/{gameId}", nonExistentId)
+        mockMvc.perform(patch("/api/platform/games/favorite/{gameId}", nonExistentId)
                         .with(validJwt()))
                 .andExpect(status().isNotFound());
     }
@@ -171,7 +172,7 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
         Game game = createTestGame();
 
         // Act & Assert
-        mockMvc.perform(patch("/api/platform/games/library/favorite/{gameId}", game.getId().id())
+        mockMvc.perform(patch("/api/platform/games/favorite/{gameId}", game.getId().id())
                         .with(validJwt()))
                 .andExpect(status().isBadRequest());
     }

@@ -7,6 +7,7 @@ import be.kdg.ipj3.catalog.domain.GameRepository;
 import be.kdg.ipj3.catalog.infrastructure.rabbitmq.dto.RegisterGameDto;
 import be.kdg.ipj3.catalog.shared.*;
 import be.kdg.ipj3.shared.domain.Money;
+import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
@@ -111,6 +112,15 @@ public class GameService implements GamesApi {
     @Transactional(readOnly = true)
     public List<Game> findOwnedGamesByKeycloakId(String keycloakId) {
         UserId userId = usersApi.findIdByKeycloakId(keycloakId);
+        List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id());
+        return gameRepository.findGamesByIds(ownedGameIds);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Game> findOwnedGamesByUserId(UserId userId) {
+        if (!usersApi.existsById(userId.id())) {
+            throw new UserNotFoundException(userId.id().toString());
+        }
         List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id());
         return gameRepository.findGamesByIds(ownedGameIds);
     }
