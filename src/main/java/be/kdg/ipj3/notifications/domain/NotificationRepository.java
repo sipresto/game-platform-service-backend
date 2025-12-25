@@ -14,6 +14,4 @@ public interface NotificationRepository {
     void deleteAll();
     void saveAll(List<Notification> notifications);
     List<Notification> findByUserIdAndType(UserId id, NotificationType type);
-    Optional<UserNotificationPreferences> findPreferencesByUserId(UserId userId);
-    void savePreferences(UserNotificationPreferences preferences);
 }

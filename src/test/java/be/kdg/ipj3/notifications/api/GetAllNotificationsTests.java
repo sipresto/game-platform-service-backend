@@ -134,4 +134,6 @@ public class GetAllNotificationsTests {
     }
 
     // TODO: Test when user does not exist
+
+    // TODO: Test when user not logged in
 }

@@ -6,7 +6,6 @@ import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
 
 @AggregateRoot
@@ -20,9 +19,6 @@ public class Notification {
     private boolean read;
     private final UserId user;
     private final UUID referenceId;
-    // TODO: is al nullable, best deze verwijderen en de preference logica in service afhandelen, want preferences
-    //  worden bij een user opgeslagen en hoeven niet nog extra hier te worden toegevoegd
-    private Optional<UserNotificationPreferences> preferences;
 
     public Notification(NotificationId id, String title, String description, NotificationType type,
                         Instant createdAt, boolean read, UserId user, UUID referenceId) {
@@ -34,7 +30,6 @@ public class Notification {
         this.read = read;
         this.user = user;
         this.referenceId = referenceId;
-        this.preferences = Optional.empty();
     }
 
     public Notification(String description, NotificationType type, UserId user) {
@@ -43,29 +38,6 @@ public class Notification {
 
     public Notification(String title, String description, NotificationType type, Instant sentAt, UserId user, UUID referenceId) {
         this(NotificationId.create(), title, description, type, sentAt, false, user, referenceId);
-    }
-
-    public boolean shouldSendViaChannel(NotificationChannel channel) {
-        return preferences
-                .map(prefs -> prefs.isEnabled(type, channel))
-                .orElse(getDefaultForType(type, channel));
-    }
-
-    // TODO: maybe restructure this to make it more readable or always have default preferences so this method can be removed
-    private boolean getDefaultForType(NotificationType type, NotificationChannel channel) {
-        if (type == NotificationType.CHAT_MESSAGE && channel != NotificationChannel.IN_APP) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public void setPreferences(UserNotificationPreferences preferences) {
-        this.preferences = Optional.ofNullable(preferences);
-    }
-
-    public Optional<UserNotificationPreferences> getPreferences() {
-        return preferences;
     }
 
     public NotificationId getId() {

@@ -4,9 +4,13 @@ import be.kdg.ipj3.notifications.domain.NotificationChannel;
 import be.kdg.ipj3.notifications.domain.UserNotificationPreferences;
 import be.kdg.ipj3.notifications.shared.NotificationType;
 import be.kdg.ipj3.users.shared.UserId;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
-import java.time.Instant;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -16,47 +20,35 @@ public class JpaUserNotificationPreferencesEntity {
     @Column(name = "user_id")
     private UUID userId;
 
-    @Column(name = "friend_request_in_app")
-    private Boolean friendRequestInApp;
+    @Column(nullable = false)
+    private boolean friendRequestInApp;
 
-    @Column(name = "friend_request_email")
-    private Boolean friendRequestEmail;
+    @Column(nullable = false)
+    private boolean friendRequestEmail;
 
-    @Column(name = "achievement_in_app")
-    private Boolean achievementInApp;
+    @Column(nullable = false)
+    private boolean achievementInApp;
 
-    @Column(name = "achievement_email")
-    private Boolean achievementEmail;
+    @Column(nullable = false)
+    private boolean achievementEmail;
 
-    @Column(name = "your_turn_in_app")
-    private Boolean yourTurnInApp;
+    @Column(nullable = false)
+    private boolean yourTurnInApp;
 
-    @Column(name = "your_turn_email")
-    private Boolean yourTurnEmail;
+    @Column(nullable = false)
+    private boolean yourTurnEmail;
 
-    @Column(name = "created_at")
-    private Instant createdAt;
+    @Column(nullable = false)
+    private boolean chatMessageInApp;
 
-    @Column(name = "updated_at")
-    private Instant updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = Instant.now();
-        updatedAt = Instant.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = Instant.now();
-    }
+    @Column(nullable = false)
+    private boolean chatMessageEmail;
 
     protected JpaUserNotificationPreferencesEntity() {}
 
-    public JpaUserNotificationPreferencesEntity(UUID userId,
-                                                Boolean friendRequestInApp, Boolean friendRequestEmail,
-                                                Boolean achievementInApp, Boolean achievementEmail,
-                                                Boolean yourTurnInApp, Boolean yourTurnEmail) {
+    public JpaUserNotificationPreferencesEntity(UUID userId, boolean friendRequestInApp, boolean friendRequestEmail,
+                                                boolean achievementInApp, boolean achievementEmail, boolean yourTurnInApp,
+                                                boolean yourTurnEmail, boolean chatMessageInApp, boolean chatMessageEmail) {
         this.userId = userId;
         this.friendRequestInApp = friendRequestInApp;
         this.friendRequestEmail = friendRequestEmail;
@@ -64,49 +56,48 @@ public class JpaUserNotificationPreferencesEntity {
         this.achievementEmail = achievementEmail;
         this.yourTurnInApp = yourTurnInApp;
         this.yourTurnEmail = yourTurnEmail;
+        this.chatMessageInApp = chatMessageInApp;
+        this.chatMessageEmail = chatMessageEmail;
     }
 
     public static JpaUserNotificationPreferencesEntity fromDomain(UserNotificationPreferences preferences) {
-        java.util.Map<NotificationType, java.util.Map<NotificationChannel, Boolean>> prefs = preferences.getAllPreferences();
+        java.util.Map<NotificationType, java.util.Map<NotificationChannel, Boolean>> prefs = preferences.getPreferences();
 
         return new JpaUserNotificationPreferencesEntity(
-                preferences.userId().id(),
+                preferences.getUserId().id(),
                 prefs.get(NotificationType.FRIEND_REQUEST).get(NotificationChannel.IN_APP),
                 prefs.get(NotificationType.FRIEND_REQUEST).get(NotificationChannel.EMAIL),
                 prefs.get(NotificationType.ACHIEVEMENT).get(NotificationChannel.IN_APP),
                 prefs.get(NotificationType.ACHIEVEMENT).get(NotificationChannel.EMAIL),
                 prefs.get(NotificationType.YOUR_TURN).get(NotificationChannel.IN_APP),
-                prefs.get(NotificationType.YOUR_TURN).get(NotificationChannel.EMAIL)
+                prefs.get(NotificationType.YOUR_TURN).get(NotificationChannel.EMAIL),
+                prefs.get(NotificationType.CHAT_MESSAGE).get(NotificationChannel.IN_APP),
+                prefs.get(NotificationType.CHAT_MESSAGE).get(NotificationChannel.EMAIL)
         );
     }
 
     public UserNotificationPreferences toDomain() {
-        java.util.Map<NotificationType, java.util.Map<NotificationChannel, Boolean>> prefMap =
-                new java.util.EnumMap<>(NotificationType.class);
+        Map<NotificationType, Map<NotificationChannel, Boolean>> prefMap = new EnumMap<>(NotificationType.class);
 
-        // FRIEND_REQUEST
-        java.util.Map<NotificationChannel, Boolean> friendRequestMap = new java.util.EnumMap<>(NotificationChannel.class);
-        friendRequestMap.put(NotificationChannel.IN_APP,
-                friendRequestInApp != null ? friendRequestInApp : true);
-        friendRequestMap.put(NotificationChannel.EMAIL,
-                friendRequestEmail != null ? friendRequestEmail : true);
+        Map<NotificationChannel, Boolean> friendRequestMap = new EnumMap<>(NotificationChannel.class);
+        friendRequestMap.put(NotificationChannel.IN_APP, friendRequestInApp);
+        friendRequestMap.put(NotificationChannel.EMAIL, friendRequestEmail);
         prefMap.put(NotificationType.FRIEND_REQUEST, friendRequestMap);
 
-        // ACHIEVEMENT
-        java.util.Map<NotificationChannel, Boolean> achievementMap = new java.util.EnumMap<>(NotificationChannel.class);
-        achievementMap.put(NotificationChannel.IN_APP,
-                achievementInApp != null ? achievementInApp : true);
-        achievementMap.put(NotificationChannel.EMAIL,
-                achievementEmail != null ? achievementEmail : true);
+        Map<NotificationChannel, Boolean> achievementMap = new EnumMap<>(NotificationChannel.class);
+        achievementMap.put(NotificationChannel.IN_APP, achievementInApp);
+        achievementMap.put(NotificationChannel.EMAIL, achievementEmail);
         prefMap.put(NotificationType.ACHIEVEMENT, achievementMap);
 
-        // YOUR_TURN
-        java.util.Map<NotificationChannel, Boolean> yourTurnMap = new java.util.EnumMap<>(NotificationChannel.class);
-        yourTurnMap.put(NotificationChannel.IN_APP,
-                yourTurnInApp != null ? yourTurnInApp : false);
-        yourTurnMap.put(NotificationChannel.EMAIL,
-                yourTurnEmail != null ? yourTurnEmail : false);
+        Map<NotificationChannel, Boolean> yourTurnMap = new EnumMap<>(NotificationChannel.class);
+        yourTurnMap.put(NotificationChannel.IN_APP, yourTurnInApp);
+        yourTurnMap.put(NotificationChannel.EMAIL, yourTurnEmail);
         prefMap.put(NotificationType.YOUR_TURN, yourTurnMap);
+
+        Map<NotificationChannel, Boolean> chatMessageMap = new EnumMap<>(NotificationChannel.class);
+        chatMessageMap.put(NotificationChannel.IN_APP, chatMessageInApp);
+        chatMessageMap.put(NotificationChannel.EMAIL, chatMessageEmail);
+        prefMap.put(NotificationType.CHAT_MESSAGE, chatMessageMap);
 
         return new UserNotificationPreferences(new UserId(userId), prefMap);
     }
