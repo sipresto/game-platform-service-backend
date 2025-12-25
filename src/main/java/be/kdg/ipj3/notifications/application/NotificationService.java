@@ -43,7 +43,7 @@ public class NotificationService {
                 .ifPresent(notification::setPreferences);
 
         if (notification.shouldSendViaChannel(NotificationChannel.IN_APP)) {
-            handleInAppNotification(description, type, userId.id(), notification);
+            handleInAppNotification(notification);
         }
 
         if (notification.shouldSendViaChannel(NotificationChannel.EMAIL)) {
@@ -51,18 +51,29 @@ public class NotificationService {
         }
     }
 
-    private void handleInAppNotification(String description, NotificationType type, UUID id, Notification notification) {
-        if (type == NotificationType.YOUR_TURN) {
-            List<Notification> notifications = notificationRepository.findByUserIdAndType(id, type);
+    private void handleInAppNotification(Notification notification) {
+        if (notification.getType() == NotificationType.YOUR_TURN) {
+            List<Notification> notifications = notificationRepository.findByUserIdAndType(notification.getUser(), notification.getType());
             if (!notifications.isEmpty()) {
                 for (Notification notif : notifications) {
-                    if (notif.getDescription().equals(description)) {
+                    if (notif.getDescription().equals(notification.getDescription())) {
+                        notificationRepository.delete(notif);
+                        break;
+                    }
+                }
+            }
+        } else if (notification.getType() == NotificationType.CHAT_MESSAGE) {
+            List<Notification> notifications = notificationRepository.findByUserIdAndType(notification.getUser(), notification.getType());
+            if (!notifications.isEmpty()) {
+                for (Notification notif : notifications) {
+                    if (notif.getTitle().equals(notification.getTitle())) {
                         notificationRepository.delete(notif);
                         break;
                     }
                 }
             }
         }
+
         notificationRepository.save(notification);
     }
 

@@ -57,7 +57,7 @@ public class Notification {
             return false;
         }
 
-        return type != NotificationType.YOUR_TURN;
+        return true;
     }
 
     public void setPreferences(UserNotificationPreferences preferences) {

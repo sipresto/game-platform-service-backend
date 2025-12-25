@@ -68,19 +68,19 @@ public class AchievementProgressService {
 
             AchievementProgress updatedProgress = handler.handle(achievement, progress, context);
 
-            if (updatedProgress.isCompleted()) {
-                usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
-            }
-
             if (updatedProgress != progress) {
                 progressRepository.save(updatedProgress);
             }
 
-            eventPublisher.publishEvent(new AchievementEarnedEvent(
-                    userId,
-                    achievement.name(),
-                    Instant.now()
-            ));
+            if (updatedProgress.isCompleted()) {
+                usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
+
+                eventPublisher.publishEvent(new AchievementEarnedEvent(
+                        userId,
+                        achievement.name(),
+                        Instant.now()
+                ));
+            }
         }
     }
 
@@ -97,19 +97,20 @@ public class AchievementProgressService {
         }
 
         AchievementProgress updatedProgress = progress.markCompleted(timestamp);
-        if (updatedProgress.isCompleted()) {
-            usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
-        }
 
         if (updatedProgress != progress) {
             progressRepository.save(updatedProgress);
         }
 
-        eventPublisher.publishEvent(new AchievementEarnedEvent(
-                userId,
-                achievement.name(),
-                Instant.now()
-        ));
+        if (updatedProgress.isCompleted()) {
+            usersApi.addPoints(updatedProgress.getPlayer().id(), achievement.points());
+
+            eventPublisher.publishEvent(new AchievementEarnedEvent(
+                    userId,
+                    achievement.name(),
+                    Instant.now()
+            ));
+        }
     }
 
     private AchievementProgress getProgress(UserId userId, AchievementId achievementId) {

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public class NotificationRepositoryImpl implements NotificationRepository {
@@ -80,8 +79,8 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
-    public List<Notification> findByUserIdAndType(UUID id, NotificationType type) {
-        return jpaNotificationRepository.findByUserIdAndType(id, type)
+    public List<Notification> findByUserIdAndType(UserId userId, NotificationType type) {
+        return jpaNotificationRepository.findByUserIdAndType(userId.id(), type)
                 .stream().map(JpaNotificationEntity::toDomain).toList();
     }
 
