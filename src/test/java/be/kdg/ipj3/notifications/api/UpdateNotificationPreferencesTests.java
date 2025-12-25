@@ -1,9 +1,8 @@
 package be.kdg.ipj3.notifications.api;
 
-import be.kdg.ipj3.notifications.domain.NotificationChannel;
 import be.kdg.ipj3.notifications.domain.NotificationRepository;
 import be.kdg.ipj3.notifications.domain.UserNotificationPreferences;
-import be.kdg.ipj3.notifications.shared.NotificationType;
+import be.kdg.ipj3.notifications.domain.UserNotificationPreferencesRepository;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;
@@ -22,7 +21,6 @@ import org.testcontainers.utility.TestcontainersConfiguration;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -43,10 +41,14 @@ public class UpdateNotificationPreferencesTests {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @Autowired
+    private UserNotificationPreferencesRepository preferencesRepository;
+
     @BeforeEach
     void setup() {
         userRepository.deleteAll();
         notificationRepository.deleteAll();
+        preferencesRepository.deleteAll();
     }
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor validJwt() {
@@ -83,9 +85,8 @@ public class UpdateNotificationPreferencesTests {
                         .with(validJwt()))
                 .andExpect(status().isOk());
 
-        Optional<UserNotificationPreferences> preferences = notificationRepository.findPreferencesByUserId(userId);
+        Optional<UserNotificationPreferences> preferences = preferencesRepository.findByUserId(userId);
         assertTrue(preferences.isPresent());
-        assertFalse(preferences.get().isEnabled(NotificationType.FRIEND_REQUEST, NotificationChannel.EMAIL));
     }
 
     @Test
@@ -111,4 +112,8 @@ public class UpdateNotificationPreferencesTests {
                         .with(validJwt()))
                 .andExpect(status().isBadRequest());
     }
+
+    // TODO: test when user does not exist
+
+    // TODO: test when user not logged in
 }

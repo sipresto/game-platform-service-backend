@@ -5,7 +5,6 @@ import be.kdg.ipj3.notifications.application.NotificationService;
 import be.kdg.ipj3.notifications.domain.NotificationChannel;
 import be.kdg.ipj3.notifications.domain.UserNotificationPreferences;
 import be.kdg.ipj3.notifications.shared.NotificationType;
-import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -19,11 +18,9 @@ import java.util.UUID;
 @RequestMapping("/api/platform/notifications")
 public class NotificationController {
     private final NotificationService notificationService;
-    private final UsersApi usersApi;
 
-    public NotificationController(NotificationService notificationService, UsersApi usersApi) {
+    public NotificationController(NotificationService notificationService) {
         this.notificationService = notificationService;
-        this.usersApi = usersApi;
     }
 
     @GetMapping
@@ -48,26 +45,24 @@ public class NotificationController {
         return ResponseEntity.ok().build();
     }
 
+    // TODO: dto gebruiken?
     @GetMapping("/preferences")
     public ResponseEntity<Map<NotificationType, Map<NotificationChannel, Boolean>>> getPreferences(
-            @AuthenticationPrincipal Jwt jwt) {
-        String keycloakId = jwt.getSubject();
-        var user = usersApi.findIdByKeycloakId(keycloakId);
-
-        UserNotificationPreferences prefs = notificationService.getPreferences(user.id());
-        return ResponseEntity.ok(prefs.getAllPreferences());
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UserNotificationPreferences prefs = notificationService.getPreferencesByKeycloakId(jwt.getSubject());
+        return ResponseEntity.ok(prefs.getPreferences());
     }
 
+    // TODO: dto gebruiken?
     @PutMapping("/preferences/{notificationType}/{channel}")
     public ResponseEntity<Void> updatePreference(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable NotificationType notificationType,
             @PathVariable NotificationChannel channel,
-            @RequestParam boolean enabled) {
-        String keycloakId = jwt.getSubject();
-        var user = usersApi.findIdByKeycloakId(keycloakId);
-
-        notificationService.updatePreferences(user.id(), notificationType, channel, enabled);
+            @RequestParam boolean enabled
+    ) {
+        notificationService.updatePreferences(jwt.getSubject(), notificationType, channel, enabled);
         return ResponseEntity.ok().build();
     }
 }

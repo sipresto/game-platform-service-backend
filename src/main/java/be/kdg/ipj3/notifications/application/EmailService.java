@@ -104,6 +104,7 @@ public class EmailService {
             case FRIEND_REQUEST -> "New Friend Request on " + senderName;
             case ACHIEVEMENT -> "Achievement Unlocked on " + senderName;
             case YOUR_TURN -> "It's Your Turn! - " + senderName;
+            case CHAT_MESSAGE -> null;
         };
     }
 
@@ -112,10 +113,12 @@ public class EmailService {
             case FRIEND_REQUEST -> "email/friend-request";
             case ACHIEVEMENT -> "email/achievement";
             case YOUR_TURN -> "email/your-turn";
+            case CHAT_MESSAGE -> null;
         };
     }
 }
 
+//TODO: in domain of shared zetten en opvangen, want er is nu geen foutafhandeling
 class EmailSendException extends RuntimeException {
     public EmailSendException(String message, Throwable cause) {
         super(message, cause);

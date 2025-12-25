@@ -84,19 +84,23 @@ public class GetAllNotificationsTests {
         List<Notification> notifications = List.of(
                 new Notification(
                         notificationIds.get(0),
+                        "Title",
                         "X-treme",
                         NotificationType.ACHIEVEMENT,
                         Instant.now(),
                         false,
-                        userId
+                        userId,
+                        null
                 ),
                 new Notification(
                         notificationIds.get(1),
+                        "Title",
                         "Someone wants to be your friend",
                         NotificationType.FRIEND_REQUEST,
                         Instant.now(),
                         true,
-                        userId
+                        userId,
+                        null
                 )
         );
 
@@ -130,4 +134,6 @@ public class GetAllNotificationsTests {
     }
 
     // TODO: Test when user does not exist
+
+    // TODO: Test when user not logged in
 }

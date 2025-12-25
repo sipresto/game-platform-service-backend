@@ -5,7 +5,6 @@ import be.kdg.ipj3.users.shared.UserId;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface NotificationRepository {
     List<Notification> findByUserId(UserId id);
@@ -14,7 +13,5 @@ public interface NotificationRepository {
     void delete(Notification notification);
     void deleteAll();
     void saveAll(List<Notification> notifications);
-    List<Notification> findByUserIdAndType(UUID id, NotificationType type);
-    Optional<UserNotificationPreferences> findPreferencesByUserId(UserId userId);
-    void savePreferences(UserNotificationPreferences preferences);
+    List<Notification> findByUserIdAndType(UserId id, NotificationType type);
 }

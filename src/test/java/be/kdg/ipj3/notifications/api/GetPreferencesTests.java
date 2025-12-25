@@ -1,9 +1,6 @@
 package be.kdg.ipj3.notifications.api;
 
-import be.kdg.ipj3.notifications.domain.Notification;
-import be.kdg.ipj3.notifications.domain.NotificationId;
 import be.kdg.ipj3.notifications.domain.NotificationRepository;
-import be.kdg.ipj3.notifications.shared.NotificationType;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;
@@ -19,21 +16,18 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @TestPropertySource("classpath:application-test.properties")
-public class MarkNotificationAsReadTests {
+public class GetPreferencesTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -57,7 +51,7 @@ public class MarkNotificationAsReadTests {
                         .claim("preferred_username", "username"));
     }
 
-    private UserId createUser() {
+    private void createUser() {
         UserId userId = UserId.create();
         User user = new User(
                 userId,
@@ -70,44 +64,28 @@ public class MarkNotificationAsReadTests {
                 "Test@gmail.com"
         );
         userRepository.save(user);
-        return userId;
     }
 
     @Test
-    void readNotification_shouldMarkNotificationAsRead() throws Exception {
-        // Arrange
-        UserId userId = createUser();
-
-        NotificationId notificationId = NotificationId.create();
-        Notification notification = new Notification(
-                notificationId,
-                "Test notification",
-                NotificationType.FRIEND_REQUEST,
-                Instant.now(),
-                false,
-                userId
-        );
-        notificationRepository.save(notification);
-
-        // Act & Assert
-        mockMvc.perform(patch("/api/platform/notifications/{id}/read", notificationId.id().toString())
-                        .with(validJwt()))
-                .andExpect(status().isOk());
-
-        Optional<Notification> updatedNotification = notificationRepository.findById(notificationId);
-        assertTrue(updatedNotification.isPresent() && updatedNotification.get().isRead());
-    }
-
-    @Test
-    void readNotification_shouldReturnNotFound_whenNotificationDoesNotExist() throws Exception {
+    void getPreferences_shouldReturnUserPreferences() throws Exception {
         // Arrange
         createUser();
 
-        UUID nonExistentNotificationId = UUID.randomUUID();
-
         // Act & Assert
-        mockMvc.perform(patch("/api/platform/notifications/{id}/read", nonExistentNotificationId.toString())
+        mockMvc.perform(get("/api/platform/notifications/preferences")
                         .with(validJwt()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.FRIEND_REQUEST.IN_APP").value(true))
+                .andExpect(jsonPath("$.FRIEND_REQUEST.EMAIL").value(true))
+                .andExpect(jsonPath("$.ACHIEVEMENT.IN_APP").value(true))
+                .andExpect(jsonPath("$.ACHIEVEMENT.EMAIL").value(false))
+                .andExpect(jsonPath("$.YOUR_TURN.IN_APP").value(true))
+                .andExpect(jsonPath("$.YOUR_TURN.EMAIL").value(false));
     }
+
+    // TODO: test when preferences al ingesteld zijn
+
+    // TODO: test when user does not exist
+
+    // TODO: test when user not logged in
 }

@@ -7,8 +7,10 @@ import be.kdg.ipj3.social.domain.ChatId;
 import be.kdg.ipj3.social.domain.ChatRepository;
 import be.kdg.ipj3.social.domain.Message;
 import be.kdg.ipj3.social.shared.InvalidChatRequestException;
+import be.kdg.ipj3.social.shared.ChatMessageSentEvent;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +25,12 @@ import java.util.stream.Collectors;
 public class ChatService {
     private final ChatRepository chatRepository;
     private final UsersApi usersApi;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public ChatService(ChatRepository chatRepository, UsersApi usersApi) {
+    public ChatService(ChatRepository chatRepository, UsersApi usersApi, ApplicationEventPublisher eventPublisher) {
         this.chatRepository = chatRepository;
         this.usersApi = usersApi;
+        this.eventPublisher = eventPublisher;
     }
 
     public List<ChatListDto> findChatListByKeycloakId(String keycloakId) {
@@ -105,6 +109,18 @@ public class ChatService {
 
         chat.sendMessage(currentUser, content);
         chatRepository.save(chat);
+
+        var recipients = chat.getParticipants().stream()
+                .filter(id -> !id.equals(currentUser))
+                .collect(Collectors.toSet());
+
+        eventPublisher.publishEvent(new ChatMessageSentEvent(
+                chat.getId(),
+                currentUser,
+                recipients,
+                content,
+                chat.getLastMessageAt()
+        ));
 
         var usernames = chat.getParticipants().stream()
                 .collect(Collectors.toMap(
