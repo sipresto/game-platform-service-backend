@@ -17,11 +17,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
@@ -33,33 +34,38 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @TestPropertySource("classpath:application-test.properties")
-@Transactional
-public class GetFavoriteGamesIntegrationTests {
+public class GetUserLibraryTests {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private GameRepository gameRepository;
 
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
-        userRepository.deleteAll();
         gameRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor validJwt() {
-        return jwt().jwt(builder -> builder
-                .subject("keycloak-id")
-                .claim("preferred_username", "test-user"));
+        return jwt().authorities(() -> "ROLE_PLAYER")
+                .jwt(builder -> builder
+                        .subject("keycloakId")
+                        .claim("preferred_username", "test-user"));
     }
 
     private User createTestUser() {
-        User user = User.createFromKeycloak("keycloak-id", "test-user", "Test@gmail.com");
+        User user = User.createFromKeycloak("keycloak-id", "test-user", "test@gmail.com");
+        userRepository.save(user);
+        return user;
+    }
+
+    private User createTestUser2() {
+        User user = User.createFromKeycloak("keycloak-id-2", "test-user-2", "test2@gmail.com");
         userRepository.save(user);
         return user;
     }
@@ -69,7 +75,7 @@ public class GetFavoriteGamesIntegrationTests {
                 GameId.create(),
                 name,
                 "Description for " + name,
-                Money.of(new java.math.BigDecimal("19.99")),
+                Money.of(BigDecimal.valueOf(6.99)),
                 "/api/game",
                 "/game",
                 "A rule",
@@ -83,41 +89,38 @@ public class GetFavoriteGamesIntegrationTests {
     }
 
     @Test
-    void getFavoriteGames_shouldReturnListOfGames_whenUserHasFavorites() throws Exception {
+    void getUserLibrary_shouldReturnListOfGames_whenUserHasGames() throws Exception {
         // Arrange
         User user = createTestUser();
-        Game game1 = createTestGame("TicTac");
-        Game game2 = createTestGame("Chess");
-        Game game3 = createTestGame("Quoridor");
+        User user2 = createTestUser2();
 
-        user.addGame(game1.getId());
-        user.addGame(game2.getId());
-        user.addGame(game3.getId());
+        Game game1 = createTestGame("Game1");
+        Game game2 = createTestGame("Game2");
+        Game game3 = createTestGame("Game3");
 
-        userRepository.save(user);
+        user2.addGame(game1.getId());
+        user2.addGame(game2.getId());
 
-        user.addFavorite(game1.getId());
-        user.addFavorite(game3.getId());
-        userRepository.save(user);
+        userRepository.save(user2);
 
         // Act & Assert
-        mockMvc.perform(get("/api/platform/games/favorites")
+        mockMvc.perform(get("/api/platform/games/library/user/" + user2.getId().id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[*].name", containsInAnyOrder("TicTac", "Quoridor")));
+                .andExpect(jsonPath("$[*].name", containsInAnyOrder("Game1", "Game2")));
     }
 
     @Test
-    void getFavoriteGames_shouldReturnEmptyListOfGames_whenUserHasNoFavorites() throws Exception {
+    void getUserLibrary_shouldReturnEmptyList_whenUserHasNoGames() throws Exception {
         // Arrange
         User user = createTestUser();
-        userRepository.save(user);
+        User user2 = createTestUser2();
 
         // Act & Assert
-        mockMvc.perform(get("/api/platform/games/favorites")
+        mockMvc.perform(get("/api/platform/games/library/user/" + user2.getId().id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -125,4 +128,36 @@ public class GetFavoriteGamesIntegrationTests {
                 .andExpect(jsonPath("$", hasSize(0)));
     }
 
+    @Test
+    void getUserLibrary_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
+        // Arrange
+        User user = createTestUser();
+
+        // Act & Assert
+        mockMvc.perform(get("/api/platform/games/library/user/" + UUID.randomUUID())
+                        .with(validJwt())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getUserLibrary_shouldReturnUnauthorized_whenUserNotLoggedIn() throws Exception {
+        // Arrange
+        User user = createTestUser();
+        User user2 = createTestUser2();
+
+        Game game1 = createTestGame("Game1");
+        Game game2 = createTestGame("Game2");
+        Game game3 = createTestGame("Game3");
+
+        user2.addGame(game1.getId());
+        user2.addGame(game2.getId());
+
+        userRepository.save(user2);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/platform/games/library")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
 }

@@ -50,9 +50,10 @@ public class AddAndRemoveFavoriteGamesIntegrationTests {
     }
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor validJwt() {
-        return jwt().jwt(builder -> builder
-                .subject("keycloak-id")
-                .claim("preferred_username", "test-user"));
+        return jwt().authorities(() -> "ROLE_PLAYER")
+                .jwt(builder -> builder
+                        .subject("keycloak-id")
+                        .claim("preferred_username", "test-user"));
     }
 
     private User createTestUser() {
