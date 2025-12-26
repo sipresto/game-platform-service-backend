@@ -3,11 +3,15 @@ package be.kdg.ipj3.users.infrastructure.jpa;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.domain.VisibleField;
+import be.kdg.ipj3.users.domain.VisibilitySettings;
 import be.kdg.ipj3.users.shared.UserId;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -26,10 +30,6 @@ public class JpaUserEntity {
 
     @Column
     private int points;
-
-    @Column
-    @Enumerated(EnumType.STRING)
-    private Visibility visibility;
 
     @Column
     private String email;
@@ -74,28 +74,44 @@ public class JpaUserEntity {
     )
     private final List<JpaFriendRequest> outgoingFriendRequests = new ArrayList<>();
 
+    // New: Store visibility settings
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "user_visibility_settings",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @MapKeyColumn(name = "field")
+    @MapKeyEnumerated(EnumType.STRING)
+    @Column(name = "visibility")
+    @Enumerated(EnumType.STRING)
+    private Map<VisibleField, Visibility> visibilitySettings = new HashMap<>();
+
     protected JpaUserEntity() {
     } // for JPA
 
-    public JpaUserEntity(UUID id, String keycloakId, String username, JpaProfile profile, int points, Visibility visibility, String email) {
+    public JpaUserEntity(UUID id, String keycloakId, String username, JpaProfile profile,
+                         int points, String email, Map<VisibleField, Visibility> visibilitySettings) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
         this.profile = profile;
         this.points = points;
-        this.visibility = visibility;
         this.email = email;
+        this.visibilitySettings = visibilitySettings != null ? new HashMap<>(visibilitySettings) : new HashMap<>();
     }
 
     public static JpaUserEntity fromDomain(User user) {
+        // Convert visibility settings to map
+        Map<VisibleField, Visibility> visibilityMap = user.getVisibilitySettings().fieldVisibilities();
+
         JpaUserEntity jpaUserEntity = new JpaUserEntity(
                 user.getId().id(),
                 user.getKeycloakId(),
                 user.getUsername(),
                 JpaProfile.fromDomain(user.getProfile()),
                 user.getPoints(),
-                user.getVisibility(),
-                user.getEmail()
+                user.getEmail(),
+                visibilityMap
         );
 
         user.getOwnedGames().stream()
@@ -122,7 +138,20 @@ public class JpaUserEntity {
     }
 
     public User toDomain() {
-        User user = new User(new UserId(id), keycloakId, username, profile.toDomain(), points, email);
+        VisibilitySettings visibilitySettings = new VisibilitySettings(new HashMap<>(this.visibilitySettings));
+
+        User user = new User(
+                new UserId(id),
+                keycloakId,
+                username,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                points,
+                profile.toDomain(),
+                visibilitySettings,
+                email
+        );
+
         ownedGames.stream()
                 .map(GameId::new)
                 .forEach(user::addGame);
@@ -143,13 +172,13 @@ public class JpaUserEntity {
                 .map(JpaFriendRequest::toDomain)
                 .forEach(user::addOutgoingFriendRequest);
 
-        user.updateVisibility(this.visibility);
         return user;
     }
 
     private void addGame(UUID gameId) {
         this.ownedGames.add(gameId);
     }
+
     private void addFavoriteGame(UUID gameId){
         this.favoriteGames.add(gameId);
     }
@@ -182,7 +211,7 @@ public class JpaUserEntity {
         return profile;
     }
 
-    public Visibility getVisibility() {
-        return visibility;
+    public Map<VisibleField, Visibility> getVisibilitySettings() {
+        return visibilitySettings;
     }
 }

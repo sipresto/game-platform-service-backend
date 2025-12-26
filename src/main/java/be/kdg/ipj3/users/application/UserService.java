@@ -117,9 +117,21 @@ public class UserService implements UsersApi {
         userRepository.save(user);
     }
 
+    public void updateFieldVisibility(String keycloakId, VisibleField field, Visibility visibility) {
+        User user = findByKeycloakId(keycloakId);
+        user.updateVisibilityForField(field, visibility);
+        userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public VisibilitySettings getVisibilitySettings(String keycloakId) {
+        User user = findByKeycloakId(keycloakId);
+        return user.getVisibilitySettings();
+    }
+
     @Transactional(readOnly = true)
     public List<User> findAllPublicUsers() {
-        return userRepository.findAllPublicUsers();
+        return userRepository.findAll();
     }
 
     @Transactional(readOnly = true)
@@ -141,11 +153,11 @@ public class UserService implements UsersApi {
     public SmallUserDto findSmallUserDtoById(UUID id) {
         return SmallUserDto.fromDomain(findById(id));
     }
+
     @Transactional(readOnly = true)
     public EmailUserDto findEmailUserDtoByKeycloakId(UUID id){
         return EmailUserDto.fromDomain(findById(id));
     }
-
 
     @Override
     public String findEmailByUserId(UserId id) {

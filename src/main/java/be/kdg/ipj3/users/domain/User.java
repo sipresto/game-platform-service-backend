@@ -18,13 +18,15 @@ public class User {
     private final List<GameId> favoriteGames;
     private int points;
     private Profile profile;
-    private Visibility visibility;
+    private VisibilitySettings visibilitySettings;
     private final List<UserId> friends;
     private final String email;
     private final List<FriendRequest> incomingFriendRequests;
     private final List<FriendRequest> outgoingFriendRequests;
 
-    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames, List<GameId> favoriteGames, int points, Profile profile, String email) {
+    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames,
+                List<GameId> favoriteGames, int points, Profile profile,
+                VisibilitySettings visibilitySettings, String email) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
@@ -32,26 +34,23 @@ public class User {
         this.favoriteGames = favoriteGames != null ? new ArrayList<>(favoriteGames) : new ArrayList<>();
         this.points = points;
         this.profile = profile;
+        this.visibilitySettings = visibilitySettings;
         this.friends = new ArrayList<>();
-        this.visibility = Visibility.PUBLIC;
         this.email = email;
         this.incomingFriendRequests = new ArrayList<>();
         this.outgoingFriendRequests = new ArrayList<>();
     }
 
     public User(UserId id, String keycloakId, String username, Profile profile, int points, String email) {
-        this.id = id;
-        this.keycloakId = keycloakId;
-        this.username = username;
-        this.ownedGames = new ArrayList<>();
-        this.favoriteGames = new ArrayList<>();
-        this.points = points;
-        this.profile = profile;
-        this.visibility = Visibility.PUBLIC;
-        this.friends = new ArrayList<>();
-        this.email = email;
-        this.incomingFriendRequests = new ArrayList<>();
-        this.outgoingFriendRequests = new ArrayList<>();
+        this(id, keycloakId, username,
+                new ArrayList<>(), new ArrayList<>(),
+                points, profile, VisibilitySettings.defaultPublic(), email);
+    }
+
+    public User(UserId id, String keycloakId, String username, List<GameId> ownedGames,
+                List<GameId> favoriteGames, int points, Profile profile, String email) {
+        this(id, keycloakId, username, ownedGames, favoriteGames, points, profile,
+                VisibilitySettings.defaultPublic(), email);
     }
 
     public static User createFromKeycloak(String keycloakId, String keycloakUsername, String email) {
@@ -59,6 +58,18 @@ public class User {
                 List.of(),
                 List.of(),
                 0, new Profile(keycloakUsername, ""), email);
+    }
+
+    public VisibilitySettings getVisibilitySettings() {
+        return visibilitySettings;
+    }
+
+    public void updateVisibility(Visibility visibility) {
+        this.visibilitySettings = VisibilitySettings.template(visibility);
+    }
+
+    public void updateVisibilityForField(VisibleField field, Visibility visibility) {
+        this.visibilitySettings = visibilitySettings.withFieldVisibility(field, visibility);
     }
 
     public UserId getId() {
@@ -94,10 +105,6 @@ public class User {
         this.username = displayName;
     }
 
-    public void updateVisibility(Visibility visibility) {
-        this.visibility = visibility;
-    }
-
     public void addGame(GameId gameId) {
         if (!ownedGames.contains(gameId)) {
             ownedGames.add(gameId);
@@ -105,6 +112,7 @@ public class User {
             throw new IllegalArgumentException("Game already owned by this user");
         }
     }
+
     public void addFavorite(GameId gameId){
         if (!favoriteGames.contains(gameId)){
             favoriteGames.add(gameId);
@@ -112,6 +120,7 @@ public class User {
             throw new IllegalArgumentException("Game already favorited by this user");
         }
     }
+
     public void removeFavorite(GameId gameId){
         if (favoriteGames.contains(gameId)){
             favoriteGames.remove(gameId);
@@ -120,13 +129,8 @@ public class User {
         }
     }
 
-
     public List<GameId> getFavoriteGames() {
         return favoriteGames;
-    }
-
-    public Visibility getVisibility() {
-        return visibility;
     }
 
     public List<UserId> getFriends() {
@@ -158,11 +162,17 @@ public class User {
     }
 
     public void removeOutgoingFriendRequest(UserId userId) {
-        this.outgoingFriendRequests.remove(outgoingFriendRequests.stream().filter(friendRequest -> friendRequest.otherUser().equals(userId)).findFirst().orElse(null));
+        this.outgoingFriendRequests.remove(outgoingFriendRequests.stream()
+                .filter(friendRequest -> friendRequest.otherUser().equals(userId))
+                .findFirst()
+                .orElse(null));
     }
 
     public void removeIncomingFriendRequest(UserId userId) {
-        this.incomingFriendRequests.remove(incomingFriendRequests.stream().filter(friendRequest -> friendRequest.otherUser().equals(userId)).findFirst().orElse(null));
+        this.incomingFriendRequests.remove(incomingFriendRequests.stream()
+                .filter(friendRequest -> friendRequest.otherUser().equals(userId))
+                .findFirst()
+                .orElse(null));
     }
 
     public List<FriendRequest> getIncomingFriendRequests() {
@@ -180,7 +190,8 @@ public class User {
     }
 
     public void validateFriendRequests(UserId userId) {
-        if(this.id.equals(userId) || this.outgoingFriendRequests.stream().anyMatch(friendRequest -> friendRequest.otherUser().equals(userId))) {
+        if(this.id.equals(userId) || this.outgoingFriendRequests.stream()
+                .anyMatch(friendRequest -> friendRequest.otherUser().equals(userId))) {
             throw new IllegalArgumentException("You cannot send friend requests to yourself nor to users you have already sent a request to");
         }
     }

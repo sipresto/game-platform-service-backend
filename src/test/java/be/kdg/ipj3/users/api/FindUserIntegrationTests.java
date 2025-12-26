@@ -1,6 +1,8 @@
 package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.domain.VisibleField;
+import be.kdg.ipj3.users.domain.VisibilitySettings;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
@@ -15,6 +17,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -47,14 +50,16 @@ public class FindUserIntegrationTests {
 
     private UUID createUser(String keycloakId, String username) {
         UUID userId = UUID.randomUUID();
+        Map<VisibleField, Visibility> visibility = VisibilitySettings.defaultPublic().fieldVisibilities();
+
         JpaUserEntity userEntity = new JpaUserEntity(
                 userId,
                 keycloakId,
                 username,
                 new JpaProfile(username, "Test bio", null, null),
                 0,
-                Visibility.PUBLIC,
-                "Test@gmail.com"
+                "Test@gmail.com",
+                visibility
         );
         userRepository.save(userEntity);
         return userId;
@@ -68,7 +73,7 @@ public class FindUserIntegrationTests {
         UUID userId = createUser(keycloakId, username);
 
         // Act & Assert
-        mockMvc.perform(get("/api/platform/users/find-by-keycloak-id")
+        mockMvc.perform(get("/api/platform/users/me")
                         .with(validJwt(keycloakId, username))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -83,7 +88,7 @@ public class FindUserIntegrationTests {
     @Test
     void findUser_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
         // Act & Assert
-        mockMvc.perform(get("/api/platform/users/find-by-keycloak-id")
+        mockMvc.perform(get("/api/platform/users/me")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -95,7 +100,7 @@ public class FindUserIntegrationTests {
         createUser(keycloakId, username);
 
         // Act & Assert
-        mockMvc.perform(get("/api/platform/users/find-by-keycloak-id")
+        mockMvc.perform(get("/api/platform/users/me")
                         .with(jwt()
                                 .jwt(builder -> builder
                                         .subject(keycloakId)

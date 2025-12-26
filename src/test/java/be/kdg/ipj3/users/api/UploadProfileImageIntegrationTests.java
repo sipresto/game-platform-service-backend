@@ -1,6 +1,8 @@
 package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.domain.VisibilitySettings;
+import be.kdg.ipj3.users.domain.VisibleField;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,32 +44,34 @@ public class UploadProfileImageIntegrationTests {
     @Autowired
     private JpaUserRepository userRepository;
 
-    private String testKeycloakId;
     private final String testEmail = "test@example.com";
 
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
-
-        UUID testUserId = UUID.randomUUID();
-        testKeycloakId = "test-keycloak-id-" + UUID.randomUUID();
-
-        JpaUserEntity user = new JpaUserEntity(
-                testUserId,
-                testKeycloakId,
-                "testuser",
-                new JpaProfile("Test User", "Test bio", null, null),
-                0,
-                Visibility.PUBLIC,
-                testEmail
-        );
-        userRepository.save(user);
     }
 
-    private JwtRequestPostProcessor validJwt() {
+    private String createUser(String keycloakId, String username) {
+        UUID userId = UUID.randomUUID();
+        Map<VisibleField, Visibility> visibility = VisibilitySettings.defaultPublic().fieldVisibilities();
+
+        JpaUserEntity user = new JpaUserEntity(
+                userId,
+                keycloakId,
+                username,
+                new JpaProfile(username, "Initial bio", null, null),
+                0,
+                "Test@gmail.com",
+                visibility
+        );
+        userRepository.save(user);
+        return keycloakId;
+    }
+
+    private JwtRequestPostProcessor validJwt(String subject) {
         return jwt()
                 .jwt(builder -> builder
-                        .subject(testKeycloakId)
+                        .subject(subject)
                         .claim("preferred_username", "testuser")
                         .claim("email", testEmail))
                 .authorities(new SimpleGrantedAuthority("ROLE_PLAYER"));
@@ -118,6 +123,7 @@ public class UploadProfileImageIntegrationTests {
     @Test
     void uploadProfileImage_shouldSucceed_whenValidImage() throws Exception {
         MockMultipartFile imageFile = createValidTestImage();
+        String keycloakId = createUser("kc-id1", "testuser");
 
         mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(imageFile)
@@ -125,11 +131,11 @@ public class UploadProfileImageIntegrationTests {
                             request.setMethod("PUT");
                             return request;
                         })
-                        .with(validJwt())
+                        .with(validJwt(keycloakId))
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isOk());
 
-        Optional<JpaUserEntity> userOpt = userRepository.findByKeycloakId(testKeycloakId);
+        Optional<JpaUserEntity> userOpt = userRepository.findByKeycloakId(keycloakId);
         assertThat(userOpt).isPresent();
 
         JpaUserEntity user = userOpt.get();
@@ -141,6 +147,7 @@ public class UploadProfileImageIntegrationTests {
     @Test
     void uploadProfileImage_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
         MockMultipartFile imageFile = createValidTestImage();
+        String keycloakId = createUser("kc-id1", "testuser");
 
         mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(imageFile)
@@ -151,7 +158,7 @@ public class UploadProfileImageIntegrationTests {
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isUnauthorized());
 
-        Optional<JpaUserEntity> userOpt = userRepository.findByKeycloakId(testKeycloakId);
+        Optional<JpaUserEntity> userOpt = userRepository.findByKeycloakId(keycloakId);
         assertThat(userOpt).isPresent();
         assertThat(userOpt.get().getProfile().getProfileImage()).isNull();
     }
@@ -159,6 +166,7 @@ public class UploadProfileImageIntegrationTests {
     @Test
     void uploadProfileImage_shouldReturnBadRequest_whenFileTooLarge() throws Exception {
         MockMultipartFile largeImageFile = createLargeTestImage();
+        String keycloakId = createUser("kc-id1", "testuser");
 
         mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(largeImageFile)
@@ -166,11 +174,11 @@ public class UploadProfileImageIntegrationTests {
                             request.setMethod("PUT");
                             return request;
                         })
-                        .with(validJwt())
+                        .with(validJwt(keycloakId))
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isBadRequest());
 
-        Optional<JpaUserEntity> userOpt = userRepository.findByKeycloakId(testKeycloakId);
+        Optional<JpaUserEntity> userOpt = userRepository.findByKeycloakId(keycloakId);
         assertThat(userOpt).isPresent();
         assertThat(userOpt.get().getProfile().getProfileImage()).isNull();
     }
@@ -178,6 +186,7 @@ public class UploadProfileImageIntegrationTests {
     @Test
     void uploadProfileImage_shouldReturnBadRequest_whenInvalidFileType() throws Exception {
         MockMultipartFile invalidImageFile = createInvalidImageFile();
+        String keycloakId = createUser("kc-id1", "testuser");
 
         mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(invalidImageFile)
@@ -185,11 +194,11 @@ public class UploadProfileImageIntegrationTests {
                             request.setMethod("PUT");
                             return request;
                         })
-                        .with(validJwt())
+                        .with(validJwt(keycloakId))
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isBadRequest());
 
-        Optional<JpaUserEntity> userOpt = userRepository.findByKeycloakId(testKeycloakId);
+        Optional<JpaUserEntity> userOpt = userRepository.findByKeycloakId(keycloakId);
         assertThat(userOpt).isPresent();
         assertThat(userOpt.get().getProfile().getProfileImage()).isNull();
     }
@@ -197,17 +206,19 @@ public class UploadProfileImageIntegrationTests {
     @Test
     void uploadProfileImage_shouldOverwriteExistingImage() throws Exception {
         MockMultipartFile firstImage = createValidTestImage();
+        String keycloakId = createUser("kc-id1", "testuser");
+
         mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(firstImage)
                         .with(request -> {
                             request.setMethod("PUT");
                             return request;
                         })
-                        .with(validJwt())
+                        .with(validJwt(keycloakId))
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isOk());
 
-        Optional<JpaUserEntity> userAfter = userRepository.findByKeycloakId(testKeycloakId);
+        Optional<JpaUserEntity> userAfter = userRepository.findByKeycloakId(keycloakId);
         assertThat(userAfter).isPresent();
         assertThat(userAfter.get().getProfile().getProfileImage()).isNotNull();
         assertThat(userAfter.get().getProfile().getImageMimeType()).isEqualTo("image/png");

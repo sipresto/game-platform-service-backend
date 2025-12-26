@@ -44,7 +44,6 @@ public class SecurityConfig {
                 .securityMatcher("/api/platform/public/**",
                         "/api/platform/games/browse/**",
                         "/api/platform/session/**",
-                        "/api/platform/users",
                         "/api/platform/users/profile-image/**")
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
