@@ -112,16 +112,16 @@ public class GameService implements GamesApi {
     @Transactional(readOnly = true)
     public List<Game> findOwnedGamesByKeycloakId(String keycloakId) {
         UserId userId = usersApi.findIdByKeycloakId(keycloakId);
-        List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id());
+        List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id(), keycloakId);
         return gameRepository.findGamesByIds(ownedGameIds);
     }
 
     @Transactional(readOnly = true)
-    public List<Game> findOwnedGamesByUserId(UserId userId) {
+    public List<Game> findOwnedGamesByUserId(UserId userId, String keycloakid) {
         if (!usersApi.existsById(userId.id())) {
             throw new UserNotFoundException(userId.id().toString());
         }
-        List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id());
+        List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id(), keycloakid);
         return gameRepository.findGamesByIds(ownedGameIds);
     }
 

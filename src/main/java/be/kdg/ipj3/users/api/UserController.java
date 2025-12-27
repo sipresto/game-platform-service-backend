@@ -61,9 +61,7 @@ public class UserController {
             @RequestBody @Valid UserDto.ProfileDto profileDto
     ) {
         String keycloakId = jwt.getSubject();
-
         userService.updateProfile(keycloakId, profileDto.displayName(), profileDto.bio());
-
         return ResponseEntity.ok().build();
     }
 
@@ -144,15 +142,7 @@ public class UserController {
             @AuthenticationPrincipal Jwt jwt
     ) {
         User targetUser = userService.findById(userId);
-        User viewer = null;
-
-        if (jwt != null) {
-            try {
-                viewer = userService.findByKeycloakId(jwt.getSubject());
-            } catch (Exception e) {
-                // Viewer not in system
-            }
-        }
+        var viewer = userService.findByKeycloakId(jwt.getSubject());
 
         return ResponseEntity.ok(PublicUserDto.fromDomain(targetUser, viewer));
     }
@@ -164,11 +154,6 @@ public class UserController {
     public ResponseEntity<Void> uploadProfileImage(
             @AuthenticationPrincipal Jwt jwt,
             @RequestParam("image") MultipartFile file) throws IOException {
-
-        if (jwt == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
         String keycloakId = jwt.getSubject();
         profileImageService.updateProfileImage(keycloakId, file);
 

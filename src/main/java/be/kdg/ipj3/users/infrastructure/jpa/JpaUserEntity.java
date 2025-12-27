@@ -74,7 +74,6 @@ public class JpaUserEntity {
     )
     private final List<JpaFriendRequest> outgoingFriendRequests = new ArrayList<>();
 
-    // New: Store visibility settings
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "user_visibility_settings",
@@ -101,7 +100,6 @@ public class JpaUserEntity {
     }
 
     public static JpaUserEntity fromDomain(User user) {
-        // Convert visibility settings to map
         Map<VisibleField, Visibility> visibilityMap = user.getVisibilitySettings().fieldVisibilities();
 
         JpaUserEntity jpaUserEntity = new JpaUserEntity(

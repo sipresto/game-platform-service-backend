@@ -87,15 +87,21 @@ public class UserService implements UsersApi {
 
 
     @Transactional(readOnly = true)
-    public List<GameId> findOwnedGamesById(UUID id) {
-        return userRepository.findOwnedGamesById(new UserId(id));
+    public List<GameId> findOwnedGamesById(UUID id, String viewerKeycloakId) {
+        var target = findById(id);
+        var viewer = findByKeycloakId(viewerKeycloakId);
+        boolean isVisible = target.getVisibilitySettings().isVisibleTo(VisibleField.OWNED_GAMES, viewer, target);
+        if(isVisible) {
+            return userRepository.findOwnedGamesById(new UserId(id));
+        }
+        return List.of();
     }
 
+    @Transactional(readOnly = true)
     public List<GameId> findFavoriteGamesByUserId(UUID id){
         return userRepository.findFavoriteGamesByUserId(new UserId(id));
     }
 
-    @Transactional
     public void addPoints(UUID id, int points) {
         var userId = new UserId(id);
 

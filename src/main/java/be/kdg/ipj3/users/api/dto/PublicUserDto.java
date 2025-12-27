@@ -23,7 +23,8 @@ public record PublicUserDto(
         @JsonInclude(Include.NON_ABSENT)
         Optional<List<UUID>> ownedGames,
         @JsonInclude(Include.NON_ABSENT)
-        Optional<List<UUID>> friends
+        Optional<List<UUID>> friends,
+        String keycloakId
 ) {
     public static PublicUserDto fromDomain(User user, User viewer) {
         VisibilitySettings visibilitySettings = user.getVisibilitySettings();
@@ -35,7 +36,8 @@ public record PublicUserDto(
                 getPointsIfVisible(user, visibilitySettings, viewer),
                 getFavoriteGamesIfVisible(user, visibilitySettings, viewer),
                 getOwnedGamesIfVisible(user, visibilitySettings, viewer),
-                getFriendsIfVisible(user, visibilitySettings, viewer)
+                getFriendsIfVisible(user, visibilitySettings, viewer),
+                user.getKeycloakId()
         );
     }
 
