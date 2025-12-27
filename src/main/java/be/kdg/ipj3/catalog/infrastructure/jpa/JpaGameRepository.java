@@ -17,10 +17,9 @@ public interface JpaGameRepository extends JpaRepository<JpaGameEntity, UUID> {
                 LEFT JOIN g.categories c
                 WHERE (:minPrice IS NULL OR g.price >= :minPrice)
                   AND (:maxPrice IS NULL OR g.price <= :maxPrice)
-                  AND (:categories IS NULL OR :categories IS EMPTY OR c IN :categories)
+                  AND (:categories IS NULL OR c IN :categories)
             """)
-    List<JpaGameEntity> filterGames(BigDecimal minPrice, BigDecimal maxPrice,
-                                    List<Category> categories);
+    List<JpaGameEntity> filterGames(BigDecimal minPrice, BigDecimal maxPrice, List<Category> categories);
 
     @Query("SELECT g FROM JpaGameEntity g WHERE g.id IN :ids")
     List<JpaGameEntity> findAllByIds(List<UUID> ids);
@@ -38,10 +37,10 @@ public interface JpaGameRepository extends JpaRepository<JpaGameEntity, UUID> {
     Optional<JpaAchievementEntity> findAchievementByGameIdAndCode(UUID gameId, String code);
 
     @Query("""
-                 SELECT g
-                 FROM JpaGameEntity g
-                 JOIN FETCH g.achievements
-                 WHERE g.id = :id
-            """)
+                SELECT g
+                FROM JpaGameEntity g
+                JOIN FETCH g.achievements
+                WHERE g.id = :id
+           """)
     Optional<JpaGameEntity> findByIdWithAchievements(UUID id);
 }

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,7 +25,7 @@ public class UserService implements UsersApi {
     }
 
     /**
-     * Register or get existing user fromDomain Keycloak JWT
+     * Register or get existing user from Keycloak JWT
      * This is called automatically on first login
      */
     public User registerOrGetUser(String keycloakId, String keycloakUsername, String email) {
@@ -85,16 +86,13 @@ public class UserService implements UsersApi {
         userRepository.save(user);
     }
 
-
     @Transactional(readOnly = true)
     public List<GameId> findOwnedGamesById(UUID id, String viewerKeycloakId) {
         var target = findById(id);
         var viewer = findByKeycloakId(viewerKeycloakId);
-        boolean isVisible = target.getVisibilitySettings().isVisibleTo(VisibleField.OWNED_GAMES, viewer, target);
-        if(isVisible) {
-            return userRepository.findOwnedGamesById(new UserId(id));
-        }
-        return List.of();
+
+        Optional<List<GameId>> visibleOwnedGames = target.getVisibleOwnedGames(viewer);
+        return visibleOwnedGames.orElse(List.of());
     }
 
     @Transactional(readOnly = true)

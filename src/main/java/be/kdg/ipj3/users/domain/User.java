@@ -7,6 +7,7 @@ import org.jmolecules.ddd.annotation.Identity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @AggregateRoot
 public class User {
@@ -60,6 +61,59 @@ public class User {
                 0, new Profile(keycloakUsername, ""), email);
     }
 
+    public Optional<Integer> getVisiblePoints(User viewer) {
+        if (viewer != null && this.id.equals(viewer.getId())) {
+            return Optional.of(this.points);
+        }
+        if (visibilitySettings.isVisibleTo(VisibleField.POINTS, viewer, this)) {
+            return Optional.of(this.points);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<List<GameId>> getVisibleFavoriteGames(User viewer) {
+        if (viewer != null && this.id.equals(viewer.getId())) {
+            return Optional.of(new ArrayList<>(this.favoriteGames));
+        }
+        if (visibilitySettings.isVisibleTo(VisibleField.FAVORITE_GAMES, viewer, this)) {
+            return Optional.of(new ArrayList<>(this.favoriteGames));
+        }
+        return Optional.empty();
+    }
+
+    public Optional<List<GameId>> getVisibleOwnedGames(User viewer) {
+        if (viewer != null && this.id.equals(viewer.getId())) {
+            return Optional.of(new ArrayList<>(this.ownedGames));
+        }
+        if (visibilitySettings.isVisibleTo(VisibleField.OWNED_GAMES, viewer, this)) {
+            return Optional.of(new ArrayList<>(this.ownedGames));
+        }
+        return Optional.empty();
+    }
+
+    public Optional<List<UserId>> getVisibleFriends(User viewer) {
+        if (viewer != null && this.id.equals(viewer.getId())) {
+            return Optional.of(new ArrayList<>(this.friends));
+        }
+        if (visibilitySettings.isVisibleTo(VisibleField.FRIENDS_LIST, viewer, this)) {
+            return Optional.of(new ArrayList<>(this.friends));
+        }
+        return Optional.empty();
+    }
+
+    public Profile getVisibleProfile(User viewer) {
+        if (viewer != null && this.id.equals(viewer.getId())) {
+            return this.profile;
+        }
+
+        boolean profileVisible = visibilitySettings.isVisibleTo(VisibleField.PROFILE, viewer, this);
+        if (profileVisible) {
+            return this.profile;
+        } else {
+            return new Profile(this.profile.displayName(), null, null, null);
+        }
+    }
+
     public VisibilitySettings getVisibilitySettings() {
         return visibilitySettings;
     }
@@ -85,7 +139,7 @@ public class User {
     }
 
     public List<GameId> getOwnedGames() {
-        return ownedGames;
+        return new ArrayList<>(ownedGames);
     }
 
     public Profile getProfile() {
@@ -130,11 +184,11 @@ public class User {
     }
 
     public List<GameId> getFavoriteGames() {
-        return favoriteGames;
+        return new ArrayList<>(favoriteGames);
     }
 
     public List<UserId> getFriends() {
-        return friends;
+        return new ArrayList<>(friends);
     }
 
     public int getPoints() {
@@ -176,7 +230,7 @@ public class User {
     }
 
     public List<FriendRequest> getIncomingFriendRequests() {
-        return incomingFriendRequests;
+        return new ArrayList<>(incomingFriendRequests);
     }
 
     public void acceptFriendRequest(UserId userId) {
@@ -219,6 +273,6 @@ public class User {
     }
 
     public List<FriendRequest> getOutgoingFriendRequests() {
-        return outgoingFriendRequests;
+        return new ArrayList<>(outgoingFriendRequests);
     }
 }

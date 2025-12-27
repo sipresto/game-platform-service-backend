@@ -27,74 +27,25 @@ public record PublicUserDto(
         String keycloakId
 ) {
     public static PublicUserDto fromDomain(User user, User viewer) {
-        VisibilitySettings visibilitySettings = user.getVisibilitySettings();
+        Profile visibleProfile = user.getVisibleProfile(viewer);
+        Optional<Integer> visiblePoints = user.getVisiblePoints(viewer);
+        Optional<List<GameId>> visibleFavoriteGames = user.getVisibleFavoriteGames(viewer);
+        Optional<List<GameId>> visibleOwnedGames = user.getVisibleOwnedGames(viewer);
+        Optional<List<UserId>> visibleFriends = user.getVisibleFriends(viewer);
 
         return new PublicUserDto(
                 user.getId().id(),
                 user.getUsername(),
-                ProfileDto.fromDomain(user.getProfile(), visibilitySettings, viewer, user),
-                getPointsIfVisible(user, visibilitySettings, viewer),
-                getFavoriteGamesIfVisible(user, visibilitySettings, viewer),
-                getOwnedGamesIfVisible(user, visibilitySettings, viewer),
-                getFriendsIfVisible(user, visibilitySettings, viewer),
+                ProfileDto.fromDomain(visibleProfile),
+                visiblePoints,
+                visibleFavoriteGames.map(games ->
+                        games.stream().map(GameId::id).toList()),
+                visibleOwnedGames.map(games ->
+                        games.stream().map(GameId::id).toList()),
+                visibleFriends.map(friends ->
+                        friends.stream().map(UserId::id).toList()),
                 user.getKeycloakId()
         );
-    }
-
-    private static Optional<Integer> getPointsIfVisible(User user, VisibilitySettings settings, User viewer) {
-        if (viewer != null && viewer.getId().equals(user.getId())) {
-            return Optional.of(user.getPoints());
-        }
-
-        if (settings.isVisibleTo(VisibleField.POINTS, viewer, user)) {
-            return Optional.of(user.getPoints());
-        }
-        return Optional.empty();
-    }
-
-    private static Optional<List<UUID>> getFavoriteGamesIfVisible(User user, VisibilitySettings settings, User viewer) {
-        if (viewer != null && viewer.getId().equals(user.getId())) {
-            return Optional.of(user.getFavoriteGames().stream()
-                    .map(GameId::id)
-                    .toList());
-        }
-
-        if (settings.isVisibleTo(VisibleField.FAVORITE_GAMES, viewer, user)) {
-            return Optional.of(user.getFavoriteGames().stream()
-                    .map(GameId::id)
-                    .toList());
-        }
-        return Optional.empty();
-    }
-
-    private static Optional<List<UUID>> getOwnedGamesIfVisible(User user, VisibilitySettings settings, User viewer) {
-        if (viewer != null && viewer.getId().equals(user.getId())) {
-            return Optional.of(user.getOwnedGames().stream()
-                    .map(GameId::id)
-                    .toList());
-        }
-
-        if (settings.isVisibleTo(VisibleField.OWNED_GAMES, viewer, user)) {
-            return Optional.of(user.getOwnedGames().stream()
-                    .map(GameId::id)
-                    .toList());
-        }
-        return Optional.empty();
-    }
-
-    private static Optional<List<UUID>> getFriendsIfVisible(User user, VisibilitySettings settings, User viewer) {
-        if (viewer != null && viewer.getId().equals(user.getId())) {
-            return Optional.of(user.getFriends().stream()
-                    .map(UserId::id)
-                    .toList());
-        }
-
-        if (settings.isVisibleTo(VisibleField.FRIENDS_LIST, viewer, user)) {
-            return Optional.of(user.getFriends().stream()
-                    .map(UserId::id)
-                    .toList());
-        }
-        return Optional.empty();
     }
 
     public record ProfileDto(
@@ -104,21 +55,11 @@ public record PublicUserDto(
             @JsonInclude(Include.NON_ABSENT)
             Optional<Boolean> hasProfileImage
     ) {
-        public static ProfileDto fromDomain(Profile profile, VisibilitySettings settings, User viewer, User target) {
-            if (viewer != null && viewer.getId().equals(target.getId())) {
-                return new ProfileDto(
-                        profile.displayName(),
-                        Optional.ofNullable(profile.bio()),
-                        Optional.of(profile.profileImage() != null && profile.imageMimeType() != null)
-                );
-            }
-
-            boolean profileVisible = settings.isVisibleTo(VisibleField.PROFILE, viewer, target);
-
+        public static ProfileDto fromDomain(Profile profile) {
             return new ProfileDto(
                     profile.displayName(),
-                    profileVisible ? Optional.ofNullable(profile.bio()) : Optional.empty(),
-                    profileVisible ? Optional.of(profile.profileImage() != null && profile.imageMimeType() != null) : Optional.empty()
+                    profile.getBio(),
+                    profile.getHasProfileImage()
             );
         }
     }

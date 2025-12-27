@@ -2,7 +2,6 @@ package be.kdg.ipj3.achievementProgress.api;
 
 import be.kdg.ipj3.achievementProgress.api.dto.AchievementProgressDto;
 import be.kdg.ipj3.achievementProgress.application.AchievementProgressService;
-import be.kdg.ipj3.users.shared.UserId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -24,7 +23,7 @@ public class AchievementProgressController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<AchievementProgressDto>> getAchievementProgressByKeycloakId(
+    public ResponseEntity<List<AchievementProgressDto>> getAchievementProgressByUserId(
             @PathVariable UUID userId,
             @AuthenticationPrincipal Jwt jwt
     ) {

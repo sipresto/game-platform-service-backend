@@ -57,7 +57,7 @@ public class FindUserIntegrationTests {
                 keycloakId,
                 username,
                 new JpaProfile(username, "Test bio", null, null),
-                0,
+                100,
                 "Test@gmail.com",
                 visibility
         );
@@ -108,5 +108,53 @@ public class FindUserIntegrationTests {
                                 .authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void getUserById_shouldRespectVisibility_whenViewerIsNotOwner() throws Exception {
+        // Arrange
+        UUID friendId = UUID.randomUUID();
+        String friendKeycloakId = "friend-keycloak";
+        String keycloakId = "test-keycloak-id";
+        String username = "testuser";
+        UUID userId = createUser(keycloakId, username);
+
+        Map<VisibleField, Visibility> privateVisibility = VisibilitySettings.defaultPublic().fieldVisibilities();
+        privateVisibility.put(VisibleField.PROFILE, Visibility.PRIVATE);
+        privateVisibility.put(VisibleField.POINTS, Visibility.PRIVATE);
+
+        JpaUserEntity friend = new JpaUserEntity(
+                friendId,
+                friendKeycloakId,
+                "friend",
+                new JpaProfile("Friend", "Private bio", null, null),
+                200,
+                "friend@example.com",
+                privateVisibility
+        );
+        userRepository.save(friend);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/platform/users/{userId}", friendId)
+                        .with(validJwt(keycloakId, username)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("friend"))
+                .andExpect(jsonPath("$.profile.bio").doesNotExist())
+                .andExpect(jsonPath("$.points").doesNotExist());
+    }
+
+    @Test
+    void getUserById_shouldShowAllData_whenViewerIsOwner() throws Exception {
+        String keycloakId = "test-keycloak-id";
+        String username = "testuser";
+        UUID userId = createUser(keycloakId, username);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/platform/users/{userId}", userId)
+                        .with(validJwt(keycloakId, username)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("testuser"))
+                .andExpect(jsonPath("$.profile.bio").value("Test bio"))
+                .andExpect(jsonPath("$.points").value(100));
     }
 }
