@@ -91,13 +91,13 @@ services:
   # ---------------------
   # AI PLAYER SERVICE
   # ---------------------
-  ai_player:
-    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team4/ai-player
-    pull_policy: always
-    ports:
-      - "8000:8000"
-    networks:
-      - dev
+ # ai_player:
+ #   image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team4/ai-player
+ #   pull_policy: always
+ #   ports:
+ #     - "8000:8000"
+ #   networks:
+ #     - dev
 
   # ---------------------
   # Chess B and F
