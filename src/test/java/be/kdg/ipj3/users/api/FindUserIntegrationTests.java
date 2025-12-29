@@ -118,6 +118,7 @@ public class FindUserIntegrationTests {
         String friendKeycloakId = "friend-keycloak";
         String keycloakId = "test-keycloak-id";
         String username = "testuser";
+        createUser(keycloakId, username);
 
         Map<VisibleField, Visibility> privateVisibility = VisibilitySettings.defaultPublic().fieldVisibilities();
         privateVisibility.put(VisibleField.PROFILE, Visibility.PRIVATE);
