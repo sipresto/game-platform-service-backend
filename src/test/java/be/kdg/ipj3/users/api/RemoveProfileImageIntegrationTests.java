@@ -1,11 +1,10 @@
 package be.kdg.ipj3.users.api;
 
-import be.kdg.ipj3.users.domain.Visibility;
-import be.kdg.ipj3.users.domain.VisibilitySettings;
-import be.kdg.ipj3.users.domain.VisibleField;
+import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,14 +36,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
-@Transactional
 public class RemoveProfileImageIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private JpaUserRepository userRepository;
+    private UserRepository userRepository;
 
     private final String testEmail = "test@example.com";
 
@@ -55,16 +53,17 @@ public class RemoveProfileImageIntegrationTests {
 
     private String createUser(String keycloakId, String username, String email) {
         UUID userId = UUID.randomUUID();
-        Map<VisibleField, Visibility> visibility = VisibilitySettings.defaultPublic().fieldVisibilities();
 
-        JpaUserEntity user = new JpaUserEntity(
-                userId,
+        User user = new User(
+                new UserId(userId),
                 keycloakId,
                 username,
-                new JpaProfile(username, "Initial bio", null, null),
+                List.of(),
+                List.of(),
                 0,
-                email,
-                visibility
+                new Profile(username, "Initial bio", null, null),
+                VisibilitySettings.defaultPublic(),
+                email
         );
         userRepository.save(user);
         return keycloakId;
@@ -132,7 +131,7 @@ public class RemoveProfileImageIntegrationTests {
         String keycloakId = createUser("kc-id1", "testuser", "Test@gmail.com");
         uploadTestImage(keycloakId);
 
-        Optional<JpaUserEntity> userBefore = userRepository.findByKeycloakId(keycloakId);
+        Optional<User> userBefore = userRepository.findByKeycloakId(keycloakId);
         assertThat(userBefore).isPresent();
         assertThat(userBefore.get().getProfile().getProfileImage()).isNotNull();
 
@@ -140,7 +139,7 @@ public class RemoveProfileImageIntegrationTests {
                         .with(validJwt(keycloakId)))
                 .andExpect(status().isNoContent());
 
-        Optional<JpaUserEntity> userAfter = userRepository.findByKeycloakId(keycloakId);
+        Optional<User> userAfter = userRepository.findByKeycloakId(keycloakId);
         assertThat(userAfter).isPresent();
         assertThat(userAfter.get().getProfile().getProfileImage()).isNull();
         assertThat(userAfter.get().getProfile().getImageMimeType()).isNull();
@@ -155,7 +154,7 @@ public class RemoveProfileImageIntegrationTests {
     @Test
     void removeProfileImage_shouldSucceedEvenWhenNoImageExists() throws Exception {
         String keycloakId = createUser("kc-id1", "testuser", "Test@gmail.com");
-        Optional<JpaUserEntity> userBefore = userRepository.findByKeycloakId(keycloakId);
+        Optional<User> userBefore = userRepository.findByKeycloakId(keycloakId);
 
         assertThat(userBefore).isPresent();
         assertThat(userBefore.get().getProfile().getProfileImage()).isNull();
@@ -164,7 +163,7 @@ public class RemoveProfileImageIntegrationTests {
                         .with(validJwt(keycloakId)))
                 .andExpect(status().isNoContent());
 
-        Optional<JpaUserEntity> userAfter = userRepository.findByKeycloakId(keycloakId);
+        Optional<User> userAfter = userRepository.findByKeycloakId(keycloakId);
         assertThat(userAfter).isPresent();
         assertThat(userAfter.get().getProfile().getProfileImage()).isNull();
     }
@@ -179,7 +178,7 @@ public class RemoveProfileImageIntegrationTests {
                         .with(jwtForUser(keycloakId2)))
                 .andExpect(status().isNoContent());
 
-        Optional<JpaUserEntity> originalUser = userRepository.findByKeycloakId(keycloakId1);
+        Optional<User> originalUser = userRepository.findByKeycloakId(keycloakId1);
         assertThat(originalUser).isPresent();
         assertThat(originalUser.get().getProfile().getProfileImage()).isNotNull();
     }

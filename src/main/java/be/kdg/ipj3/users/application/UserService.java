@@ -203,4 +203,16 @@ public class UserService implements UsersApi {
         userRepository.save(receiverUser);
         userRepository.save(senderUser);
     }
+
+    public void removeFriend(UUID userId, UUID friendId) {
+        if(userId.equals(friendId)) {
+            throw new IllegalArgumentException("FriendId can't be the same as UserId");
+        }
+        User user = findById(userId);
+        User friend = findById(friendId);
+        user.removeFriend(friend.getId());
+        friend.removeFriend(user.getId());
+        userRepository.save(user);
+        userRepository.save(friend);
+    }
 }

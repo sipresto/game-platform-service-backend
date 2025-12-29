@@ -227,4 +227,14 @@ public class UserController {
         userService.rejectFriendRequest(receiverId.id(), senderId);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{friendId}/remove")
+    public ResponseEntity<Void> removeFriends(
+            @PathVariable UUID friendId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        var userId = userService.findIdByKeycloakId(jwt.getSubject());
+        userService.removeFriend(userId.id(), friendId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -26,4 +26,20 @@ public record Profile(
     public boolean getHasProfileImage() {
         return profileImage != null;
     }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public byte[] getProfileImage() {
+        return profileImage;
+    }
+
+    public String getImageMimeType() {
+        return imageMimeType;
+    }
 }

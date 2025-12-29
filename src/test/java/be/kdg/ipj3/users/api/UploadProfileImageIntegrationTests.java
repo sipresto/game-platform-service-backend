@@ -1,11 +1,10 @@
 package be.kdg.ipj3.users.api;
 
-import be.kdg.ipj3.users.domain.Visibility;
-import be.kdg.ipj3.users.domain.VisibilitySettings;
-import be.kdg.ipj3.users.domain.VisibleField;
+import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,14 +35,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
-@Transactional
 public class UploadProfileImageIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private JpaUserRepository userRepository;
+    private UserRepository userRepository;
 
     private final String testEmail = "test@example.com";
 
@@ -53,16 +52,17 @@ public class UploadProfileImageIntegrationTests {
 
     private String createUser(String keycloakId, String username) {
         UUID userId = UUID.randomUUID();
-        Map<VisibleField, Visibility> visibility = VisibilitySettings.defaultPublic().fieldVisibilities();
 
-        JpaUserEntity user = new JpaUserEntity(
-                userId,
+        User user = new User(
+                new UserId(userId),
                 keycloakId,
                 username,
-                new JpaProfile(username, "Initial bio", null, null),
+                List.of(),
+                List.of(),
                 0,
-                "Test@gmail.com",
-                visibility
+                new Profile(username, "Initial bio", null, null),
+                VisibilitySettings.defaultPublic(),
+                "Test@gmail.com"
         );
         userRepository.save(user);
         return keycloakId;
@@ -135,10 +135,10 @@ public class UploadProfileImageIntegrationTests {
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isOk());
 
-        Optional<JpaUserEntity> userOpt = userRepository.findByKeycloakId(keycloakId);
+        Optional<User> userOpt = userRepository.findByKeycloakId(keycloakId);
         assertThat(userOpt).isPresent();
 
-        JpaUserEntity user = userOpt.get();
+        User user = userOpt.get();
         assertThat(user.getProfile().getProfileImage()).isNotNull();
         assertThat(user.getProfile().getProfileImage().length).isGreaterThan(0);
         assertThat(user.getProfile().getImageMimeType()).isEqualTo("image/png");
@@ -158,7 +158,7 @@ public class UploadProfileImageIntegrationTests {
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isUnauthorized());
 
-        Optional<JpaUserEntity> userOpt = userRepository.findByKeycloakId(keycloakId);
+        Optional<User> userOpt = userRepository.findByKeycloakId(keycloakId);
         assertThat(userOpt).isPresent();
         assertThat(userOpt.get().getProfile().getProfileImage()).isNull();
     }
@@ -178,7 +178,7 @@ public class UploadProfileImageIntegrationTests {
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isBadRequest());
 
-        Optional<JpaUserEntity> userOpt = userRepository.findByKeycloakId(keycloakId);
+        Optional<User> userOpt = userRepository.findByKeycloakId(keycloakId);
         assertThat(userOpt).isPresent();
         assertThat(userOpt.get().getProfile().getProfileImage()).isNull();
     }
@@ -198,7 +198,7 @@ public class UploadProfileImageIntegrationTests {
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isBadRequest());
 
-        Optional<JpaUserEntity> userOpt = userRepository.findByKeycloakId(keycloakId);
+        Optional<User> userOpt = userRepository.findByKeycloakId(keycloakId);
         assertThat(userOpt).isPresent();
         assertThat(userOpt.get().getProfile().getProfileImage()).isNull();
     }
@@ -218,7 +218,7 @@ public class UploadProfileImageIntegrationTests {
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isOk());
 
-        Optional<JpaUserEntity> userAfter = userRepository.findByKeycloakId(keycloakId);
+        Optional<User> userAfter = userRepository.findByKeycloakId(keycloakId);
         assertThat(userAfter).isPresent();
         assertThat(userAfter.get().getProfile().getProfileImage()).isNotNull();
         assertThat(userAfter.get().getProfile().getImageMimeType()).isEqualTo("image/png");

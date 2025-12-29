@@ -1,11 +1,10 @@
 package be.kdg.ipj3.users.api;
 
-import be.kdg.ipj3.users.domain.Visibility;
-import be.kdg.ipj3.users.domain.VisibleField;
-import be.kdg.ipj3.users.domain.VisibilitySettings;
+import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,13 +28,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
-@Transactional
 public class UpdateFieldVisibilityIntegrationTests {
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private JpaUserRepository userRepository;
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -51,16 +50,17 @@ public class UpdateFieldVisibilityIntegrationTests {
 
     private void createUser(String keycloakId, String username) {
         UUID userId = UUID.randomUUID();
-        Map<VisibleField, Visibility> visibility = VisibilitySettings.defaultPublic().fieldVisibilities();
 
-        JpaUserEntity userEntity = new JpaUserEntity(
-                userId,
+        User userEntity = new User(
+                new UserId(userId),
                 keycloakId,
                 username,
-                new JpaProfile(username, "Test bio", null, null),
+                List.of(),
+                List.of(),
                 0,
-                "Test@gmail.com",
-                visibility
+                new Profile(username, "Test bio", null, null),
+                VisibilitySettings.defaultPublic(),
+                "Test@gmail.com"
         );
         userRepository.save(userEntity);
     }
@@ -80,7 +80,7 @@ public class UpdateFieldVisibilityIntegrationTests {
 
         // Assert
         var user = userRepository.findByKeycloakId(keycloakId).orElseThrow();
-        assertThat(user.getVisibilitySettings().get(VisibleField.PROFILE)).isEqualTo(Visibility.PRIVATE);
+        assertThat(user.getVisibilitySettings().getVisibility(VisibleField.PROFILE)).isEqualTo(Visibility.PRIVATE);
     }
 
     @Test

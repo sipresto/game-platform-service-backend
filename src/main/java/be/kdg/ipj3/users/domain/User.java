@@ -274,4 +274,13 @@ public class User {
     public List<FriendRequest> getOutgoingFriendRequests() {
         return new ArrayList<>(outgoingFriendRequests);
     }
+
+    public void removeFriend(UserId id) {
+        if (!friends.contains(id)) {
+            throw new IllegalArgumentException("You aren't friends with this user");
+        }
+        else {
+            friends.remove(id);
+        }
+    }
 }
