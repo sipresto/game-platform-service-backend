@@ -21,7 +21,7 @@ public interface UserRepository {
 
     void deleteAll();
 
-    List<User> findAllPublicUsers();
+    List<User> findAll();
 
     List<User> findFriends(UserId userId);
 

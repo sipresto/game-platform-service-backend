@@ -54,7 +54,9 @@ public class GameRepositoryImpl implements GameRepository {
     public List<Game> filterGames(Money minPrice, Money maxPrice, List<Category> categories) {
         BigDecimal minPriceAmount = minPrice != null ? minPrice.amount() : null;
         BigDecimal maxPriceAmount = maxPrice != null ? maxPrice.amount() : null;
-
+        if (categories != null && categories.isEmpty()) {
+            categories = null;
+        }
         return jpaGameRepository.filterGames(minPriceAmount, maxPriceAmount, categories)
                 .stream()
                 .map(JpaGameEntity::toDomain)

@@ -3,7 +3,6 @@ package be.kdg.ipj3.users.infrastructure;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;
-import be.kdg.ipj3.users.domain.Visibility;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
 import be.kdg.ipj3.users.shared.UserId;
@@ -57,15 +56,17 @@ public class UserRepositoryImpl implements UserRepository {
                 .stream()
                 .map(GameId::new).toList();
     }
+
     @Override
     public void deleteAll() {
         jpaUserRepository.deleteAll();
     }
 
     @Override
-    public List<User> findAllPublicUsers() {
-        var publicUsers = jpaUserRepository.findAllByVisibility(Visibility.PUBLIC);
-        return publicUsers.stream().map(JpaUserEntity::toDomain).toList();
+    public List<User> findAll() {
+        return jpaUserRepository.findAll().stream()
+                .map(JpaUserEntity::toDomain)
+                .toList();
     }
 
     @Override

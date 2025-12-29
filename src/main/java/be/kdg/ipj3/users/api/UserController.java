@@ -1,10 +1,13 @@
 package be.kdg.ipj3.users.api;
 
+import be.kdg.ipj3.users.api.dto.PublicUserDto;
 import be.kdg.ipj3.users.api.dto.UserDto;
 import be.kdg.ipj3.users.application.ProfileImageService;
 import be.kdg.ipj3.users.application.UserService;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.domain.VisibilitySettings;
+import be.kdg.ipj3.users.domain.VisibleField;
 import be.kdg.ipj3.users.shared.UserId;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
@@ -34,11 +37,10 @@ public class UserController {
 
 
     /**
-     * Get current user's profile
-     * Automatically registers user on first login
+     * Get current user's profile (full profile)
      */
-    @GetMapping("/find-by-keycloak-id")
-    public ResponseEntity<UserDto> findUser(
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getCurrentUser(
             @AuthenticationPrincipal Jwt jwt
     ) {
         String keycloakId = jwt.getSubject();
@@ -59,9 +61,7 @@ public class UserController {
             @RequestBody @Valid UserDto.ProfileDto profileDto
     ) {
         String keycloakId = jwt.getSubject();
-
         userService.updateProfile(keycloakId, profileDto.displayName(), profileDto.bio());
-
         return ResponseEntity.ok().build();
     }
 
@@ -80,31 +80,71 @@ public class UserController {
     }
 
     /**
-     * Unsecured endpoint that gets all users whose accounts are public
+     * Updates the visibility of a specific field
+     */
+    @PutMapping("/privacy/fields")
+    public ResponseEntity<Void> updateFieldVisibility(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam VisibleField field,
+            @RequestParam Visibility visibility
+    ) {
+        String keycloakId = jwt.getSubject();
+        userService.updateFieldVisibility(keycloakId, field, visibility);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Gets the current user's visibility settings
+     */
+    @GetMapping("/privacy/settings")
+    public ResponseEntity<VisibilitySettings> getVisibilitySettings(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        String keycloakId = jwt.getSubject();
+        VisibilitySettings settings = userService.getVisibilitySettings(keycloakId);
+        return ResponseEntity.ok(settings);
+    }
+
+    /**
+     * Unsecured endpoint that gets all users with visibility-aware data
      */
     @GetMapping
-    public ResponseEntity<List<UserDto>> findAllPublicUsers() {
-        var publicUsers = userService.findAllPublicUsers().stream().map(UserDto::fromDomain).toList();
-        return ResponseEntity.ok(publicUsers);
+    public ResponseEntity<List<PublicUserDto>> findAllUsers(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        List<User> users = userService.findAllPublicUsers();
+        User viewer = userService.findByKeycloakId(jwt.getSubject());
+        var userDtos = users.stream()
+                .map(user -> PublicUserDto.fromDomain(user, viewer))
+                .toList();
+        return ResponseEntity.ok(userDtos);
     }
 
     /**
-     * Gets friends of a user
+     * Gets friends of current user
      */
     @GetMapping("/friends")
-    public ResponseEntity<List<UserDto>> findFriendsForUser(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<List<PublicUserDto>> findFriendsForUser(@AuthenticationPrincipal Jwt jwt) {
         var user = userService.findByKeycloakId(jwt.getSubject());
-        var friends = userService.findFriends(user).stream().map(UserDto::fromDomain).toList();
-        return ResponseEntity.ok(friends);
+        var friends = userService.findFriends(user);
+        var friendDtos = friends.stream()
+                .map(friend -> PublicUserDto.fromDomain(friend, user))
+                .toList();
+        return ResponseEntity.ok(friendDtos);
     }
 
     /**
-     * Gets a user by their ID
+     * Gets a user by their ID with visibility-aware data
      */
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> findUserById(@PathVariable UUID userId) {
-        User user = userService.findById(userId);
-        return ResponseEntity.ok(UserDto.fromDomain(user));
+    public ResponseEntity<PublicUserDto> findUserById(
+            @PathVariable UUID userId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        User targetUser = userService.findById(userId);
+        var viewer = userService.findByKeycloakId(jwt.getSubject());
+
+        return ResponseEntity.ok(PublicUserDto.fromDomain(targetUser, viewer));
     }
 
     /**
@@ -114,11 +154,6 @@ public class UserController {
     public ResponseEntity<Void> uploadProfileImage(
             @AuthenticationPrincipal Jwt jwt,
             @RequestParam("image") MultipartFile file) throws IOException {
-
-        if (jwt == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
         String keycloakId = jwt.getSubject();
         profileImageService.updateProfileImage(keycloakId, file);
 

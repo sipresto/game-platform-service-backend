@@ -101,10 +101,11 @@ public class GameController {
 
     @GetMapping("/library/user/{userId}")
     public ResponseEntity<List<PublicGameDto>> getUserLibrary(
-            @PathVariable UUID userId
+            @PathVariable UUID userId,
+            @AuthenticationPrincipal Jwt jwt
     ) {
         return ResponseEntity.ok(
-                gameService.findOwnedGamesByUserId(new UserId(userId)).stream()
+                gameService.findOwnedGamesByUserId(new UserId(userId), jwt.getSubject()).stream()
                         .map(game -> new PublicGameDto(
                                 game.getId().id(),
                                 game.getName(),

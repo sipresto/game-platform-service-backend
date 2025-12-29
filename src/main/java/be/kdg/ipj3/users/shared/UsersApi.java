@@ -19,7 +19,7 @@ public interface UsersApi {
 
     UserId findIdByKeycloakId(String keycloakId);
 
-    List<GameId> findOwnedGamesById(UUID id);
+    List<GameId> findOwnedGamesById(UUID id, String viewerKeycloakId);
 
     List<GameId> findFavoriteGamesByUserId(UUID id);
 

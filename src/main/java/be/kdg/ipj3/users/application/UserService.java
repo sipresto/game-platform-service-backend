@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,7 +25,7 @@ public class UserService implements UsersApi {
     }
 
     /**
-     * Register or get existing user fromDomain Keycloak JWT
+     * Register or get existing user from Keycloak JWT
      * This is called automatically on first login
      */
     public User registerOrGetUser(String keycloakId, String keycloakUsername, String email) {
@@ -85,17 +86,19 @@ public class UserService implements UsersApi {
         userRepository.save(user);
     }
 
-
     @Transactional(readOnly = true)
-    public List<GameId> findOwnedGamesById(UUID id) {
-        return userRepository.findOwnedGamesById(new UserId(id));
+    public List<GameId> findOwnedGamesById(UUID id, String viewerKeycloakId) {
+        var target = findById(id);
+        var viewer = findByKeycloakId(viewerKeycloakId);
+
+        return target.getVisibleOwnedGames(viewer);
     }
 
+    @Transactional(readOnly = true)
     public List<GameId> findFavoriteGamesByUserId(UUID id){
         return userRepository.findFavoriteGamesByUserId(new UserId(id));
     }
 
-    @Transactional
     public void addPoints(UUID id, int points) {
         var userId = new UserId(id);
 
@@ -117,9 +120,21 @@ public class UserService implements UsersApi {
         userRepository.save(user);
     }
 
+    public void updateFieldVisibility(String keycloakId, VisibleField field, Visibility visibility) {
+        User user = findByKeycloakId(keycloakId);
+        user.updateVisibilityForField(field, visibility);
+        userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public VisibilitySettings getVisibilitySettings(String keycloakId) {
+        User user = findByKeycloakId(keycloakId);
+        return user.getVisibilitySettings();
+    }
+
     @Transactional(readOnly = true)
     public List<User> findAllPublicUsers() {
-        return userRepository.findAllPublicUsers();
+        return userRepository.findAll();
     }
 
     @Transactional(readOnly = true)
@@ -141,11 +156,11 @@ public class UserService implements UsersApi {
     public SmallUserDto findSmallUserDtoById(UUID id) {
         return SmallUserDto.fromDomain(findById(id));
     }
+
     @Transactional(readOnly = true)
     public EmailUserDto findEmailUserDtoByKeycloakId(UUID id){
         return EmailUserDto.fromDomain(findById(id));
     }
-
 
     @Override
     public String findEmailByUserId(UserId id) {

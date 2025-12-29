@@ -1,6 +1,8 @@
 package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.domain.VisibilitySettings;
+import be.kdg.ipj3.users.domain.VisibleField;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
@@ -11,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -43,34 +46,37 @@ public class RemoveProfileImageIntegrationTests {
     @Autowired
     private JpaUserRepository userRepository;
 
-    private String testKeycloakId;
     private final String testEmail = "test@example.com";
 
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
-
-        UUID testUserId = UUID.randomUUID();
-        testKeycloakId = "test-keycloak-id-" + UUID.randomUUID();
-
-        JpaUserEntity user = new JpaUserEntity(
-                testUserId,
-                testKeycloakId,
-                "testuser",
-                new JpaProfile("Test User", "Test bio", null, null),
-                0,
-                Visibility.PUBLIC,
-                testEmail
-        );
-        userRepository.save(user);
     }
 
-    private JwtRequestPostProcessor validJwt() {
-        return jwt().authorities(() -> "ROLE_PLAYER")
+    private String createUser(String keycloakId, String username, String email) {
+        UUID userId = UUID.randomUUID();
+        Map<VisibleField, Visibility> visibility = VisibilitySettings.defaultPublic().fieldVisibilities();
+
+        JpaUserEntity user = new JpaUserEntity(
+                userId,
+                keycloakId,
+                username,
+                new JpaProfile(username, "Initial bio", null, null),
+                0,
+                email,
+                visibility
+        );
+        userRepository.save(user);
+        return keycloakId;
+    }
+
+    private JwtRequestPostProcessor validJwt(String subject) {
+        return jwt()
                 .jwt(builder -> builder
-                        .subject(testKeycloakId)
+                        .subject(subject)
                         .claim("preferred_username", "testuser")
-                        .claim("email", testEmail));
+                        .claim("email", testEmail))
+                .authorities(new SimpleGrantedAuthority("ROLE_PLAYER"));
     }
 
     private JwtRequestPostProcessor jwtForUser(String keycloakId) {
@@ -107,32 +113,34 @@ public class RemoveProfileImageIntegrationTests {
         return baos.toByteArray();
     }
 
-    private void uploadTestImage() throws Exception {
+    private void uploadTestImage(String keycloakId) throws Exception {
         MockMultipartFile imageFile = createValidTestImage();
+
         mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(imageFile)
                         .with(request -> {
                             request.setMethod("PUT");
                             return request;
                         })
-                        .with(validJwt())
+                        .with(validJwt(keycloakId))
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isOk());
     }
 
     @Test
     void removeProfileImage_shouldSucceed_whenAuthenticatedAndHasImage() throws Exception {
-        uploadTestImage();
+        String keycloakId = createUser("kc-id1", "testuser", "Test@gmail.com");
+        uploadTestImage(keycloakId);
 
-        Optional<JpaUserEntity> userBefore = userRepository.findByKeycloakId(testKeycloakId);
+        Optional<JpaUserEntity> userBefore = userRepository.findByKeycloakId(keycloakId);
         assertThat(userBefore).isPresent();
         assertThat(userBefore.get().getProfile().getProfileImage()).isNotNull();
 
         mockMvc.perform(delete("/api/platform/users/me/delete/profile-image")
-                        .with(validJwt()))
+                        .with(validJwt(keycloakId)))
                 .andExpect(status().isNoContent());
 
-        Optional<JpaUserEntity> userAfter = userRepository.findByKeycloakId(testKeycloakId);
+        Optional<JpaUserEntity> userAfter = userRepository.findByKeycloakId(keycloakId);
         assertThat(userAfter).isPresent();
         assertThat(userAfter.get().getProfile().getProfileImage()).isNull();
         assertThat(userAfter.get().getProfile().getImageMimeType()).isNull();
@@ -146,41 +154,32 @@ public class RemoveProfileImageIntegrationTests {
 
     @Test
     void removeProfileImage_shouldSucceedEvenWhenNoImageExists() throws Exception {
-        Optional<JpaUserEntity> userBefore = userRepository.findByKeycloakId(testKeycloakId);
+        String keycloakId = createUser("kc-id1", "testuser", "Test@gmail.com");
+        Optional<JpaUserEntity> userBefore = userRepository.findByKeycloakId(keycloakId);
+
         assertThat(userBefore).isPresent();
         assertThat(userBefore.get().getProfile().getProfileImage()).isNull();
 
         mockMvc.perform(delete("/api/platform/users/me/delete/profile-image")
-                        .with(validJwt()))
+                        .with(validJwt(keycloakId)))
                 .andExpect(status().isNoContent());
 
-        Optional<JpaUserEntity> userAfter = userRepository.findByKeycloakId(testKeycloakId);
+        Optional<JpaUserEntity> userAfter = userRepository.findByKeycloakId(keycloakId);
         assertThat(userAfter).isPresent();
         assertThat(userAfter.get().getProfile().getProfileImage()).isNull();
     }
 
     @Test
     void removeProfileImage_shouldOnlyRemoveOwnImage() throws Exception {
-        uploadTestImage();
-
-        String differentKeycloakId = "different-keycloak-id";
-        UUID differentUserId = UUID.randomUUID();
-        JpaUserEntity differentUser = new JpaUserEntity(
-                differentUserId,
-                differentKeycloakId,
-                "differentuser",
-                new JpaProfile("Different User", "", null, null),
-                0,
-                Visibility.PUBLIC,
-                "different@example.com"
-        );
-        userRepository.save(differentUser);
+        String keycloakId1 = createUser("kc-id1", "testuser", "Test1@gmail.com");
+        String keycloakId2 = createUser("kc-id2", "testuser2", "Test2@gmail.com");
+        uploadTestImage(keycloakId1);
 
         mockMvc.perform(delete("/api/platform/users/me/delete/profile-image")
-                        .with(jwtForUser(differentKeycloakId)))
+                        .with(jwtForUser(keycloakId2)))
                 .andExpect(status().isNoContent());
 
-        Optional<JpaUserEntity> originalUser = userRepository.findByKeycloakId(testKeycloakId);
+        Optional<JpaUserEntity> originalUser = userRepository.findByKeycloakId(keycloakId1);
         assertThat(originalUser).isPresent();
         assertThat(originalUser.get().getProfile().getProfileImage()).isNotNull();
     }

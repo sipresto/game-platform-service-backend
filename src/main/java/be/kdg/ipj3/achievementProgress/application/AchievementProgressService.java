@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -119,10 +120,9 @@ public class AchievementProgressService {
                 .orElse(new AchievementProgress(userId, achievementId));
     }
 
-    public List<AchievementProgressDto> findAllAchievementsByKeycloakId(String keycloakId) {
-        var userId = usersApi.findIdByKeycloakId(keycloakId);
-        var userGameIds = usersApi.findOwnedGamesById(userId.id());
-        if (userGameIds.isEmpty()) {
+    public List<AchievementProgressDto> findAllAchievementsByUserId(UUID userId, String viewerKeycloakId) {
+        var userGameIds = usersApi.findOwnedGamesById(userId, viewerKeycloakId);
+        if (userGameIds == null || userGameIds.isEmpty()) {
             return List.of();
         }
 
@@ -135,7 +135,7 @@ public class AchievementProgressService {
 
         for (List<GameAchievementDto> gameAchievementDtos : achievements) {
             for (GameAchievementDto gameAchievementDto : gameAchievementDtos) {
-                var ap = progressRepository.findByUserIdAndAchievementId(userId, gameAchievementDto.achievementId());
+                var ap = progressRepository.findByUserIdAndAchievementId(new UserId(userId), gameAchievementDto.achievementId());
                 if (ap.isPresent()) {
                     var progress = ap.get();
                     achievementProgressDtos.add(new AchievementProgressDto(

@@ -1,9 +1,10 @@
 package be.kdg.ipj3.users.api.dto;
 
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.users.domain.FriendRequest;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
-import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.domain.VisibilitySettings;
 import be.kdg.ipj3.users.shared.UserId;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -18,11 +19,14 @@ public record UserDto(
         @NotBlank String keycloakId,
         @NotBlank String username,
         @Valid @NotNull ProfileDto profile,
-        @NotNull Visibility visibility,
+        @NotNull VisibilitySettings visibilitySettings,
         @NotNull int points,
         List<IncomingFriendRequestDto> incomingFriendRequests,
         List<UUID> friends,
-        List<OutgoingFriendRequestDto> outgoingFriendRequests
+        List<OutgoingFriendRequestDto> outgoingFriendRequests,
+        List<UUID> ownedGames,
+        List<UUID> favoriteGames,
+        @NotBlank String email
 ) {
     public static UserDto fromDomain(User user) {
         return new UserDto(
@@ -30,11 +34,19 @@ public record UserDto(
                 user.getKeycloakId(),
                 user.getUsername(),
                 ProfileDto.fromDomain(user.getProfile()),
-                user.getVisibility(),
+                user.getVisibilitySettings(),
                 user.getPoints(),
-                user.getIncomingFriendRequests().stream().map(IncomingFriendRequestDto::fromDomain).toList(),
-                user.getFriends().stream().map(UserId::id).toList(),
-                user.getOutgoingFriendRequests().stream().map(OutgoingFriendRequestDto::fromDomain).toList()
+                user.getIncomingFriendRequests().stream()
+                        .map(IncomingFriendRequestDto::fromDomain).toList(),
+                user.getFriends().stream()
+                        .map(UserId::id).toList(),
+                user.getOutgoingFriendRequests().stream()
+                        .map(OutgoingFriendRequestDto::fromDomain).toList(),
+                user.getOwnedGames().stream()
+                        .map(GameId::id).toList(),
+                user.getFavoriteGames().stream()
+                        .map(GameId::id).toList(),
+                user.getEmail()
         );
     }
 

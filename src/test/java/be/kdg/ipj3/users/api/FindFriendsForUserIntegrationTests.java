@@ -1,6 +1,8 @@
 package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.domain.VisibleField;
+import be.kdg.ipj3.users.domain.VisibilitySettings;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
@@ -17,6 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -51,14 +54,18 @@ public class FindFriendsForUserIntegrationTests {
 
     private UUID createUserWithFriend(UUID friendId) {
         UUID mainId = UUID.randomUUID();
+
+        Map<VisibleField, Visibility> mainVisibility = VisibilitySettings.defaultPublic().fieldVisibilities();
+        Map<VisibleField, Visibility> friendVisibility = VisibilitySettings.defaultPublic().fieldVisibilities();
+
         JpaUserEntity mainUser = new JpaUserEntity(
                 mainId,
                 "kc-main-" + mainId,
                 "main-user-" + mainId,
                 new JpaProfile("Main", "main bio", null, null),
-                0,
-                Visibility.PUBLIC,
-                "Test@gmail.com"
+                100,
+                "main@gmail.com",
+                mainVisibility
         );
 
         JpaUserEntity friend = new JpaUserEntity(
@@ -66,9 +73,9 @@ public class FindFriendsForUserIntegrationTests {
                 "kc-friend-" + friendId,
                 "friend-user-" + friendId,
                 new JpaProfile("Friend", "friend bio",null, null),
-                0,
-                Visibility.PUBLIC,
-                "Test@gmail.com"
+                50,
+                "friend@gmail.com",
+                friendVisibility
         );
 
         mainUser.getFriends().add(friendId);
@@ -80,7 +87,7 @@ public class FindFriendsForUserIntegrationTests {
     }
 
     @Test
-    void getFriends_shouldReturnFriends_forAuthenticatedUser() throws Exception {
+    void getFriends_shouldReturnFriends_forAuthenticatedUser_withAppropriateVisibility() throws Exception {
         // Arrange
         UUID friendId = UUID.randomUUID();
         UUID mainId = createUserWithFriend(friendId);
@@ -93,7 +100,9 @@ public class FindFriendsForUserIntegrationTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].username").value("friend-user-" + friendId))
-                .andExpect(jsonPath("$[0].id").value(friendId.toString()));
+                .andExpect(jsonPath("$[0].id").value(friendId.toString()))
+                .andExpect(jsonPath("$[0].profile.bio").value("friend bio"))
+                .andExpect(jsonPath("$[0].points").value(50));
     }
 
     @Test

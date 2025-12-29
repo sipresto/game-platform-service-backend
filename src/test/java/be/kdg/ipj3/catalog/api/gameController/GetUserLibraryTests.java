@@ -54,7 +54,7 @@ public class GetUserLibraryTests {
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor validJwt() {
         return jwt().authorities(() -> "ROLE_PLAYER")
                 .jwt(builder -> builder
-                        .subject("keycloakId")
+                        .subject("keycloak-id")
                         .claim("preferred_username", "test-user"));
     }
 
@@ -98,13 +98,13 @@ public class GetUserLibraryTests {
         Game game2 = createTestGame("Game2");
         Game game3 = createTestGame("Game3");
 
-        user2.addGame(game1.getId());
-        user2.addGame(game2.getId());
+        user.addGame(game1.getId());
+        user.addGame(game2.getId());
 
-        userRepository.save(user2);
+        userRepository.save(user);
 
         // Act & Assert
-        mockMvc.perform(get("/api/platform/games/library/user/" + user2.getId().id())
+        mockMvc.perform(get("/api/platform/games/library/user/" + user.getId().id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

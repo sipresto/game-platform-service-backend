@@ -1,6 +1,8 @@
 package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.domain.VisibleField;
+import be.kdg.ipj3.users.domain.VisibilitySettings;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
@@ -19,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.util.Map;
 import java.util.UUID;
 
 import static javax.imageio.ImageIO.write;
@@ -50,14 +53,16 @@ public class GetProfileImageIntegrationTests {
         testUserId = UUID.randomUUID();
         testKeycloakId = "test-keycloak-id-" + UUID.randomUUID();
 
+        Map<VisibleField, Visibility> visibility = VisibilitySettings.defaultPublic().fieldVisibilities();
+
         JpaUserEntity user = new JpaUserEntity(
                 testUserId,
                 testKeycloakId,
                 "testuser",
                 new JpaProfile("Test User", "Test bio", null, null),
                 0,
-                Visibility.PUBLIC,
-                testEmail
+                testEmail,
+                visibility
         );
         userRepository.save(user);
     }
@@ -145,16 +150,20 @@ public class GetProfileImageIntegrationTests {
 
     @Test
     void getProfileImage_shouldReturnImage_whenUserIsOwnerAndProfileIsPrivate() throws Exception {
+        Map<VisibleField, Visibility> privateVisibility = VisibilitySettings.defaultPublic().fieldVisibilities();
+        privateVisibility.put(VisibleField.PROFILE, Visibility.PRIVATE);
+
         JpaUserEntity privateUser = new JpaUserEntity(
                 testUserId,
                 testKeycloakId,
                 "testuser",
                 new JpaProfile("Test User", "Test bio", null, null),
                 0,
-                Visibility.PRIVATE,
-                testEmail
+                testEmail,
+                privateVisibility
         );
         userRepository.save(privateUser);
+
         uploadTestImage();
 
         mockMvc.perform(get("/api/platform/users/profile-image/{userId}", testUserId)

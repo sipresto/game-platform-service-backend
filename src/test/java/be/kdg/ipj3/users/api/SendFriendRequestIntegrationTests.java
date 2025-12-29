@@ -1,6 +1,8 @@
 package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.domain.VisibilitySettings;
+import be.kdg.ipj3.users.domain.VisibleField;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
@@ -15,6 +17,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,9 +39,10 @@ class SendFriendRequestIntegrationTests {
     }
 
     private JpaUserEntity createUser(String keycloakId, String username) {
+        Map<VisibleField, Visibility> visibility = VisibilitySettings.defaultPublic().fieldVisibilities();
         return userRepository.save(new JpaUserEntity(
                 UUID.randomUUID(), keycloakId, username,
-                new JpaProfile(username, "Bio", null, null), 0, Visibility.PUBLIC, "Test@gmail.com"
+                new JpaProfile(username, "Bio", null, null), 0, "Test@gmail.com", visibility
         ));
     }
 
