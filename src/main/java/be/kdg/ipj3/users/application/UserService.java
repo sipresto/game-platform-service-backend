@@ -1,6 +1,7 @@
 package be.kdg.ipj3.users.application;
 
 import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.perks.shared.PerkId;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.shared.EmailUserDto;
@@ -12,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -173,6 +173,44 @@ public class UserService implements UsersApi {
                 .orElseThrow(id::notFound)
                 .getProfile()
                 .displayName();
+    }
+
+    @Override
+    public void purchasePerk(UUID perkIdParam, int pointCost, UserId userId) {
+        User user = findById(userId.id());
+        int availablePoints = user.getPoints();
+
+        if (availablePoints < pointCost) {
+            throw new IllegalArgumentException("Not enough points to purchase this perk");
+        }
+
+        var perkId = new PerkId(perkIdParam);
+        if (user.hasPerk(perkId)) {
+            throw new IllegalArgumentException("User already owns this perk");
+        }
+
+        user.removePoints(pointCost);
+        user.addPerk(perkId);
+
+        userRepository.save(user);
+    }
+
+    public void equipBorder(UserId userId, UUID perkId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        user.equipBorder(new PerkId(perkId)); // Delegates to domain logic in UserCosmetics
+        userRepository.save(user);
+    }
+
+    public void equipTheme(UserId userId, UUID perkId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        user.equipTheme(new PerkId(perkId));
+        userRepository.save(user);
+    }
+
+    public void equipTitle(UserId userId, UUID perkId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        user.equipTitle(new PerkId(perkId));
+        userRepository.save(user);
     }
 
     public void sendFriendRequest(UUID receiver, String loggedInUserKeycloakId) {

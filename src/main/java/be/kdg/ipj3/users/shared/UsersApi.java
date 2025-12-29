@@ -32,4 +32,9 @@ public interface UsersApi {
     String findEmailByUserId(UserId id);
 
     String findDisplayNameById(UserId id);
+
+    void purchasePerk(UUID perkId, int pointCost,UserId userId);
+    void equipTitle(UserId userId, UUID perkId);
+    void equipTheme(UserId userId, UUID perkId);
+    void equipBorder(UserId userId, UUID perkId);
 }

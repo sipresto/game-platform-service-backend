@@ -56,4 +56,8 @@ public class UserCosmetics {
     public PerkId getEquippedTitleId() {
         return equippedTitleId;
     }
+
+    public Set<PerkId> getUnlockedPerkIds() {
+        return unlockedPerkIds;
+    }
 }
