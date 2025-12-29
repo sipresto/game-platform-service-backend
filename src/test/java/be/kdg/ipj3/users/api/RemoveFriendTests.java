@@ -61,6 +61,7 @@ public class RemoveFriendTests {
 
         user1.addFriend(user2.getId());
         user2.addFriend(user1.getId());
+
         userRepository.save(user1);
         userRepository.save(user2);
 
