@@ -33,7 +33,7 @@ public class PerkController {
             @PathVariable UUID perkId) {
         return PerkDto.fromDomain(perkService.findPerkById(perkId));
     }
-    @PostMapping("/perk/purchase/{perkId}")
+    @PostMapping("/purchase/{perkId}")
     public ResponseEntity<Void> buyPerk(
             @PathVariable UUID perkId,
             @AuthenticationPrincipal Jwt jwt) {
