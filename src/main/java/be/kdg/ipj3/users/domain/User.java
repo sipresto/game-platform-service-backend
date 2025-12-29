@@ -7,7 +7,6 @@ import org.jmolecules.ddd.annotation.Identity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @AggregateRoot
 public class User {
@@ -61,44 +60,44 @@ public class User {
                 0, new Profile(keycloakUsername, ""), email);
     }
 
-    public Optional<Integer> getVisiblePoints(User viewer) {
+    public Integer getVisiblePoints(User viewer) {
         if (viewer != null && this.id.equals(viewer.getId())) {
-            return Optional.of(this.points);
+            return this.points;
         }
         if (visibilitySettings.isVisibleTo(VisibleField.POINTS, viewer, this)) {
-            return Optional.of(this.points);
+            return this.points;
         }
-        return Optional.empty();
+        return null;
     }
 
-    public Optional<List<GameId>> getVisibleFavoriteGames(User viewer) {
+    public List<GameId> getVisibleFavoriteGames(User viewer) {
         if (viewer != null && this.id.equals(viewer.getId())) {
-            return Optional.of(new ArrayList<>(this.favoriteGames));
+            return new ArrayList<>(this.favoriteGames);
         }
         if (visibilitySettings.isVisibleTo(VisibleField.FAVORITE_GAMES, viewer, this)) {
-            return Optional.of(new ArrayList<>(this.favoriteGames));
+            return new ArrayList<>(this.favoriteGames);
         }
-        return Optional.empty();
+        return null;
     }
 
-    public Optional<List<GameId>> getVisibleOwnedGames(User viewer) {
+    public List<GameId> getVisibleOwnedGames(User viewer) {
         if (viewer != null && this.id.equals(viewer.getId())) {
-            return Optional.of(new ArrayList<>(this.ownedGames));
+            return new ArrayList<>(this.ownedGames);
         }
         if (visibilitySettings.isVisibleTo(VisibleField.OWNED_GAMES, viewer, this)) {
-            return Optional.of(new ArrayList<>(this.ownedGames));
+            return new ArrayList<>(this.ownedGames);
         }
-        return Optional.empty();
+        return null;
     }
 
-    public Optional<List<UserId>> getVisibleFriends(User viewer) {
+    public List<UserId> getVisibleFriends(User viewer) {
         if (viewer != null && this.id.equals(viewer.getId())) {
-            return Optional.of(new ArrayList<>(this.friends));
+            return new ArrayList<>(this.friends);
         }
         if (visibilitySettings.isVisibleTo(VisibleField.FRIENDS_LIST, viewer, this)) {
-            return Optional.of(new ArrayList<>(this.friends));
+            return new ArrayList<>(this.friends);
         }
-        return Optional.empty();
+        return null;
     }
 
     public Profile getVisibleProfile(User viewer) {

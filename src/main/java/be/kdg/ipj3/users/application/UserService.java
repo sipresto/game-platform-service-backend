@@ -91,8 +91,7 @@ public class UserService implements UsersApi {
         var target = findById(id);
         var viewer = findByKeycloakId(viewerKeycloakId);
 
-        Optional<List<GameId>> visibleOwnedGames = target.getVisibleOwnedGames(viewer);
-        return visibleOwnedGames.orElse(List.of());
+        return target.getVisibleOwnedGames(viewer);
     }
 
     @Transactional(readOnly = true)
