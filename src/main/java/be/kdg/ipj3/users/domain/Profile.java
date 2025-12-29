@@ -23,11 +23,7 @@ public record Profile(
         return profileImage != null && imageMimeType != null;
     }
 
-    public Optional<String> getBio() {
-        return Optional.ofNullable(bio);
-    }
-
-    public Optional<Boolean> getHasProfileImage() {
-        return Optional.of(hasProfileImage());
+    public boolean getHasProfileImage() {
+        return profileImage != null;
     }
 }

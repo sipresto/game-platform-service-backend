@@ -122,7 +122,7 @@ public class AchievementProgressService {
 
     public List<AchievementProgressDto> findAllAchievementsByUserId(UUID userId, String viewerKeycloakId) {
         var userGameIds = usersApi.findOwnedGamesById(userId, viewerKeycloakId);
-        if (userGameIds.isEmpty()) {
+        if (userGameIds == null || userGameIds.isEmpty()) {
             return List.of();
         }
 

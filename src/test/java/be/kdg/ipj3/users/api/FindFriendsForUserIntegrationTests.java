@@ -87,7 +87,7 @@ public class FindFriendsForUserIntegrationTests {
     }
 
     @Test
-    void getFriends_shouldReturnFriends_forAuthenticatedUser() throws Exception {
+    void getFriends_shouldReturnFriends_forAuthenticatedUser_withAppropriateVisibility() throws Exception {
         // Arrange
         UUID friendId = UUID.randomUUID();
         UUID mainId = createUserWithFriend(friendId);

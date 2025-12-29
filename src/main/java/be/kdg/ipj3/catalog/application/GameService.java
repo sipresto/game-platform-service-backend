@@ -113,6 +113,9 @@ public class GameService implements GamesApi {
     public List<Game> findOwnedGamesByKeycloakId(String keycloakId) {
         UserId userId = usersApi.findIdByKeycloakId(keycloakId);
         List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id(), keycloakId);
+        if(ownedGameIds == null || ownedGameIds.isEmpty()) {
+            return List.of();
+        }
         return gameRepository.findGamesByIds(ownedGameIds);
     }
 
@@ -122,6 +125,9 @@ public class GameService implements GamesApi {
             throw new UserNotFoundException(userId.id().toString());
         }
         List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id(), keycloakid);
+        if(ownedGameIds == null || ownedGameIds.isEmpty()) {
+            return List.of();
+        }
         return gameRepository.findGamesByIds(ownedGameIds);
     }
 
