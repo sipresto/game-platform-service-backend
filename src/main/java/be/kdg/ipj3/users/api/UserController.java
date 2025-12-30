@@ -114,7 +114,7 @@ public class UserController {
         List<User> users = userService.findAllPublicUsers();
         User viewer = userService.findByKeycloakId(jwt.getSubject());
         var userDtos = users.stream()
-                .filter(user -> !viewer.getBlockedUsers().contains(user.getId()))
+                .filter(user -> !user.getBlockedUsers().contains(viewer.getId()))
                 .map(user -> PublicUserDto.fromDomain(user, viewer))
                 .toList();
         return ResponseEntity.ok(userDtos);
@@ -144,7 +144,7 @@ public class UserController {
         User targetUser = userService.findById(userId);
         var viewer = userService.findByKeycloakId(jwt.getSubject());
 
-        if(viewer.getBlockedUsers().contains(targetUser.getId())) {
+        if(targetUser.getBlockedUsers().contains(viewer.getId())) {
             return ResponseEntity.ok(null);
         }
 
