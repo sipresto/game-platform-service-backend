@@ -15,14 +15,19 @@ public enum NotificationType {
     ACHIEVEMENT(true, false) {
         @Override
         public boolean isDuplicate(Notification a, Notification b) {
+            return a.getDescription().equals(b.getDescription());
+        }
+    },
+    CHAT_MESSAGE(true, false) {
+        @Override
+        public boolean isDuplicate(Notification a, Notification b) {
             return a.getTitle().equals(b.getTitle());
         }
     },
-    CHAT_MESSAGE(true, false),
     YOUR_TURN(true, false) {
         @Override
         public boolean isDuplicate(Notification a, Notification b) {
-            return a.getType() == b.getType();
+            return a.getDescription().equals(b.getDescription());
         }
     };
 
