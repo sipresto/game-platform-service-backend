@@ -1,11 +1,10 @@
 package be.kdg.ipj3.users.api;
 
-import be.kdg.ipj3.users.domain.Visibility;
-import be.kdg.ipj3.users.domain.VisibleField;
-import be.kdg.ipj3.users.domain.VisibilitySettings;
+import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,7 +40,7 @@ public class GetProfileImageIntegrationTests {
     private MockMvc mockMvc;
 
     @Autowired
-    private JpaUserRepository userRepository;
+    private UserRepository userRepository;
 
     private UUID testUserId;
     private String testKeycloakId;
@@ -53,16 +53,16 @@ public class GetProfileImageIntegrationTests {
         testUserId = UUID.randomUUID();
         testKeycloakId = "test-keycloak-id-" + UUID.randomUUID();
 
-        Map<VisibleField, Visibility> visibility = VisibilitySettings.defaultPublic().fieldVisibilities();
-
-        JpaUserEntity user = new JpaUserEntity(
-                testUserId,
+        User user = new User(
+                new UserId(testUserId),
                 testKeycloakId,
                 "testuser",
-                new JpaProfile("Test User", "Test bio", null, null),
+                List.of(),
+                List.of(),
                 0,
-                testEmail,
-                visibility
+                new Profile("Test User", "Test bio", null, null),
+                VisibilitySettings.defaultPublic(),
+                testEmail
         );
         userRepository.save(user);
     }
@@ -152,15 +152,17 @@ public class GetProfileImageIntegrationTests {
     void getProfileImage_shouldReturnImage_whenUserIsOwnerAndProfileIsPrivate() throws Exception {
         Map<VisibleField, Visibility> privateVisibility = VisibilitySettings.defaultPublic().fieldVisibilities();
         privateVisibility.put(VisibleField.PROFILE, Visibility.PRIVATE);
-
-        JpaUserEntity privateUser = new JpaUserEntity(
-                testUserId,
+        var privateVisibilitySettings = new VisibilitySettings(privateVisibility);
+        User privateUser = new User(
+                new UserId(testUserId),
                 testKeycloakId,
                 "testuser",
-                new JpaProfile("Test User", "Test bio", null, null),
+                List.of(),
+                List.of(),
                 0,
-                testEmail,
-                privateVisibility
+                new Profile("Test User", "Test bio", null, null),
+                privateVisibilitySettings,
+                testEmail
         );
         userRepository.save(privateUser);
 

@@ -1,7 +1,5 @@
 package be.kdg.ipj3.users.domain;
 
-import java.util.Optional;
-
 public record Profile(
         String displayName,
         String bio,

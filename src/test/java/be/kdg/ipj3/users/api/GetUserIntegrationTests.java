@@ -1,11 +1,7 @@
 package be.kdg.ipj3.users.api;
 
-import be.kdg.ipj3.users.domain.Visibility;
-import be.kdg.ipj3.users.domain.VisibleField;
-import be.kdg.ipj3.users.domain.VisibilitySettings;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
+import be.kdg.ipj3.users.domain.*;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +13,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,13 +24,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
-public class FindUserIntegrationTests {
+public class GetUserIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private JpaUserRepository userRepository;
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -50,16 +47,17 @@ public class FindUserIntegrationTests {
 
     private UUID createUser(String keycloakId, String username) {
         UUID userId = UUID.randomUUID();
-        Map<VisibleField, Visibility> visibility = VisibilitySettings.defaultPublic().fieldVisibilities();
 
-        JpaUserEntity userEntity = new JpaUserEntity(
-                userId,
+        User userEntity = new User(
+                new UserId(userId),
                 keycloakId,
                 username,
-                new JpaProfile(username, "Test bio", null, null),
+                List.of(),
+                List.of(),
                 100,
-                "Test@gmail.com",
-                visibility
+                new Profile(username, "Test bio", null, null),
+                VisibilitySettings.defaultPublic(),
+                "Test@gmail.com"
         );
         userRepository.save(userEntity);
         return userId;
@@ -117,20 +115,22 @@ public class FindUserIntegrationTests {
         String friendKeycloakId = "friend-keycloak";
         String keycloakId = "test-keycloak-id";
         String username = "testuser";
-        UUID userId = createUser(keycloakId, username);
+        createUser(keycloakId, username);
 
         Map<VisibleField, Visibility> privateVisibility = VisibilitySettings.defaultPublic().fieldVisibilities();
         privateVisibility.put(VisibleField.PROFILE, Visibility.PRIVATE);
         privateVisibility.put(VisibleField.POINTS, Visibility.PRIVATE);
-
-        JpaUserEntity friend = new JpaUserEntity(
-                friendId,
+        var privateVisibilitySettings = new VisibilitySettings(privateVisibility);
+        User friend = new User(
+                new UserId(friendId),
                 friendKeycloakId,
                 "friend",
-                new JpaProfile("Friend", "Private bio", null, null),
+                List.of(),
+                List.of(),
                 200,
-                "friend@example.com",
-                privateVisibility
+                new Profile("Friend", "Private bio", null, null),
+                privateVisibilitySettings,
+                "friend@example.com"
         );
         userRepository.save(friend);
 

@@ -1,5 +1,6 @@
 package be.kdg.ipj3.users.api;
 
+import be.kdg.ipj3.users.api.dto.BlockedUserDto;
 import be.kdg.ipj3.users.api.dto.PublicUserDto;
 import be.kdg.ipj3.users.api.dto.UserDto;
 import be.kdg.ipj3.users.application.ProfileImageService;
@@ -73,9 +74,7 @@ public class UserController {
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody Visibility visibility
     ) {
-        String keycloakId = jwt.getSubject();
-        User user = userService.findByKeycloakId(keycloakId);
-        userService.updatePrivacySettingsByKeycloakId(visibility, user);
+        userService.updatePrivacySettingsByKeycloakId(visibility, jwt.getSubject());
         return ResponseEntity.ok().build();
     }
 
@@ -109,12 +108,13 @@ public class UserController {
      * Unsecured endpoint that gets all users with visibility-aware data
      */
     @GetMapping
-    public ResponseEntity<List<PublicUserDto>> findAllUsers(
+    public ResponseEntity<List<PublicUserDto>> getAllUsers(
             @AuthenticationPrincipal Jwt jwt
     ) {
         List<User> users = userService.findAllPublicUsers();
         User viewer = userService.findByKeycloakId(jwt.getSubject());
         var userDtos = users.stream()
+                .filter(user -> !viewer.getBlockedUsers().contains(user.getId()))
                 .map(user -> PublicUserDto.fromDomain(user, viewer))
                 .toList();
         return ResponseEntity.ok(userDtos);
@@ -124,7 +124,7 @@ public class UserController {
      * Gets friends of current user
      */
     @GetMapping("/friends")
-    public ResponseEntity<List<PublicUserDto>> findFriendsForUser(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<List<PublicUserDto>> getFriendsForUser(@AuthenticationPrincipal Jwt jwt) {
         var user = userService.findByKeycloakId(jwt.getSubject());
         var friends = userService.findFriends(user);
         var friendDtos = friends.stream()
@@ -137,12 +137,16 @@ public class UserController {
      * Gets a user by their ID with visibility-aware data
      */
     @GetMapping("/{userId}")
-    public ResponseEntity<PublicUserDto> findUserById(
+    public ResponseEntity<PublicUserDto> getUserById(
             @PathVariable UUID userId,
             @AuthenticationPrincipal Jwt jwt
     ) {
         User targetUser = userService.findById(userId);
         var viewer = userService.findByKeycloakId(jwt.getSubject());
+
+        if(viewer.getBlockedUsers().contains(targetUser.getId())) {
+            return ResponseEntity.ok(null);
+        }
 
         return ResponseEntity.ok(PublicUserDto.fromDomain(targetUser, viewer));
     }
@@ -154,8 +158,7 @@ public class UserController {
     public ResponseEntity<Void> uploadProfileImage(
             @AuthenticationPrincipal Jwt jwt,
             @RequestParam("image") MultipartFile file) throws IOException {
-        String keycloakId = jwt.getSubject();
-        profileImageService.updateProfileImage(keycloakId, file);
+        profileImageService.updateProfileImage(jwt.getSubject(), file);
 
         return ResponseEntity.ok().build();
     }
@@ -184,8 +187,7 @@ public class UserController {
      */
     @DeleteMapping("/me/delete/profile-image")
     public ResponseEntity<Void> removeProfileImage(@AuthenticationPrincipal Jwt jwt) {
-        String keycloakId = jwt.getSubject();
-        profileImageService.removeProfileImage(keycloakId);
+        profileImageService.removeProfileImage(jwt.getSubject());
 
         return ResponseEntity.noContent().build();
     }
@@ -210,8 +212,7 @@ public class UserController {
             @PathVariable UUID senderId,
             @AuthenticationPrincipal Jwt jwt
     ) {
-        var receiverId = userService.findIdByKeycloakId(jwt.getSubject());
-        userService.acceptFriendRequest(receiverId.id(), senderId);
+        userService.acceptFriendRequest(jwt.getSubject(), senderId);
         return ResponseEntity.noContent().build();
     }
 
@@ -223,8 +224,42 @@ public class UserController {
             @PathVariable UUID senderId,
             @AuthenticationPrincipal Jwt jwt
     ) {
-        var receiverId = userService.findIdByKeycloakId(jwt.getSubject());
-        userService.rejectFriendRequest(receiverId.id(), senderId);
+        userService.rejectFriendRequest(jwt.getSubject(), senderId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{friendId}/remove")
+    public ResponseEntity<Void> removeFriends(
+            @PathVariable UUID friendId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        userService.removeFriend(jwt.getSubject(), friendId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{blockId}/block")
+    public ResponseEntity<Void> blockUser(
+            @PathVariable UUID blockId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        userService.blockUser(jwt.getSubject(), blockId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{unblockId}/unblock")
+    public ResponseEntity<Void> unblockUser(
+            @PathVariable UUID unblockId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        userService.unblockUser(jwt.getSubject(), unblockId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/blocked")
+    public ResponseEntity<List<BlockedUserDto>> getBlockedUsers(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        var friends = userService.findBlockedUsers(jwt.getSubject()).stream().map(BlockedUserDto::fromDomain).toList();
+        return ResponseEntity.ok(friends);
     }
 }

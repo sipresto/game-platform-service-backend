@@ -91,7 +91,9 @@ public class ChatService {
                 });
 
         String chatName = buildChatName(participantIds, currentUser);
-
+        if (usersApi.checkBlock(participantIds)) {
+            throw new InvalidChatRequestException("One of the users has blocked another user in this chat");
+        }
         var usernames = chat.getParticipants().stream()
                 .collect(Collectors.toMap(
                         userId -> userId,

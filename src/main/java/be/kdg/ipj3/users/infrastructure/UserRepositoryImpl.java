@@ -79,4 +79,10 @@ public class UserRepositoryImpl implements UserRepository {
     public boolean existsById(UserId id) {
         return jpaUserRepository.existsById(id.id());
     }
+
+    @Override
+    public List<User> findBlockedUsers(UserId id) {
+        var blockedUsers = jpaUserRepository.findBlockedUsers(id.id());
+        return blockedUsers.stream().map(JpaUserEntity::toDomain).toList();
+    }
 }

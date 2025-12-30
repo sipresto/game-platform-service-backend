@@ -7,6 +7,7 @@ import org.jmolecules.ddd.annotation.Identity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @AggregateRoot
 public class User {
@@ -23,6 +24,7 @@ public class User {
     private final String email;
     private final List<FriendRequest> incomingFriendRequests;
     private final List<FriendRequest> outgoingFriendRequests;
+    private final List<UserId> blockedUsers;
 
     public User(UserId id, String keycloakId, String username, List<GameId> ownedGames,
                 List<GameId> favoriteGames, int points, Profile profile,
@@ -39,6 +41,7 @@ public class User {
         this.email = email;
         this.incomingFriendRequests = new ArrayList<>();
         this.outgoingFriendRequests = new ArrayList<>();
+        this.blockedUsers = new ArrayList<>();
     }
 
     public User(UserId id, String keycloakId, String username, Profile profile, int points, String email) {
@@ -273,5 +276,34 @@ public class User {
 
     public List<FriendRequest> getOutgoingFriendRequests() {
         return new ArrayList<>(outgoingFriendRequests);
+    }
+
+    public void removeFriend(UserId id) {
+        if (!friends.contains(id)) {
+            throw new IllegalArgumentException("You aren't friends with this user");
+        }
+        else {
+            friends.remove(id);
+        }
+    }
+
+    public List<UserId> getBlockedUsers() {
+        return new ArrayList<>(blockedUsers);
+    }
+
+    public void block(UserId userId) {
+        if (friends.contains(userId)) {
+            removeFriend(userId);
+        }
+        blockedUsers.add(userId);
+    }
+
+    public void unblock(UserId unblockId) {
+        if (blockedUsers.contains(unblockId)) {
+            blockedUsers.remove(unblockId);
+        }
+        else {
+            throw new IllegalArgumentException("This user is not blocked");
+        }
     }
 }

@@ -85,6 +85,14 @@ public class JpaUserEntity {
     @Enumerated(EnumType.STRING)
     private Map<VisibleField, Visibility> visibilitySettings = new HashMap<>();
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "blocked_users",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "blocked_user_id")
+    private final List<UUID> blockedUsers = new ArrayList<>();
+
     protected JpaUserEntity() {
     } // for JPA
 
@@ -132,6 +140,10 @@ public class JpaUserEntity {
                 .map(JpaFriendRequest::fromDomain)
                 .forEach(jpaUserEntity.outgoingFriendRequests::add);
 
+        user.getBlockedUsers().stream()
+                .map(UserId::id)
+                .forEach(jpaUserEntity::addBlockedUser);
+
         return jpaUserEntity;
     }
 
@@ -170,6 +182,10 @@ public class JpaUserEntity {
                 .map(JpaFriendRequest::toDomain)
                 .forEach(user::addOutgoingFriendRequest);
 
+        blockedUsers.stream()
+                .map(UserId::new)
+                .forEach(user::block);
+
         return user;
     }
 
@@ -183,6 +199,10 @@ public class JpaUserEntity {
 
     private void addFriend(UUID friendId) {
         this.friends.add(friendId);
+    }
+
+    private void addBlockedUser(UUID blockedUserId) {
+        this.blockedUsers.add(blockedUserId);
     }
 
     public UUID getId() {

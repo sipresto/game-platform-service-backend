@@ -1,11 +1,7 @@
 package be.kdg.ipj3.users.api;
 
-import be.kdg.ipj3.users.domain.Visibility;
-import be.kdg.ipj3.users.domain.VisibleField;
-import be.kdg.ipj3.users.domain.VisibilitySettings;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
+import be.kdg.ipj3.users.domain.*;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +15,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -31,13 +27,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @TestPropertySource("classpath:application-test.properties")
-public class FindFriendsForUserIntegrationTests {
+public class GetFriendsForUserIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private JpaUserRepository userRepository;
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -55,31 +51,32 @@ public class FindFriendsForUserIntegrationTests {
     private UUID createUserWithFriend(UUID friendId) {
         UUID mainId = UUID.randomUUID();
 
-        Map<VisibleField, Visibility> mainVisibility = VisibilitySettings.defaultPublic().fieldVisibilities();
-        Map<VisibleField, Visibility> friendVisibility = VisibilitySettings.defaultPublic().fieldVisibilities();
-
-        JpaUserEntity mainUser = new JpaUserEntity(
-                mainId,
+        User mainUser = new User(
+                new UserId(mainId),
                 "kc-main-" + mainId,
                 "main-user-" + mainId,
-                new JpaProfile("Main", "main bio", null, null),
+                List.of(),
+                List.of(),
                 100,
-                "main@gmail.com",
-                mainVisibility
+                new Profile("Main", "main bio", null, null),
+                VisibilitySettings.defaultPublic(),
+                "main@gmail.com"
         );
 
-        JpaUserEntity friend = new JpaUserEntity(
-                friendId,
+        User friend = new User(
+                new UserId(friendId),
                 "kc-friend-" + friendId,
                 "friend-user-" + friendId,
-                new JpaProfile("Friend", "friend bio",null, null),
+                List.of(),
+                List.of(),
                 50,
-                "friend@gmail.com",
-                friendVisibility
+                new Profile("Friend", "friend bio",null, null),
+                VisibilitySettings.defaultPublic(),
+                "friend@gmail.com"
         );
 
-        mainUser.getFriends().add(friendId);
-
+        mainUser.addFriend(friend.getId());
+        friend.addFriend(mainUser.getId());
         userRepository.save(friend);
         userRepository.save(mainUser);
 

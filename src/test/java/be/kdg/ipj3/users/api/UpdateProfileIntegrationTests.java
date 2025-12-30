@@ -1,12 +1,11 @@
 package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.users.api.dto.UserDto;
-import be.kdg.ipj3.users.domain.Visibility;
-import be.kdg.ipj3.users.domain.VisibilitySettings;
-import be.kdg.ipj3.users.domain.VisibleField;
+import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
 import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
+import be.kdg.ipj3.users.shared.UserId;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,7 +40,7 @@ public class UpdateProfileIntegrationTests {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private JpaUserRepository userRepository;
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -59,14 +59,16 @@ public class UpdateProfileIntegrationTests {
         UUID userId = UUID.randomUUID();
         Map<VisibleField, Visibility> visibility = VisibilitySettings.defaultPublic().fieldVisibilities();
 
-        JpaUserEntity user = new JpaUserEntity(
-                userId,
+        User user = new User(
+                new UserId(userId),
                 keycloakId,
                 username,
-                new JpaProfile(username, "Initial bio", null, null),
+                List.of(),
+                List.of(),
                 0,
-                "Test@gmail.com",
-                visibility
+                new Profile(username, "Initial bio", null, null),
+                VisibilitySettings.defaultPublic(),
+                "Test@gmail.com"
         );
         userRepository.save(user);
         return keycloakId;
@@ -83,14 +85,14 @@ public class UpdateProfileIntegrationTests {
                         .content(objectMapper.writeValueAsString(profileDto)))
                 .andExpect(status().isOk());
 
-        Optional<JpaUserEntity> opt = userRepository.findByKeycloakId(keycloakId);
-        JpaUserEntity updated = opt.orElseThrow(
+        Optional<User> opt = userRepository.findByKeycloakId(keycloakId);
+        User updated = opt.orElseThrow(
                 () -> new AssertionError("User not found in database after profile update")
         );
 
-        assertThat(updated.getProfile().toDomain().displayName())
+        assertThat(updated.getProfile().displayName())
                 .isEqualTo("Updated Display Name");
-        assertThat(updated.getProfile().toDomain().bio())
+        assertThat(updated.getProfile().bio())
                 .isEqualTo("Updated bio");
     }
 

@@ -1,11 +1,7 @@
 package be.kdg.ipj3.users.api;
 
-import be.kdg.ipj3.users.domain.Visibility;
-import be.kdg.ipj3.users.domain.VisibleField;
-import be.kdg.ipj3.users.domain.VisibilitySettings;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
+import be.kdg.ipj3.users.domain.*;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +13,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,13 +25,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
-public class FindAllPublicUsersIntegrationTests {
+public class GetAllPublicUsersIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private JpaUserRepository userRepository;
+    private UserRepository userRepository;
 
     private JwtRequestPostProcessor validJwt(String subject, String preferredUsername) {
         return jwt()
@@ -58,24 +55,31 @@ public class FindAllPublicUsersIntegrationTests {
         privateVisibility.put(VisibleField.OWNED_GAMES, Visibility.PRIVATE);
         privateVisibility.put(VisibleField.FRIENDS_LIST, Visibility.PRIVATE);
 
-        JpaUserEntity publicUser = new JpaUserEntity(
-                UUID.randomUUID(),
+        var publicVisibilitySettings = new VisibilitySettings(publicVisibility);
+        var privateVisibilitySettings = new VisibilitySettings(privateVisibility);
+
+        User publicUser = new User(
+                new UserId(UUID.randomUUID()),
                 "kc-public",
                 "public-user",
-                new JpaProfile("Public", "I am public", null, null),
+                List.of(),
+                List.of(),
                 100,
-                "public@gmail.com",
-                publicVisibility
+                new Profile("Public", "I am public", null, null),
+                publicVisibilitySettings,
+                "public@gmail.com"
         );
 
-        JpaUserEntity privateUser = new JpaUserEntity(
-                UUID.randomUUID(),
+        User privateUser = new User(
+                new UserId(UUID.randomUUID()),
                 "kc-private",
                 "private-user",
-                new JpaProfile("Private", "I am private", null, null),
+                List.of(),
+                List.of(),
                 50,
-                "private@gmail.com",
-                privateVisibility
+                new Profile("Private", "I am private", null, null),
+                privateVisibilitySettings,
+                "private@gmail.com"
         );
 
         userRepository.save(publicUser);
