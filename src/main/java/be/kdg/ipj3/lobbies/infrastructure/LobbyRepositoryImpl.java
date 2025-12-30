@@ -63,4 +63,9 @@ public class LobbyRepositoryImpl implements LobbyRepository {
     public void deleteAll() {
         jpaLobbyRepository.deleteAll();
     }
+
+    @Override
+    public void deleteById(LobbyId lobbyId) {
+        jpaLobbyRepository.deleteById(lobbyId.id());
+    }
 }

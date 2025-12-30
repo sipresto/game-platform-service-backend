@@ -167,7 +167,12 @@ public class LobbyService implements LobbyApi {
         Lobby lobby = lobbyRepository.findById(lobbyId)
                 .orElseThrow(lobbyId::notFound);
 
-        lobby.leave(playerId);
-        lobbyRepository.save(lobby);
+        boolean readyToDelete = lobby.leave(playerId);
+        if(readyToDelete){
+            lobbyRepository.deleteById(lobby.getId());
+        }
+        else{
+            lobbyRepository.save(lobby);
+        }
     }
 }

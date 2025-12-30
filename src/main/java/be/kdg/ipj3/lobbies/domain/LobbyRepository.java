@@ -23,4 +23,6 @@ public interface LobbyRepository {
     void deleteLobbyByGameId(UUID gameId);
 
     void deleteAll();
+
+    void deleteById(LobbyId lobbyId);
 }

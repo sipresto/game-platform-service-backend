@@ -54,14 +54,16 @@ public class Lobby {
         players.add(player);
     }
 
-    public void leave(UserId player) {
+    public boolean leave(UserId player) {
         players.remove(player);
 
         if (players.isEmpty()) {
-            this.status = LobbyStatus.CLOSED;
+            return true;
         } else if (host.equals(player)) {
             host = players.getFirst();
+            return false;
         }
+        return false;
     }
 
     public void validateReadyToStart(UserId requestor) {

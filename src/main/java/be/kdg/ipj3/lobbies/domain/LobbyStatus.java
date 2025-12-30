@@ -4,5 +4,4 @@ public enum LobbyStatus {
     OPEN,
     STARTING,
     IN_GAME,
-    CLOSED
 }
