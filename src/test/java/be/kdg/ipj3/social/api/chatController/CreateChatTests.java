@@ -58,25 +58,44 @@ public class CreateChatTests {
                 .claim("preferred_username", "test-user"));
     }
 
-    private UserId createTestUser1() {
+    private User createTestUser1() {
         User user = User.createFromKeycloak("keycloak-id", "test-user", "test@gmail.com");
         userRepository.save(user);
-        return user.getId();
+        return user;
     }
 
-    private UserId createTestUser2() {
+    private User createTestUser2() {
         User user = User.createFromKeycloak("keycloak-id-2", "test-user-2", "test2@gmail.com");
         userRepository.save(user);
-        return user.getId();
+        return user;
+    }
+
+    @Test
+    void createChat_shouldFail_whenUserIsBlocked() throws Exception {
+        // Arrange
+        User user1 = createTestUser1();
+        User user2 = createTestUser2();
+
+        user1.block(user2.getId());
+        userRepository.save(user1);
+
+        CreateChatDto dto = new CreateChatDto(Set.of(user2.getId().id()));
+
+        // Act
+        mockMvc.perform(post("/api/platform/chats")
+                        .with(validJwt())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     void createChat_shouldReturnChatDto_whenValidRequest() throws Exception {
         // Arrange
-        UserId userId1 = createTestUser1();
-        UserId userId2 = createTestUser2();
+        User user1 = createTestUser1();
+        User user2 = createTestUser2();
 
-        CreateChatDto dto = new CreateChatDto(Set.of(userId2.id()));
+        CreateChatDto dto = new CreateChatDto(Set.of(user2.getId().id()));
 
         // Act
         var result = mockMvc.perform(post("/api/platform/chats")
@@ -87,8 +106,8 @@ public class CreateChatTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.participants[*].id",
                         containsInAnyOrder(
-                                userId1.id().toString(),
-                                userId2.id().toString()
+                                user1.getId().id().toString(),
+                                user2.getId().id().toString()
                         )))
                 .andReturn();
 
@@ -101,16 +120,16 @@ public class CreateChatTests {
         assertThat(optionalChat).isPresent();
 
         Chat chat = optionalChat.get();
-        assertThat(chat.getParticipants()).contains(userId1, userId2);
+        assertThat(chat.getParticipants()).contains(user1.getId(), user2.getId());
     }
 
     @Test
     void createChat_shouldReturnUnauthorized_whenUserNotLoggedIn() throws Exception {
         // Arrange
-        UserId userId1 = createTestUser1();
-        UserId userId2 = createTestUser2();
+        User user1 = createTestUser1();
+        User user2 = createTestUser2();
 
-        CreateChatDto dto = new CreateChatDto(Set.of(userId2.id()));
+        CreateChatDto dto = new CreateChatDto(Set.of(user2.getId().id()));
 
         // Act & Assert
         mockMvc.perform(post("/api/platform/chats")
@@ -122,7 +141,7 @@ public class CreateChatTests {
     @Test
     void createChat_shouldReturnBadRequest_whenInvalidParticipant() throws Exception {
         // Arrange
-        UserId userId1 = createTestUser1();
+        User user1 = createTestUser1();
         UserId userId2 = UserId.create();
 
         CreateChatDto dto = new CreateChatDto(Set.of(userId2.id()));
@@ -138,13 +157,13 @@ public class CreateChatTests {
     @Test
     void createChat_shouldReturnExistingChat_whenChatExists() throws Exception {
         // Arrange
-        UserId userId1 = createTestUser1();
-        UserId userId2 = createTestUser2();
+        User user1 = createTestUser1();
+        User user2 = createTestUser2();
 
-        Chat chat = new Chat(null, Set.of(userId1, userId2));
+        Chat chat = new Chat(null, Set.of(user1.getId(), user2.getId()));
         chatRepository.save(chat);
 
-        CreateChatDto dto = new CreateChatDto(Set.of(userId2.id()));
+        CreateChatDto dto = new CreateChatDto(Set.of(user2.getId().id()));
 
         // Act & Assert
         mockMvc.perform(post("/api/platform/chats")
@@ -155,8 +174,8 @@ public class CreateChatTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.participants[*].id",
                         containsInAnyOrder(
-                                userId1.id().toString(),
-                                userId2.id().toString()
+                                user1.getId().id().toString(),
+                                user2.getId().id().toString()
                         )))
                 .andExpect(jsonPath("$.id").value(chat.getId().id().toString()));
     }

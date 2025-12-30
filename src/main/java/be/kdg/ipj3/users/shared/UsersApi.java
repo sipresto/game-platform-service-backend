@@ -4,6 +4,7 @@ import be.kdg.ipj3.catalog.shared.GameId;
 import org.springframework.modulith.NamedInterface;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @NamedInterface
@@ -32,6 +33,8 @@ public interface UsersApi {
     String findEmailByUserId(UserId id);
 
     String findDisplayNameById(UserId id);
+
+    boolean checkBlock(Set<UserId> participantIds);
 
     void purchasePerk(UUID perkId, int pointCost,UserId userId);
     void equipTitle(UserId userId, UUID perkId);

@@ -49,4 +49,17 @@ public interface JpaUserRepository extends JpaRepository<JpaUserEntity, UUID> {
             """
     )
     List<JpaUserEntity> findFriends(@Param("userId") UUID userId);
+
+    @Query("""
+            SELECT ue
+            FROM JpaUserEntity ue
+            WHERE ue.id IN (
+                SELECT b
+                FROM JpaUserEntity u
+                JOIN u.blockedUsers b
+                WHERE u.id = :userId
+            )
+            """
+    )
+    List<JpaUserEntity> findBlockedUsers(UUID userId);
 }

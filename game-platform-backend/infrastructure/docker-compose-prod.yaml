@@ -218,6 +218,62 @@ services:
       - tictactoe_frontend
       - quoridor_frontend
       - idp-keycloak
+      - app_chessgame_back
+      - app_chessgame_front
+
+  # ---------------------
+  # Chess B and F
+  # ---------------------
+  app_chessgame_front:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/demo-content/chessgame/front:latest
+    pull_policy: always
+    ports:
+      - '3333:80'
+    networks:
+      - prod
+    depends_on:
+      - app_chessgame_back
+      - app_rabbitmq
+      - app_postgres
+
+  app_chessgame_back:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/demo-content/chessgame/back:latest
+    pull_policy: always
+    ports:
+      - '8080:8080'
+    networks:
+      - prod
+    depends_on:
+      - app_postgres
+      - app_rabbitmq
+    environment:
+      - GAME_REGISTRATION_ID=8496c496-a884-48ed-9bb3-7c3aa50fb8ca
+      - DATASOURCE_URL=jdbc:postgresql://app_postgres:5432/platformdb?currentSchema=acl
+      - DATASOURCE_USER=platform
+      - DATASOURCE_PASSWORD=platformSecretPassword
+      - RABBIT_HOST=app_rabbitmq
+      - RABBIT_PORT=5672
+      - RABBIT_USER=user
+      - RABBIT_PASSWORD=password
+
+  # ---------------------
+  # ACL
+  # ---------------------
+  acl:
+    build:
+      context: ../../../acl
+      dockerfile: Dockerfile
+    ports:
+      - "8099:8099"
+    depends_on:
+      - app_postgres
+      - app_rabbitmq
+      - platform_backend
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    networks:
+      - prod
+    restart: "no"
 
 networks:
   prod:
