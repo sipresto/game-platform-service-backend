@@ -60,7 +60,7 @@ public class GetBlockedUsersTests {
         User user1 = createUser("user1", "user1");
         User user2 = createUser("user2", "user2");
 
-        user1.blockUser(user2.getId());
+        user1.block(user2.getId());
         userRepository.save(user1);
 
         mockMvc.perform(get("/api/platform/users/blocked")

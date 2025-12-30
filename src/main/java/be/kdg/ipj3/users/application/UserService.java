@@ -10,9 +10,7 @@ import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional
@@ -175,6 +173,17 @@ public class UserService implements UsersApi {
                 .displayName();
     }
 
+    @Override
+    public boolean checkBlock(Set<UserId> participantIds) {
+        return participantIds.stream()
+                .map(userRepository::findById)
+                .flatMap(Optional::stream)
+                .anyMatch(user ->
+                        user.getBlockedUsers().stream()
+                                .anyMatch(participantIds::contains)
+                );
+    }
+
     public void sendFriendRequest(UUID receiver, String loggedInUserKeycloakId) {
         User receiverUser = findById(receiver);
         User senderUser = findByKeycloakId(loggedInUserKeycloakId);
@@ -222,14 +231,25 @@ public class UserService implements UsersApi {
             throw new IllegalArgumentException("You can't block yourself");
         }
         User blockUser = findById(blockId);
-        user.blockUser(blockUser.getId());
-        blockUser.blockUser(user.getId());
+        user.block(blockUser.getId());
+        if(blockUser.getFriends().contains(user.getId())) {
+            blockUser.removeFriend(user.getId());
+            userRepository.save(blockUser);
+        }
         userRepository.save(user);
-        userRepository.save(blockUser);
     }
 
     public List<User> findBlockedUsers(String keycloakId) {
         User user = findByKeycloakId(keycloakId);
         return new ArrayList<>(userRepository.findBlockedUsers(user.getId()));
+    }
+
+    public void unblockUser(String keycloakId, UUID unblockId) {
+        User user = findByKeycloakId(keycloakId);
+        if (user.getId().id().equals(unblockId)) {
+            throw new IllegalArgumentException("You can't unblock yourself");
+        }
+        user.unblock(new UserId(unblockId));
+        userRepository.save(user);
     }
 }

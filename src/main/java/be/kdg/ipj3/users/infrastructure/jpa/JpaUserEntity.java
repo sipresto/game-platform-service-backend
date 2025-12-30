@@ -184,7 +184,7 @@ public class JpaUserEntity {
 
         blockedUsers.stream()
                 .map(UserId::new)
-                .forEach(user::blockUser);
+                .forEach(user::block);
 
         return user;
     }

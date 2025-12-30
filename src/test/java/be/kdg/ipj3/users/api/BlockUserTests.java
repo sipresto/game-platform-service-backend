@@ -55,11 +55,11 @@ public class BlockUserTests {
     }
 
     @Test
-    void blockUser_shouldSucceed_whenUsersAreNotFriends() throws Exception {
+    void block_shouldSucceed_whenUsersAreNotFriends() throws Exception {
         User user1 = createUser("kc-user1", "User1");
         User user2 = createUser("kc-user2", "User2");
 
-        mockMvc.perform(patch("/api/platform/users/{friendId}/block", user2.getId().id())
+        mockMvc.perform(patch("/api/platform/users/{blockId}/block", user2.getId().id())
                         .with(jwtForUser(user1.getKeycloakId())))
                 .andExpect(status().isNoContent());
 
@@ -67,11 +67,11 @@ public class BlockUserTests {
         User updatedUser2 = userRepository.findById(user2.getId()).orElseThrow();
 
         assertThat(updatedUser1.getBlockedUsers().size()).isEqualTo(1);
-        assertThat(updatedUser2.getBlockedUsers().size()).isEqualTo(1);
+        assertThat(updatedUser2.getBlockedUsers().size()).isEqualTo(0);
     }
 
     @Test
-    void blockUser_shouldSucceed_whenUsersAreFriends() throws Exception {
+    void block_shouldSucceed_whenUsersAreFriends() throws Exception {
         User user1 = createUser("kc-user1", "User1");
         User user2 = createUser("kc-user2", "User2");
 
@@ -92,11 +92,10 @@ public class BlockUserTests {
         assertThat(updatedUser2.getFriends().size()).isEqualTo(0);
 
         assertThat(updatedUser1.getBlockedUsers().size()).isEqualTo(1);
-        assertThat(updatedUser2.getBlockedUsers().size()).isEqualTo(1);
     }
 
     @Test
-    void blockUser_shouldFail_whenUserIdsAreTheSame() throws Exception {
+    void block_shouldFail_whenIdsAreTheSame() throws Exception {
         User user1 = createUser("kc-user1", "User1");
 
         mockMvc.perform(patch("/api/platform/users/{friendId}/block", user1.getId().id())
@@ -105,7 +104,7 @@ public class BlockUserTests {
     }
 
     @Test
-    void blockUser_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
+    void block_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
         User user1 = createUser("kc-user1", "User1");
 
         mockMvc.perform(patch("/api/platform/users/{friendId}/block", user1.getId().id()))

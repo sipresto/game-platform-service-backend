@@ -144,6 +144,10 @@ public class UserController {
         User targetUser = userService.findById(userId);
         var viewer = userService.findByKeycloakId(jwt.getSubject());
 
+        if(viewer.getBlockedUsers().contains(targetUser.getId())) {
+            return ResponseEntity.ok(null);
+        }
+
         return ResponseEntity.ok(PublicUserDto.fromDomain(targetUser, viewer));
     }
 
@@ -239,6 +243,15 @@ public class UserController {
             @AuthenticationPrincipal Jwt jwt
     ) {
         userService.blockUser(jwt.getSubject(), blockId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{unblockId}/unblock")
+    public ResponseEntity<Void> unblockUser(
+            @PathVariable UUID unblockId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        userService.unblockUser(jwt.getSubject(), unblockId);
         return ResponseEntity.noContent().build();
     }
 

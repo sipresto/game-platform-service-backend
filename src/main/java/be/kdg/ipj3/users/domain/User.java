@@ -7,6 +7,7 @@ import org.jmolecules.ddd.annotation.Identity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @AggregateRoot
 public class User {
@@ -290,10 +291,19 @@ public class User {
         return new ArrayList<>(blockedUsers);
     }
 
-    public void blockUser(UserId userId) {
+    public void block(UserId userId) {
         if (friends.contains(userId)) {
             removeFriend(userId);
         }
         blockedUsers.add(userId);
+    }
+
+    public void unblock(UserId unblockId) {
+        if (blockedUsers.contains(unblockId)) {
+            blockedUsers.remove(unblockId);
+        }
+        else {
+            throw new IllegalArgumentException("This user is not blocked");
+        }
     }
 }
