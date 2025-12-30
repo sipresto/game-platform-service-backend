@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface LobbyRepository {
@@ -19,7 +20,7 @@ public interface LobbyRepository {
 
     List<Lobby> findAll();
 
-    void deleteById(LobbyId id);
+    void deleteLobbyByGameId(UUID gameId);
 
     void deleteAll();
 }

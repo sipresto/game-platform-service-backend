@@ -1,5 +1,6 @@
 package be.kdg.ipj3.sessions.infrastructure.rabbitmq;
 
+import be.kdg.ipj3.lobbies.shared.LobbyApi;
 import be.kdg.ipj3.sessions.application.SessionService;
 import be.kdg.ipj3.sessions.infrastructure.rabbitmq.config.RabbitMQTopologySessions;
 import be.kdg.ipj3.sessions.infrastructure.rabbitmq.dto.GameRematchDto;
@@ -16,10 +17,12 @@ public class SessionMessageHandler {
 
     private final SessionService sessionService;
     private final UsersApi usersApi;
+    private final LobbyApi lobbyApi;
 
-    public SessionMessageHandler(SessionService sessionService, UsersApi usersApi) {
+    public SessionMessageHandler(SessionService sessionService, UsersApi usersApi, LobbyApi lobbyApi) {
         this.sessionService = sessionService;
         this.usersApi = usersApi;
+        this.lobbyApi = lobbyApi;
     }
 
     @RabbitListener(queues = RabbitMQTopologySessions.SESSION_GAME_RESULTS_QUEUE)
@@ -34,6 +37,8 @@ public class SessionMessageHandler {
                 winnerId,
                 dto.completedAt()
         );
+
+        lobbyApi.deleteLobby(dto.gameId());
     }
 
     @RabbitListener(queues = RabbitMQTopologySessions.SESSION_GAME_REMATCH_QUEUE)

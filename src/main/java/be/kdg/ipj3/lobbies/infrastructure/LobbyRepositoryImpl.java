@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class LobbyRepositoryImpl implements LobbyRepository {
@@ -54,8 +55,8 @@ public class LobbyRepositoryImpl implements LobbyRepository {
     }
 
     @Override
-    public void deleteById(LobbyId id) {
-        jpaLobbyRepository.deleteById(id.id());
+    public void deleteLobbyByGameId(UUID gameId) {
+        jpaLobbyRepository.deleteByActiveGameUrlContaining(gameId.toString());
     }
 
     @Override

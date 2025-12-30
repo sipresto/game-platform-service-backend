@@ -97,7 +97,6 @@ public class GetOpenLobbiesForGameTests {
         lobbyRepository.save(lobby);
     }
 
-    // TODO: Update when url gets updated
     @Test
     void getOpenLobbiesForGame_shouldReturnListOfLobbies_whenLobbiesExist() throws Exception {
         // Arrange

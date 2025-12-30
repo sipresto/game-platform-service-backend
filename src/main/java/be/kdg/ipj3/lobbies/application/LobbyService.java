@@ -12,9 +12,9 @@ import be.kdg.ipj3.lobbies.domain.LobbyStatus;
 import be.kdg.ipj3.lobbies.shared.GameServiceUnavailableException;
 import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
+import be.kdg.ipj3.lobbies.shared.LobbyApi;
 import be.kdg.ipj3.sessions.shared.SessionId;
 import be.kdg.ipj3.sessions.shared.SessionsApi;
-import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 @Service
 @Transactional
-public class LobbyService {
+public class LobbyService implements LobbyApi {
     private final GameClient gameClient;
     private final LobbyRepository lobbyRepository;
     private final GamesApi gamesApi;
@@ -133,14 +133,15 @@ public class LobbyService {
             lobby.startGame(gameUrl);
             lobbyRepository.save(lobby);
 
-            // TODO: cleanup job to remove after a period because polling
-            //lobbyRepository.deleteById(lobbyId);
-
             return gameUrl;
         } catch (Exception e) {
             logger.warning(e.toString());
             throw new GameServiceUnavailableException("Game service is currently unavailable.");
         }
+    }
+
+    public void deleteLobby(UUID gameId){
+        lobbyRepository.deleteLobbyByGameId(gameId);
     }
 
     @Transactional(readOnly = true)
