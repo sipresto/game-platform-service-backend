@@ -25,7 +25,7 @@ public class User {
     private final List<FriendRequest> incomingFriendRequests;
     private final List<FriendRequest> outgoingFriendRequests;
 
-    private UserCosmetics cosmetics;
+    private final UserCosmetics cosmetics;
 
     public User(UserId id, String keycloakId, String username, List<GameId> ownedGames,
                 List<GameId> favoriteGames, UserCosmetics cosmetics, int points, Profile profile,
@@ -302,6 +302,18 @@ public class User {
 
     public void equipTitle(PerkId perkId) {
         this.cosmetics.equipTitle(perkId);
+    }
+
+    public void unequipBorder() {
+        this.cosmetics.unequipBorder();
+    }
+
+    public void unequipTheme() {
+        this.cosmetics.unequipTheme();
+    }
+
+    public void unequipTitle() {
+        this.cosmetics.unequipTitle();
     }
 
     public UserCosmetics getCosmetics() {

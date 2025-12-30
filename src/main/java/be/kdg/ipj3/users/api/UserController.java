@@ -227,4 +227,11 @@ public class UserController {
         userService.rejectFriendRequest(receiverId.id(), senderId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/me/points")
+    public ResponseEntity<Integer> getPoints(@AuthenticationPrincipal Jwt jwt) {
+        String keycloakId = jwt.getSubject();
+        var points = userService.findPoints(keycloakId);
+        return ResponseEntity.ok(points);
+    }
 }

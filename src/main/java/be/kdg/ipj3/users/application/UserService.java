@@ -4,10 +4,7 @@ import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.perks.shared.PerkId;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.domain.*;
-import be.kdg.ipj3.users.shared.EmailUserDto;
-import be.kdg.ipj3.users.shared.SmallUserDto;
-import be.kdg.ipj3.users.shared.UserId;
-import be.kdg.ipj3.users.shared.UsersApi;
+import be.kdg.ipj3.users.shared.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,7 +92,7 @@ public class UserService implements UsersApi {
     }
 
     @Transactional(readOnly = true)
-    public List<GameId> findFavoriteGamesByUserId(UUID id){
+    public List<GameId> findFavoriteGamesByUserId(UUID id) {
         return userRepository.findFavoriteGamesByUserId(new UserId(id));
     }
 
@@ -158,7 +155,7 @@ public class UserService implements UsersApi {
     }
 
     @Transactional(readOnly = true)
-    public EmailUserDto findEmailUserDtoByKeycloakId(UUID id){
+    public EmailUserDto findEmailUserDtoByKeycloakId(UUID id) {
         return EmailUserDto.fromDomain(findById(id));
     }
 
@@ -195,6 +192,11 @@ public class UserService implements UsersApi {
         userRepository.save(user);
     }
 
+    public int findPoints(String keycloakId) {
+        User user = findByKeycloakId(keycloakId);
+        return user.getPoints();
+    }
+
     public void equipBorder(UserId userId, UUID perkId) {
         User user = userRepository.findById(userId).orElseThrow(userId::notFound);
         user.equipBorder(new PerkId(perkId)); // Delegates to domain logic in UserCosmetics
@@ -210,6 +212,27 @@ public class UserService implements UsersApi {
     public void equipTitle(UserId userId, UUID perkId) {
         User user = userRepository.findById(userId).orElseThrow(userId::notFound);
         user.equipTitle(new PerkId(perkId));
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unequipBorder(UserId userId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        user.unequipBorder();
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unequipTheme(UserId userId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        user.unequipTheme();
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unequipTitle(UserId userId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        user.unequipTitle();
         userRepository.save(user);
     }
 
@@ -240,5 +263,23 @@ public class UserService implements UsersApi {
         senderUser.removeOutgoingFriendRequest(receiverUser.getId());
         userRepository.save(receiverUser);
         userRepository.save(senderUser);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserCosmeticsDto getUserCosmetics(UserId userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(userId::notFound);
+
+        UserCosmetics cosmetics = user.getCosmetics();
+
+        return new UserCosmeticsDto(
+                cosmetics.getUnlockedPerkIds().stream()
+                        .map(PerkId::id)
+                        .collect(java.util.stream.Collectors.toSet()),
+                cosmetics.getEquippedBorderId() != null ? cosmetics.getEquippedBorderId().id() : null,
+                cosmetics.getEquippedThemeId() != null ? cosmetics.getEquippedThemeId().id() : null,
+                cosmetics.getEquippedTitleId() != null ? cosmetics.getEquippedTitleId().id() : null
+        );
     }
 }

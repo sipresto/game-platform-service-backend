@@ -1,6 +1,7 @@
 package be.kdg.ipj3.perks.api;
 
 import be.kdg.ipj3.perks.api.dto.PerkDto;
+import be.kdg.ipj3.perks.api.dto.UserPerkDto;
 import be.kdg.ipj3.perks.application.PerkService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,5 +51,23 @@ public class PerkController {
         String keycloakId = jwt.getSubject();
         perkService.equipPerk(perkId, keycloakId);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{perkId}/unequip")
+    public ResponseEntity<Void> unequipPerk(
+            @PathVariable UUID perkId,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        String keycloakId = jwt.getSubject();
+        perkService.unequipPerk(perkId, keycloakId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<List<UserPerkDto>> getUserPerks(
+            @AuthenticationPrincipal Jwt jwt) {
+        String keycloakId = jwt.getSubject();
+        List<UserPerkDto> userPerks = perkService.findAllPerksForUser(keycloakId);
+        return ResponseEntity.ok(userPerks);
     }
 }
