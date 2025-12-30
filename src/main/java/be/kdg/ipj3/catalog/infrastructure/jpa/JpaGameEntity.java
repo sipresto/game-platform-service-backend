@@ -28,7 +28,7 @@ public class JpaGameEntity {
 
     private BigDecimal price;
 
-    @Column(nullable = false)
+    @Column
     private String backendUrl;
 
     @Column(nullable = false)

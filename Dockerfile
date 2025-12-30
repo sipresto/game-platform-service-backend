@@ -23,4 +23,4 @@ COPY --from=build /build/target/*.jar app.jar
 
 EXPOSE 8095
 
-ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=deploy"]
+ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=prod"]
