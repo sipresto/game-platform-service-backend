@@ -90,9 +90,9 @@ public class UpdateProfileIntegrationTests {
                 () -> new AssertionError("User not found in database after profile update")
         );
 
-        assertThat(updated.getProfile().getDisplayName())
+        assertThat(updated.getProfile().displayName())
                 .isEqualTo("Updated Display Name");
-        assertThat(updated.getProfile().getBio())
+        assertThat(updated.getProfile().bio())
                 .isEqualTo("Updated bio");
     }
 

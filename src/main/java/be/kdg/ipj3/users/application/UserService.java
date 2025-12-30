@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -115,7 +114,8 @@ public class UserService implements UsersApi {
                 .orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
     }
 
-    public void updatePrivacySettingsByKeycloakId(Visibility visibility, User user) {
+    public void updatePrivacySettingsByKeycloakId(Visibility visibility, String keycloakId) {
+        User user = findByKeycloakId(keycloakId);
         user.updateVisibility(visibility);
         userRepository.save(user);
     }
@@ -185,8 +185,8 @@ public class UserService implements UsersApi {
         userRepository.save(senderUser);
     }
 
-    public void acceptFriendRequest(UUID receiver, UUID sender) {
-        User receiverUser = findById(receiver);
+    public void acceptFriendRequest(String keycloakId, UUID sender) {
+        User receiverUser = findByKeycloakId(keycloakId);
         User senderUser = findById(sender);
         receiverUser.acceptFriendRequest(senderUser.getId());
         senderUser.addFriend(receiverUser.getId());
@@ -195,8 +195,8 @@ public class UserService implements UsersApi {
         userRepository.save(senderUser);
     }
 
-    public void rejectFriendRequest(UUID receiver, UUID sender) {
-        User receiverUser = findById(receiver);
+    public void rejectFriendRequest(String keycloakId, UUID sender) {
+        User receiverUser = findByKeycloakId(keycloakId);
         User senderUser = findById(sender);
         receiverUser.removeIncomingFriendRequest(senderUser.getId());
         senderUser.removeOutgoingFriendRequest(receiverUser.getId());
@@ -204,15 +204,32 @@ public class UserService implements UsersApi {
         userRepository.save(senderUser);
     }
 
-    public void removeFriend(UUID userId, UUID friendId) {
-        if(userId.equals(friendId)) {
+    public void removeFriend(String keycloakId, UUID friendId) {
+        User user = findByKeycloakId(keycloakId);
+        if(user.getId().id().equals(friendId)) {
             throw new IllegalArgumentException("FriendId can't be the same as UserId");
         }
-        User user = findById(userId);
         User friend = findById(friendId);
         user.removeFriend(friend.getId());
         friend.removeFriend(user.getId());
         userRepository.save(user);
         userRepository.save(friend);
+    }
+
+    public void blockUser(String keycloakId, UUID blockId) {
+        User user = findByKeycloakId(keycloakId);
+        if (user.getId().id().equals(blockId)) {
+            throw new IllegalArgumentException("You can't block yourself");
+        }
+        User blockUser = findById(blockId);
+        user.blockUser(blockUser.getId());
+        blockUser.blockUser(user.getId());
+        userRepository.save(user);
+        userRepository.save(blockUser);
+    }
+
+    public List<User> findBlockedUsers(String keycloakId) {
+        User user = findByKeycloakId(keycloakId);
+        return new ArrayList<>(userRepository.findBlockedUsers(user.getId()));
     }
 }

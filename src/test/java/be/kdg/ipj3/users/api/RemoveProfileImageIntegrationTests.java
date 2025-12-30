@@ -133,7 +133,7 @@ public class RemoveProfileImageIntegrationTests {
 
         Optional<User> userBefore = userRepository.findByKeycloakId(keycloakId);
         assertThat(userBefore).isPresent();
-        assertThat(userBefore.get().getProfile().getProfileImage()).isNotNull();
+        assertThat(userBefore.get().getProfile().profileImage()).isNotNull();
 
         mockMvc.perform(delete("/api/platform/users/me/delete/profile-image")
                         .with(validJwt(keycloakId)))
@@ -141,8 +141,8 @@ public class RemoveProfileImageIntegrationTests {
 
         Optional<User> userAfter = userRepository.findByKeycloakId(keycloakId);
         assertThat(userAfter).isPresent();
-        assertThat(userAfter.get().getProfile().getProfileImage()).isNull();
-        assertThat(userAfter.get().getProfile().getImageMimeType()).isNull();
+        assertThat(userAfter.get().getProfile().profileImage()).isNull();
+        assertThat(userAfter.get().getProfile().imageMimeType()).isNull();
     }
 
     @Test
@@ -157,7 +157,7 @@ public class RemoveProfileImageIntegrationTests {
         Optional<User> userBefore = userRepository.findByKeycloakId(keycloakId);
 
         assertThat(userBefore).isPresent();
-        assertThat(userBefore.get().getProfile().getProfileImage()).isNull();
+        assertThat(userBefore.get().getProfile().profileImage()).isNull();
 
         mockMvc.perform(delete("/api/platform/users/me/delete/profile-image")
                         .with(validJwt(keycloakId)))
@@ -165,7 +165,7 @@ public class RemoveProfileImageIntegrationTests {
 
         Optional<User> userAfter = userRepository.findByKeycloakId(keycloakId);
         assertThat(userAfter).isPresent();
-        assertThat(userAfter.get().getProfile().getProfileImage()).isNull();
+        assertThat(userAfter.get().getProfile().profileImage()).isNull();
     }
 
     @Test
@@ -180,6 +180,6 @@ public class RemoveProfileImageIntegrationTests {
 
         Optional<User> originalUser = userRepository.findByKeycloakId(keycloakId1);
         assertThat(originalUser).isPresent();
-        assertThat(originalUser.get().getProfile().getProfileImage()).isNotNull();
+        assertThat(originalUser.get().getProfile().profileImage()).isNotNull();
     }
 }

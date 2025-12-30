@@ -26,4 +26,6 @@ public interface UserRepository {
     List<User> findFriends(UserId userId);
 
     boolean existsById(UserId id);
+
+    List<User> findBlockedUsers(UserId id);
 }

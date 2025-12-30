@@ -23,6 +23,7 @@ public class User {
     private final String email;
     private final List<FriendRequest> incomingFriendRequests;
     private final List<FriendRequest> outgoingFriendRequests;
+    private final List<UserId> blockedUsers;
 
     public User(UserId id, String keycloakId, String username, List<GameId> ownedGames,
                 List<GameId> favoriteGames, int points, Profile profile,
@@ -39,6 +40,7 @@ public class User {
         this.email = email;
         this.incomingFriendRequests = new ArrayList<>();
         this.outgoingFriendRequests = new ArrayList<>();
+        this.blockedUsers = new ArrayList<>();
     }
 
     public User(UserId id, String keycloakId, String username, Profile profile, int points, String email) {
@@ -282,5 +284,16 @@ public class User {
         else {
             friends.remove(id);
         }
+    }
+
+    public List<UserId> getBlockedUsers() {
+        return new ArrayList<>(blockedUsers);
+    }
+
+    public void blockUser(UserId userId) {
+        if (friends.contains(userId)) {
+            removeFriend(userId);
+        }
+        blockedUsers.add(userId);
     }
 }

@@ -1,9 +1,6 @@
 package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.users.domain.*;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
 import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
-public class FindUserIntegrationTests {
+public class GetUserIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;

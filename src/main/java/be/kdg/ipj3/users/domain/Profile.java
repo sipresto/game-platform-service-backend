@@ -1,7 +1,5 @@
 package be.kdg.ipj3.users.domain;
 
-import java.util.Optional;
-
 public record Profile(
         String displayName,
         String bio,
@@ -25,21 +23,5 @@ public record Profile(
 
     public boolean getHasProfileImage() {
         return profileImage != null;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public byte[] getProfileImage() {
-        return profileImage;
-    }
-
-    public String getImageMimeType() {
-        return imageMimeType;
     }
 }

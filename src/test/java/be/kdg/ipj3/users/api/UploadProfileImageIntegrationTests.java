@@ -139,9 +139,9 @@ public class UploadProfileImageIntegrationTests {
         assertThat(userOpt).isPresent();
 
         User user = userOpt.get();
-        assertThat(user.getProfile().getProfileImage()).isNotNull();
-        assertThat(user.getProfile().getProfileImage().length).isGreaterThan(0);
-        assertThat(user.getProfile().getImageMimeType()).isEqualTo("image/png");
+        assertThat(user.getProfile().profileImage()).isNotNull();
+        assertThat(user.getProfile().profileImage().length).isGreaterThan(0);
+        assertThat(user.getProfile().imageMimeType()).isEqualTo("image/png");
     }
 
     @Test
@@ -160,7 +160,7 @@ public class UploadProfileImageIntegrationTests {
 
         Optional<User> userOpt = userRepository.findByKeycloakId(keycloakId);
         assertThat(userOpt).isPresent();
-        assertThat(userOpt.get().getProfile().getProfileImage()).isNull();
+        assertThat(userOpt.get().getProfile().profileImage()).isNull();
     }
 
     @Test
@@ -180,7 +180,7 @@ public class UploadProfileImageIntegrationTests {
 
         Optional<User> userOpt = userRepository.findByKeycloakId(keycloakId);
         assertThat(userOpt).isPresent();
-        assertThat(userOpt.get().getProfile().getProfileImage()).isNull();
+        assertThat(userOpt.get().getProfile().profileImage()).isNull();
     }
 
     @Test
@@ -200,7 +200,7 @@ public class UploadProfileImageIntegrationTests {
 
         Optional<User> userOpt = userRepository.findByKeycloakId(keycloakId);
         assertThat(userOpt).isPresent();
-        assertThat(userOpt.get().getProfile().getProfileImage()).isNull();
+        assertThat(userOpt.get().getProfile().profileImage()).isNull();
     }
 
     @Test
@@ -220,7 +220,7 @@ public class UploadProfileImageIntegrationTests {
 
         Optional<User> userAfter = userRepository.findByKeycloakId(keycloakId);
         assertThat(userAfter).isPresent();
-        assertThat(userAfter.get().getProfile().getProfileImage()).isNotNull();
-        assertThat(userAfter.get().getProfile().getImageMimeType()).isEqualTo("image/png");
+        assertThat(userAfter.get().getProfile().profileImage()).isNotNull();
+        assertThat(userAfter.get().getProfile().imageMimeType()).isEqualTo("image/png");
     }
 }

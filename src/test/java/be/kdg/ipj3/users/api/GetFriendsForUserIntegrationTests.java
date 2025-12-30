@@ -1,9 +1,6 @@
 package be.kdg.ipj3.users.api;
 
 import be.kdg.ipj3.users.domain.*;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
 import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -31,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @TestPropertySource("classpath:application-test.properties")
-public class FindFriendsForUserIntegrationTests {
+public class GetFriendsForUserIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
