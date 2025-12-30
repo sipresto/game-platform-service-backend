@@ -67,14 +67,15 @@ public class PerkService {
     @Transactional(readOnly = true)
     public List<UserPerkDto> findAllPerksForUser(String keycloakId) {
         var userId = usersApi.findIdByKeycloakId(keycloakId);
-
         var userCosmetics = usersApi.getUserCosmetics(userId);
 
         return findAllPerks().stream()
                 .map(perk -> {
                     UUID perkId = perk.getId().id();
 
-                    boolean purchased = userCosmetics.unlockedPerkIds().contains(perkId);
+                    boolean purchased = userCosmetics.unlockedPerkIds() != null &&
+                                        userCosmetics.unlockedPerkIds().contains(perkId);
+
                     boolean equipped = isPerkEquipped(userCosmetics, perkId, perk.getType());
 
                     return UserPerkDto.fromDomain(perk, purchased, equipped);

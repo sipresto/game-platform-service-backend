@@ -199,18 +199,30 @@ public class UserService implements UsersApi {
 
     public void equipBorder(UserId userId, UUID perkId) {
         User user = userRepository.findById(userId).orElseThrow(userId::notFound);
-        user.equipBorder(new PerkId(perkId)); // Delegates to domain logic in UserCosmetics
+        PerkId borderId = new PerkId(perkId);
+        if (!user.hasPerk(borderId)) {
+            throw new IllegalArgumentException("User does not own this border");
+        }
+        user.equipBorder(borderId);
         userRepository.save(user);
     }
 
     public void equipTheme(UserId userId, UUID perkId) {
         User user = userRepository.findById(userId).orElseThrow(userId::notFound);
-        user.equipTheme(new PerkId(perkId));
+        PerkId themeId = new PerkId(perkId);
+        if (!user.hasPerk(themeId)) {
+            throw new IllegalArgumentException("User does not own this theme");
+        }
+        user.equipTheme(themeId);
         userRepository.save(user);
     }
 
     public void equipTitle(UserId userId, UUID perkId) {
         User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        PerkId titleId = new PerkId(perkId);
+        if (!user.hasPerk(titleId)) {
+            throw new IllegalArgumentException("User does not own this title");
+        }
         user.equipTitle(new PerkId(perkId));
         userRepository.save(user);
     }
