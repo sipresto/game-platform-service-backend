@@ -121,7 +121,7 @@ services:
       - app_postgres
       - app_rabbitmq
       - idp-keycloak
- #     - ai_player
+      - ai_player
     environment:
       SPRING_PROFILES_ACTIVE: prod
     networks:
@@ -141,7 +141,7 @@ services:
       - app_postgres
       - app_rabbitmq
       - idp-keycloak
-  #    - ai_player
+      - ai_player
     environment:
       SPRING_PROFILES_ACTIVE: prod
     networks:
