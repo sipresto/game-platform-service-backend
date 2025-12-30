@@ -78,10 +78,18 @@ public class UpdateNotificationPreferencesTests {
     void updatePreference_shouldUpdateUserPreference() throws Exception {
         // Arrange
         UserId userId = createUser();
+        String requestBody = """
+            {
+                "notificationType": "FRIEND_REQUEST",
+                "channel": "EMAIL",
+                "enabled": false
+            }
+            """;
 
         // Act & Assert
-        mockMvc.perform(put("/api/platform/notifications/preferences/FRIEND_REQUEST/EMAIL")
-                        .param("enabled", "false")
+        mockMvc.perform(put("/api/platform/notifications/preferences")
+                        .contentType("application/json")
+                        .content(requestBody)
                         .with(validJwt()))
                 .andExpect(status().isOk());
 
@@ -93,10 +101,18 @@ public class UpdateNotificationPreferencesTests {
     void updatePreference_shouldReturnBadRequest_whenNotificationTypeIsInvalid() throws Exception {
         // Arrange
         createUser();
+        String requestBody = """
+            {
+                "notificationType": "INVALID_TYPE",
+                "channel": "EMAIL",
+                "enabled": false
+            }
+            """;
 
         // Act & Assert
-        mockMvc.perform(put("/api/platform/notifications/preferences/INVALID_TYPE/EMAIL")
-                        .param("enabled", "false")
+        mockMvc.perform(put("/api/platform/notifications/preferences")
+                        .contentType("application/json")
+                        .content(requestBody)
                         .with(validJwt()))
                 .andExpect(status().isBadRequest());
     }
@@ -105,15 +121,56 @@ public class UpdateNotificationPreferencesTests {
     void updatePreference_shouldReturnBadRequest_whenChannelIsInvalid() throws Exception {
         // Arrange
         createUser();
+        String requestBody = """
+            {
+                "notificationType": "FRIEND_REQUEST",
+                "channel": "INVALID_CHANNEL",
+                "enabled": false
+            }
+            """;
 
         // Act & Assert
-        mockMvc.perform(put("/api/platform/notifications/preferences/FRIEND_REQUEST/INVALID_CHANNEL")
-                        .param("enabled", "false")
+        mockMvc.perform(put("/api/platform/notifications/preferences")
+                        .contentType("application/json")
+                        .content(requestBody)
                         .with(validJwt()))
                 .andExpect(status().isBadRequest());
     }
 
-    // TODO: test when user does not exist
+    @Test
+    void updatePreference_shouldReturnForbidden_whenUserDoesNotExist() throws Exception {
+        String requestBody = """
+            {
+                "notificationType": "FRIEND_REQUEST",
+                "channel": "EMAIL",
+                "enabled": false
+            }
+            """;
 
-    // TODO: test when user not logged in
+        // Act & Assert
+        mockMvc.perform(put("/api/platform/notifications/preferences")
+                        .contentType("application/json")
+                        .content(requestBody)
+                        .with(validJwt()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updatePreference_shouldReturnUnauthorized_whenUserNotLoggedIn() throws Exception {
+        // Arrange
+        createUser();
+        String requestBody = """
+            {
+                "notificationType": "FRIEND_REQUEST",
+                "channel": "EMAIL",
+                "enabled": false
+            }
+            """;
+
+        // Act & Assert
+        mockMvc.perform(put("/api/platform/notifications/preferences")
+                        .contentType("application/json")
+                        .content(requestBody))
+                .andExpect(status().isUnauthorized());
+    }
 }

@@ -107,7 +107,6 @@ public class EvaluateAchievementsAfterGameTests {
         return user.getId();
     }
 
-    //TODO: Check if points were added to user
     @Test
     void evaluateAchievementsAfterGame_shouldCreateProgressAndMarkAsCompleted_whenAchievementTriggered() {
         // Arrange
@@ -132,6 +131,10 @@ public class EvaluateAchievementsAfterGameTests {
         AchievementProgress actualProgress = progress.get();
         assertThat(actualProgress.getCurrentProgress()).isEqualTo(1);
         assertThat(actualProgress.getCompletedAt()).isNotNull();
+
+        @SuppressWarnings("OptionalGetWithoutIsPresent")
+        User user = userRepository.findById(userId).get();
+        assertThat(user.getPoints() == 10);
     }
 
     @Test

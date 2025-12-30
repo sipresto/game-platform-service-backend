@@ -3,12 +3,15 @@ package be.kdg.ipj3.sessions.api;
 import be.kdg.ipj3.sessions.api.dto.SessionDto;
 import be.kdg.ipj3.sessions.application.SessionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/platform/sessions")
@@ -21,9 +24,10 @@ public class SessionController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<SessionDto>> getSessionsByUserId(
-            @PathVariable String userId
+            @PathVariable UUID userId,
+            @AuthenticationPrincipal Jwt jwt
     ) {
-        List<SessionDto> dtos = sessionService.findFinishedSessionsByUserId(userId).stream()
+        List<SessionDto> dtos = sessionService.findFinishedSessionsByUserId(userId, jwt.getSubject()).stream()
                 .map(SessionDto::fromDomain)
                 .toList();
 

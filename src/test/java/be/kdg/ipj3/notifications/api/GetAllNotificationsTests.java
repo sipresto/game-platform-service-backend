@@ -133,7 +133,21 @@ public class GetAllNotificationsTests {
                 .andExpect(jsonPath("$").isEmpty());
     }
 
-    // TODO: Test when user does not exist
+    @Test
+    void getAllNotifications_shouldReturnForbidden_whenUserDoesNotExist() throws Exception {
+        // Act & Assert
+        mockMvc.perform(get("/api/platform/notifications")
+                        .with(validJwt()))
+                .andExpect(status().isNotFound());
+    }
 
-    // TODO: Test when user not logged in
+    @Test
+    void getAllNotifications_shouldReturnUnauthorized_whenUserNotLoggedIn() throws Exception {
+        // Arrange
+        createUser();
+
+        // Act & Assert
+        mockMvc.perform(get("/api/platform/notifications"))
+                .andExpect(status().isUnauthorized());
+    }
 }

@@ -14,6 +14,7 @@ import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.sessions.shared.SessionId;
 import be.kdg.ipj3.sessions.shared.SessionsApi;
+import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
@@ -75,7 +76,8 @@ public class LobbyService {
     }
 
 
-    public LobbyDetailDto getLobbyDetails(UUID lobbyId) {
+    public LobbyDetailDto getLobbyDetails(UUID lobbyId, String keycloakId) {
+        usersApi.findIdByKeycloakId(keycloakId);
         Lobby lobby = findLobbyById(lobbyId);
 
         List<PlayerDto> playerDtos = lobby.getPlayers().stream()
@@ -142,14 +144,16 @@ public class LobbyService {
     }
 
     @Transactional(readOnly = true)
-    public List<Lobby> findAllOpenLobbies() {
+    public List<Lobby> findAllOpenLobbies(String keycloakId) {
+        usersApi.findIdByKeycloakId(keycloakId);
         return lobbyRepository.findByStatus(LobbyStatus.OPEN);
     }
 
     @Transactional(readOnly = true)
-    public List<Lobby> findOpenLobbiesForGame(UUID id) {
+    public List<Lobby> findOpenLobbiesForGame(UUID id, String keycloakId) {
 
         var gameId = gamesApi.findGameById(id).getId();
+        usersApi.findIdByKeycloakId(keycloakId);
 
         return lobbyRepository.findByStatusAndGameId(LobbyStatus.OPEN, gameId);
     }

@@ -19,7 +19,12 @@ public enum NotificationType {
         }
     },
     CHAT_MESSAGE(true, false),
-    YOUR_TURN(true, false);
+    YOUR_TURN(true, false) {
+        @Override
+        public boolean isDuplicate(Notification a, Notification b) {
+            return a.getType() == b.getType();
+        }
+    };
 
     private final boolean inAppDefault;
     private final boolean emailDefault;

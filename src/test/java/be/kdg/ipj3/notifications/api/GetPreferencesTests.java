@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
@@ -44,7 +44,7 @@ public class GetPreferencesTests {
         notificationRepository.deleteAll();
     }
 
-    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor validJwt() {
+    private JwtRequestPostProcessor validJwt() {
         return jwt().authorities(() -> "ROLE_PLAYER")
                 .jwt(builder -> builder
                         .subject("keycloakId")
@@ -75,17 +75,31 @@ public class GetPreferencesTests {
         mockMvc.perform(get("/api/platform/notifications/preferences")
                         .with(validJwt()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.FRIEND_REQUEST.IN_APP").value(true))
-                .andExpect(jsonPath("$.FRIEND_REQUEST.EMAIL").value(true))
-                .andExpect(jsonPath("$.ACHIEVEMENT.IN_APP").value(true))
-                .andExpect(jsonPath("$.ACHIEVEMENT.EMAIL").value(false))
-                .andExpect(jsonPath("$.YOUR_TURN.IN_APP").value(true))
-                .andExpect(jsonPath("$.YOUR_TURN.EMAIL").value(false));
+                .andExpect(jsonPath("$.preferences.FRIEND_REQUEST.IN_APP").value(true))
+                .andExpect(jsonPath("$.preferences.FRIEND_REQUEST.EMAIL").value(true))
+                .andExpect(jsonPath("$.preferences.ACHIEVEMENT.IN_APP").value(true))
+                .andExpect(jsonPath("$.preferences.ACHIEVEMENT.EMAIL").value(false))
+                .andExpect(jsonPath("$.preferences.YOUR_TURN.IN_APP").value(true))
+                .andExpect(jsonPath("$.preferences.YOUR_TURN.EMAIL").value(false))
+                .andExpect(jsonPath("$.preferences.CHAT_MESSAGE.IN_APP").value(true))
+                .andExpect(jsonPath("$.preferences.CHAT_MESSAGE.EMAIL").value(false));
     }
 
-    // TODO: test when preferences al ingesteld zijn
+    @Test
+    void getPreferences_shouldReturnForbidden_whenUserDoesNotExist() throws Exception {
+        // Act & Assert
+        mockMvc.perform(get("/api/platform/notifications/preferences")
+                        .with(validJwt()))
+                .andExpect(status().isNotFound());
+    }
 
-    // TODO: test when user does not exist
+    @Test
+    void getPreferences_shouldReturnUnauthorized_whenUserNotLoggedIn() throws Exception {
+        // Arrange
+        createUser();
 
-    // TODO: test when user not logged in
+        // Act & Assert - No JWT token provided
+        mockMvc.perform(get("/api/platform/notifications/preferences"))
+                .andExpect(status().isUnauthorized());
+    }
 }

@@ -96,7 +96,7 @@ public class CreateLobbyTests {
         CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
 
         // Act & Assert
-        String responseContent = mockMvc.perform(post("/api/platform/lobbies")
+        mockMvc.perform(post("/api/platform/lobbies")
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -135,8 +135,7 @@ public class CreateLobbyTests {
                 .andExpect(status().isNotFound());
     }
 
-    // TODO: Change user auto-registration before enabling
-    /*@Test
+    @Test
     void createLobby_shouldReturnNotFound_whenUserNotRegistered() throws Exception {
         // Arrange
         GameId gameId = createTestGame();
@@ -149,7 +148,7 @@ public class CreateLobbyTests {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNotFound());
-    }*/
+    }
 
     @Test
     void createLobby_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {

@@ -225,15 +225,14 @@ public class StartGameTests {
                 .andExpect(status().isConflict());
     }
 
-    // TODO: Change user auto-registration before enabling
-    /*@Test
+    @Test
     void startGame_shouldReturnNotFound_whenUserNotRegistered() throws Exception {
         // Arrange
         GameId gameId = createTestGame();
 
         LobbyId lobbyId = createTestLobby(gameId, UserId.create());
 
-        GameStartDto dto = new GameStartDto(gameId.id(), List.of(), Difficulty.EASY);
+        GameStartDto dto = new GameStartDto(Difficulty.EASY);
 
         // Act & Assert
         mockMvc.perform(post("/api/platform/lobbies/{id}/start", lobbyId.id())
@@ -241,7 +240,7 @@ public class StartGameTests {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNotFound());
-    }*/
+    }
 
     @Test
     void startGame_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {

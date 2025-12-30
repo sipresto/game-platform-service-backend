@@ -99,16 +99,15 @@ public class LeaveLobbyTests {
                 .andExpect(status().isNotFound());
     }
 
-    // TODO: Change user auto-registration before enabling
-    /*@Test
+    @Test
     void leaveLobby_shouldReturnNotFound_whenUserNotRegistered() throws Exception {
         LobbyId lobbyId = createTestLobbyWithUser(UserId.create());
 
         mockMvc.perform(post("/api/platform/lobbies/{id}/leave", lobbyId.id())
                         .with(validJwt())
                         .contentType(MediaType.APPLICATION_JSON))
-               .andExpect(status().isOk());
-    }*/
+               .andExpect(status().isNotFound());
+    }
 
     @Test
     void leaveLobby_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {

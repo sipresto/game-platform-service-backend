@@ -113,7 +113,35 @@ public class ReadNotificationTests {
                 .andExpect(status().isNotFound());
     }
 
-    // TODO: test when user does not exist
+    @Test
+    void readNotification_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
+        UUID notificationId = UUID.randomUUID();
 
-    // TODO: test when user not logged in
+        // Act & Assert
+        mockMvc.perform(patch("/api/platform/notifications/{id}/read", notificationId.toString())
+                        .with(validJwt()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void readNotification_shouldReturnUnauthorized_whenUserNotLoggedIn() throws Exception {
+        // Arrange
+        UserId userId = createUser();
+        NotificationId notificationId = NotificationId.create();
+        Notification notification = new Notification(
+                notificationId,
+                "Test title",
+                "Test notification",
+                NotificationType.FRIEND_REQUEST,
+                Instant.now(),
+                false,
+                userId,
+                null
+        );
+        notificationRepository.save(notification);
+
+        // Act & Assert
+        mockMvc.perform(patch("/api/platform/notifications/{id}/read", notificationId.id().toString()))
+                .andExpect(status().isUnauthorized());
+    }
 }
