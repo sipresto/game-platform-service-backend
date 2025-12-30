@@ -1,13 +1,14 @@
 package be.kdg.ipj3.users.domain;
 
 import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.perks.shared.PerkId;
 import be.kdg.ipj3.users.shared.UserId;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
 
 @AggregateRoot
 public class User {
@@ -346,6 +347,7 @@ public class User {
     public void unequipTitle() {
         this.cosmetics.unequipTitle();
     }
+
 
     public UserCosmetics getCosmetics() {
         return cosmetics;
