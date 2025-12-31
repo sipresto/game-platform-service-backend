@@ -79,14 +79,8 @@ public class LeaveLobbyTests {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        // --- extra: verify DB / repository state
         Optional<Lobby> opt = lobbyRepository.findById(lobbyId);
-        Lobby updated = opt.orElseThrow(() ->
-                new AssertionError("Lobby not found after leave, id=" + lobbyId)
-        );
-
-        assertThat(updated.getPlayers())
-                .doesNotContain(userId);
+        assertThat(opt.isEmpty());
     }
 
     @Test

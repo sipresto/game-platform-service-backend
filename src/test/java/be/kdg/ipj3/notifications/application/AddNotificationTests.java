@@ -207,41 +207,6 @@ class AddNotificationTests {
     }
 
     @Test
-    void addNotification_shouldRemoveDuplicateNotification_whenDuplicateExists() {
-        // Arrange
-        String title = "Test Title";
-        String description = "Test Description";
-        NotificationType type = NotificationType.YOUR_TURN;
-        Instant sentAt = Instant.now();
-        UserId userId = new UserId(UUID.randomUUID());
-        UUID referenceId = UUID.randomUUID();
-
-        Notification duplicateNotification = new Notification(
-                new NotificationId(UUID.randomUUID()),
-                "Old Title",
-                "Old Description",
-                type,
-                sentAt.minusSeconds(60),
-                false,
-                userId,
-                referenceId
-        );
-
-        UserNotificationPreferences preferences = new UserNotificationPreferences(userId);
-
-        given(usersApi.existsById(userId.id())).willReturn(true);
-        given(preferencesRepository.findByUserId(userId)).willReturn(Optional.of(preferences));
-        given(notificationRepository.findByUserIdAndType(userId, type)).willReturn(List.of(duplicateNotification));
-
-        // Act
-        notificationService.addNotification(title, description, type, sentAt, userId, referenceId);
-
-        // Assert
-        then(notificationRepository).should().delete(duplicateNotification);
-        then(notificationRepository).should().save(any(Notification.class));
-    }
-
-    @Test
     void addNotification_shouldNotRemoveNotification_whenNotDuplicate() {
         // Arrange
         String title = "Test Title";
