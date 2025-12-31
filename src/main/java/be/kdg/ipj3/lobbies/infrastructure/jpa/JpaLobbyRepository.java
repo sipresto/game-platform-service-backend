@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,4 +20,10 @@ public interface JpaLobbyRepository extends JpaRepository<JpaLobbyEntity, UUID> 
     @Transactional
     @Query("DELETE FROM JpaLobbyEntity l WHERE l.activeGameUrl IS NOT NULL AND l.activeGameUrl LIKE %:gameId%")
     void deleteByActiveGameUrlContaining(@Param("gameId") String gameId);
+
+    List<JpaLobbyEntity> findJpaLobbyEntitiesByLastActivityAtBefore(Instant cutoff);
+
+    @Query("SELECT l FROM JpaLobbyEntity l WHERE l.activeGameUrl IS NOT NULL AND l.activeGameUrl LIKE %:gameId%")
+    List<JpaLobbyEntity> findByGameId(@Param("gameId") String gameId);
+
 }

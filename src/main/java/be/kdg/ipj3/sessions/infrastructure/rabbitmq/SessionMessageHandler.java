@@ -38,11 +38,17 @@ public class SessionMessageHandler {
                 dto.completedAt()
         );
 
-        lobbyApi.deleteLobby(dto.gameId());
+        if(dto.endOfGame()){
+            lobbyApi.deleteLobby(dto.gameId());
+        }
+        else{
+            lobbyApi.ResetLobbyTimer(dto.gameId());
+        }
     }
 
     @RabbitListener(queues = RabbitMQTopologySessions.SESSION_GAME_REMATCH_QUEUE)
     void onGameRematchMessageReceived(GameRematchDto dto) {
         sessionService.createRematchSession(dto.oldGameId(), dto.newGameId());
+        lobbyApi.ResetLobbyTimer(dto.newGameId());
     }
 }

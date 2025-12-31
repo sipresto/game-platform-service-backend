@@ -7,4 +7,5 @@ import java.util.UUID;
 @NamedInterface
 public interface LobbyApi {
     void deleteLobby(UUID lobbyId);
+    void ResetLobbyTimer(UUID activeGameId);
 }

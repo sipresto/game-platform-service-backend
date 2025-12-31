@@ -96,6 +96,17 @@ public class LobbyService implements LobbyApi {
         return LobbyDetailDto.fromDomain(lobby, playerDtos);
     }
 
+    public void ResetLobbyTimer(UUID activeGameId){
+        var lobby = lobbyRepository.findByGameId(activeGameId);
+        if(lobby.isEmpty()){
+            logger.warning("Lobby with active game id " + activeGameId + " is empty");
+        }
+        else{
+            var presentLobby = lobby.get();
+            presentLobby.resetTimer();
+            lobbyRepository.save(presentLobby);
+        }
+    }
 
     public String startGame(UUID id, String requestorKeycloakId, Difficulty difficulty) {
         var requestor = usersApi.findIdByKeycloakId(requestorKeycloakId);
