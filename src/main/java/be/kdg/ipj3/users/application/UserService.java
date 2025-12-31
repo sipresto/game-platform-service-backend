@@ -3,10 +3,8 @@ package be.kdg.ipj3.users.application;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.domain.*;
-import be.kdg.ipj3.users.shared.EmailUserDto;
-import be.kdg.ipj3.users.shared.SmallUserDto;
-import be.kdg.ipj3.users.shared.UserId;
-import be.kdg.ipj3.users.shared.UsersApi;
+import be.kdg.ipj3.users.shared.*;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +14,11 @@ import java.util.*;
 @Transactional
 public class UserService implements UsersApi {
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, ApplicationEventPublisher eventPublisher) {
         this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -192,6 +192,12 @@ public class UserService implements UsersApi {
         senderUser.addOutgoingFriendRequest(new FriendRequest(receiverUser.getId()));
         userRepository.save(receiverUser);
         userRepository.save(senderUser);
+
+        eventPublisher.publishEvent(new FriendRequestSentEvent(
+                senderUser.getId(),
+                receiverUser.getId(),
+                senderUser.getProfile().displayName()
+        ));
     }
 
     public void acceptFriendRequest(String keycloakId, UUID sender) {
