@@ -239,9 +239,10 @@ public class UserService implements UsersApi {
 
         User blockUser = findById(blockId);
         user.block(blockUser.getId());
-        user.handleBlock(blockUser.getId());
+        blockUser.handleBlock(user.getId());
 
         userRepository.save(user);
+        userRepository.save(blockUser);
     }
 
     public List<User> findBlockedUsers(String keycloakId) {
