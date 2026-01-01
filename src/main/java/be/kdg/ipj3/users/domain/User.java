@@ -292,9 +292,7 @@ public class User {
     }
 
     public void block(UserId userId) {
-        if (friends.contains(userId)) {
-            removeFriend(userId);
-        }
+        handleBlock(userId);
         blockedUsers.add(userId);
     }
 
@@ -304,6 +302,22 @@ public class User {
         }
         else {
             throw new IllegalArgumentException("This user is not blocked");
+        }
+    }
+
+    public void getBlocked(UserId blockerId) {
+        handleBlock(blockerId);
+    }
+
+    public void handleBlock(UserId blockerId) {
+        if (friends.contains(blockerId)) {
+            removeFriend(blockerId);
+        }
+        if (incomingFriendRequests.stream().map(FriendRequest::otherUser).anyMatch(userId1 -> userId1 == blockerId)) {
+            removeIncomingFriendRequest(blockerId);
+        }
+        if (outgoingFriendRequests.stream().map(FriendRequest::otherUser).anyMatch(userId1 -> userId1 == blockerId)) {
+            removeOutgoingFriendRequest(blockerId);
         }
     }
 }
