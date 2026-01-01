@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
@@ -50,7 +50,7 @@ public class GetSessionByUserIdTests {
         userRepository.deleteAll();
     }
 
-    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor validJwt() {
+    private JwtRequestPostProcessor validJwt() {
         return jwt().authorities(() -> "ROLE_PLAYER")
                 .jwt(builder -> builder
                         .subject("keycloak-id")
@@ -93,7 +93,7 @@ public class GetSessionByUserIdTests {
         createTestSessions(userId);
 
         // Act & Assert
-        mockMvc.perform(get("/api/platform/sessions/user/{userId}", userId.id()).with(validJwt()))
+        mockMvc.perform(get("/api/platform/sessions/user").with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -110,7 +110,7 @@ public class GetSessionByUserIdTests {
         UserId userId = createTestUser();
 
         // Act & Assert
-        mockMvc.perform(get("/api/platform/sessions/user/{userId}", userId.id()).with(validJwt()))
+        mockMvc.perform(get("/api/platform/sessions/user").with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)));
