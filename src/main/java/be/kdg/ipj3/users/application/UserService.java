@@ -313,13 +313,13 @@ public class UserService implements UsersApi {
         if (user.getId().id().equals(blockId)) {
             throw new IllegalArgumentException("You can't block yourself");
         }
+
         User blockUser = findById(blockId);
         user.block(blockUser.getId());
-        if(blockUser.getFriends().contains(user.getId())) {
-            blockUser.removeFriend(user.getId());
-            userRepository.save(blockUser);
-        }
+        blockUser.handleBlock(user.getId());
+
         userRepository.save(user);
+        userRepository.save(blockUser);
     }
 
     public List<User> findBlockedUsers(String keycloakId) {
