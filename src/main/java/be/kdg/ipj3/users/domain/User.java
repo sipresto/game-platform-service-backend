@@ -318,10 +318,10 @@ public class User {
         if (friends.contains(blockerId)) {
             removeFriend(blockerId);
         }
-        if (incomingFriendRequests.stream().map(FriendRequest::otherUser).anyMatch(userId1 -> userId1 == blockerId)) {
+        if (incomingFriendRequests.stream().anyMatch(friendRequest -> friendRequest.otherUser().equals(blockerId))) {
             removeIncomingFriendRequest(blockerId);
         }
-        if (outgoingFriendRequests.stream().map(FriendRequest::otherUser).anyMatch(userId1 -> userId1 == blockerId)) {
+        if (outgoingFriendRequests.stream().anyMatch(friendRequest -> friendRequest.otherUser().equals(blockerId))) {
             removeOutgoingFriendRequest(blockerId);
         }
     }
