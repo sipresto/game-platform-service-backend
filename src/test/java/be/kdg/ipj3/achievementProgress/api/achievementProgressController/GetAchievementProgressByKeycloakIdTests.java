@@ -1,72 +1,38 @@
 package be.kdg.ipj3.achievementProgress.api.achievementProgressController;
 
+import be.kdg.ipj3.BaseIntegrationTest;
 import be.kdg.ipj3.achievementProgress.domain.AchievementProgress;
 import be.kdg.ipj3.achievementProgress.domain.AchievementProgressRepository;
 import be.kdg.ipj3.catalog.domain.Achievement;
 import be.kdg.ipj3.catalog.domain.Category;
 import be.kdg.ipj3.catalog.domain.Game;
-import be.kdg.ipj3.catalog.domain.GameRepository;
 import be.kdg.ipj3.catalog.shared.AchievementId;
 import be.kdg.ipj3.catalog.shared.CountTrigger;
 import be.kdg.ipj3.catalog.shared.CountingStrategy;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
-import be.kdg.ipj3.users.domain.UserRepository;
-import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.utility.TestcontainersConfiguration;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@SpringBootTest
-@Import(TestcontainersConfiguration.class)
-@TestPropertySource("classpath:application-test.properties")
-public class GetAchievementProgressByKeycloakIdTests {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private GameRepository gameRepository;
+public class GetAchievementProgressByKeycloakIdTests extends BaseIntegrationTest {
 
     @Autowired
     private AchievementProgressRepository achievementProgressRepository;
 
     @BeforeEach
-    void setup() {
-        userRepository.deleteAll();
-        gameRepository.deleteAll();
+    void setUp() {
         achievementProgressRepository.deleteAll();
     }
-
-    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor validJwt() {
-        return jwt().authorities(() -> "ROLE_PLAYER")
-                .jwt(builder -> builder
-                        .subject("keycloakId")
-                        .claim("preferred_username", "username"));
-    }
-
 
     @Test
     void getAchievementProgressByKeycloakId_shouldReturnFilledAchievementProgressDtoList_WhenThereAreAchievements() throws Exception {
@@ -128,38 +94,30 @@ public class GetAchievementProgressByKeycloakIdTests {
         );
         gameRepository.save(game);
 
-        UserId userId = UserId.create();
-        User user = new User(
-                userId,
-                "keycloakId",
-                "username",
-                List.of(gameId),
-                List.of(),
-                0,
-                new Profile("username", "Bio"),
-                "Test@gmail.com"
-        );
+        User user = createTestUser("keycloakId", "username", "Test@gmail.com");
+
+        user.addGame(game.getId());
         userRepository.save(user);
 
-        AchievementProgress achievementProgress = new AchievementProgress(
-                userId,
+        AchievementProgress achievementProgress1 = new AchievementProgress(
+                user.getId(),
                 achievementIds.get(0),
                 1,
                 Instant.now()
         );
-        achievementProgressRepository.save(achievementProgress);
+        achievementProgressRepository.save(achievementProgress1);
 
-        achievementProgress = new AchievementProgress(
-                userId,
+        AchievementProgress achievementProgress2 = new AchievementProgress(
+                user.getId(),
                 achievementIds.get(2),
                 1,
                 null
         );
-        achievementProgressRepository.save(achievementProgress);
+        achievementProgressRepository.save(achievementProgress2);
 
-        // Act && Assert
+        // Act & Assert
         mockMvc.perform(get("/api/platform/achievements/user/" + user.getId().id())
-                        .with(validJwt()))
+                        .with(validJwt("keycloakId", "username")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].achievementId").value(achievementIds.get(0).id().toString()))
                 .andExpect(jsonPath("$[0].gameId").value(gameId.id().toString()))
@@ -184,8 +142,6 @@ public class GetAchievementProgressByKeycloakIdTests {
         // Arrange
         GameId gameId = GameId.create();
 
-        List<Achievement> achievements = List.of();
-
         Game game = new Game(
                 gameId,
                 "Game 1",
@@ -194,7 +150,7 @@ public class GetAchievementProgressByKeycloakIdTests {
                 "/api/game",
                 "/game",
                 "A rule",
-                achievements,
+                List.of(),
                 List.of(Category.CARDGAME),
                 "",
                 Instant.now(),
@@ -202,26 +158,12 @@ public class GetAchievementProgressByKeycloakIdTests {
         );
         gameRepository.save(game);
 
-        UserId userId = UserId.create();
-        User user = new User(
-                userId,
-                "keycloakId",
-                "username",
-                List.of(gameId),
-                List.of(),
-                0,
-                new Profile("username", "Bio"),
-                "Test@gmail.com"
-        );
-        userRepository.save(user);
-
+        User user = createTestUser("keycloakId", "username", "Test@gmail.com");
 
         // Act & Assert
         mockMvc.perform(get("/api/platform/achievements/user/" + user.getId().id())
-                        .with(validJwt()))
+                        .with(validJwt("keycloakId", "username")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
-
-    // TODO: Test when user does not exist
 }

@@ -24,14 +24,18 @@ public record PublicUserDto(
         List<UUID> ownedGames,
         @JsonInclude(NON_NULL)
         List<UUID> friends,
-        String keycloakId
-) {
+        String keycloakId,
+        UUID equippedBorderId,
+        UUID equippedThemeId,
+        UUID equippedTitleId)
+{
     public static PublicUserDto fromDomain(User user, User viewer) {
         Profile visibleProfile = user.getVisibleProfile(viewer);
         Integer visiblePoints = user.getVisiblePoints(viewer);
         List<GameId> visibleFavoriteGames = user.getVisibleFavoriteGames(viewer);
         List<GameId> visibleOwnedGames = user.getVisibleOwnedGames(viewer);
         List<UserId> visibleFriends = user.getVisibleFriends(viewer);
+        var cosmetics = user.getCosmetics();
 
         return new PublicUserDto(
                 user.getId().id(),
@@ -44,7 +48,10 @@ public record PublicUserDto(
                         visibleOwnedGames.stream().map(GameId::id).toList() : null,
                 visibleFriends != null ?
                         visibleFriends.stream().map(UserId::id).toList() : null,
-                user.getKeycloakId()
+                user.getKeycloakId(),
+                cosmetics.getEquippedBorderId() != null ? cosmetics.getEquippedBorderId().id() : null,
+                cosmetics.getEquippedThemeId() != null ? cosmetics.getEquippedThemeId().id() : null,
+                cosmetics.getEquippedTitleId() != null ? cosmetics.getEquippedTitleId().id() : null
         );
     }
 

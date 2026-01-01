@@ -1,12 +1,12 @@
 package be.kdg.ipj3.perks.api;
 
 import be.kdg.ipj3.perks.api.dto.PerkDto;
+import be.kdg.ipj3.perks.api.dto.UserPerkDto;
 import be.kdg.ipj3.perks.application.PerkService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,5 +33,41 @@ public class PerkController {
     public PerkDto getPerkById(
             @PathVariable UUID perkId) {
         return PerkDto.fromDomain(perkService.findPerkById(perkId));
+    }
+    @PostMapping("/purchase/{perkId}")
+    public ResponseEntity<Void> buyPerk(
+            @PathVariable UUID perkId,
+            @AuthenticationPrincipal Jwt jwt) {
+        String keycloakId = jwt.getSubject();
+        perkService.purchasePerk(perkId, keycloakId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{perkId}/equip")
+    public ResponseEntity<Void> equipPerk(
+            @PathVariable UUID perkId,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        String keycloakId = jwt.getSubject();
+        perkService.equipPerk(perkId, keycloakId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{perkId}/unequip")
+    public ResponseEntity<Void> unequipPerk(
+            @PathVariable UUID perkId,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        String keycloakId = jwt.getSubject();
+        perkService.unequipPerk(perkId, keycloakId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<List<UserPerkDto>> getUserPerks(
+            @AuthenticationPrincipal Jwt jwt) {
+        String keycloakId = jwt.getSubject();
+        List<UserPerkDto> userPerks = perkService.findAllPerksForUser(keycloakId);
+        return ResponseEntity.ok(userPerks);
     }
 }

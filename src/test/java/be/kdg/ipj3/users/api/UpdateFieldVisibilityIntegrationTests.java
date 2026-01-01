@@ -1,75 +1,22 @@
 package be.kdg.ipj3.users.api;
 
-import be.kdg.ipj3.users.domain.*;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
-import be.kdg.ipj3.users.shared.UserId;
-import org.junit.jupiter.api.BeforeEach;
+import be.kdg.ipj3.BaseIntegrationTest;
+import be.kdg.ipj3.users.domain.Visibility;
+import be.kdg.ipj3.users.domain.VisibleField;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-public class UpdateFieldVisibilityIntegrationTests {
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @BeforeEach
-    void setUp() {
-        userRepository.deleteAll();
-    }
-
-    private JwtRequestPostProcessor validJwt(String subject, String username) {
-        return jwt()
-                .jwt(builder -> builder
-                        .subject(subject)
-                        .claim("preferred_username", username))
-                .authorities(new SimpleGrantedAuthority("ROLE_PLAYER"));
-    }
-
-    private void createUser(String keycloakId, String username) {
-        UUID userId = UUID.randomUUID();
-
-        User userEntity = new User(
-                new UserId(userId),
-                keycloakId,
-                username,
-                List.of(),
-                List.of(),
-                0,
-                new Profile(username, "Test bio", null, null),
-                VisibilitySettings.defaultPublic(),
-                "Test@gmail.com"
-        );
-        userRepository.save(userEntity);
-    }
+public class UpdateFieldVisibilityIntegrationTests extends BaseIntegrationTest {
 
     @Test
     void updateFieldVisibility_shouldSucceed_whenValidFieldAndVisibility() throws Exception {
+        // Arrange
         String keycloakId = "test-keycloak-id";
         String username = "testuser";
-        createUser(keycloakId, username);
+        createTestUser(keycloakId, username, "Test@gmail.com");
 
         // Act
         mockMvc.perform(put("/api/platform/users/privacy/fields")
@@ -85,9 +32,10 @@ public class UpdateFieldVisibilityIntegrationTests {
 
     @Test
     void updateFieldVisibility_shouldReturnBadRequest_whenInvalidField() throws Exception {
+        // Arrange
         String keycloakId = "test-keycloak-id";
         String username = "testuser";
-        createUser(keycloakId, username);
+        createTestUser(keycloakId, username, "Test@gmail.com");
 
         // Act & Assert
         mockMvc.perform(put("/api/platform/users/privacy/fields")
@@ -99,9 +47,10 @@ public class UpdateFieldVisibilityIntegrationTests {
 
     @Test
     void updateFieldVisibility_shouldReturnBadRequest_whenInvalidVisibility() throws Exception {
+        // Arrange
         String keycloakId = "test-keycloak-id";
         String username = "testuser";
-        createUser(keycloakId, username);
+        createTestUser(keycloakId, username, "Test@gmail.com");
 
         // Act & Assert
         mockMvc.perform(put("/api/platform/users/privacy/fields")

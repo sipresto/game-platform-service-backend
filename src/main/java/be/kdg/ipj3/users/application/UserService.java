@@ -1,6 +1,7 @@
 package be.kdg.ipj3.users.application;
 
 import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.perks.shared.PerkId;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.shared.*;
@@ -184,6 +185,82 @@ public class UserService implements UsersApi {
                 );
     }
 
+    @Override
+    public void purchasePerk(UUID perkIdParam, int pointCost, UserId userId) {
+        User user = findById(userId.id());
+        int availablePoints = user.getPoints();
+
+        if (availablePoints < pointCost) {
+            throw new IllegalArgumentException("Not enough points to purchase this perk");
+        }
+
+        var perkId = new PerkId(perkIdParam);
+        if (user.hasPerk(perkId)) {
+            throw new IllegalArgumentException("User already owns this perk");
+        }
+
+        user.removePoints(pointCost);
+        user.addPerk(perkId);
+
+        userRepository.save(user);
+    }
+
+    public int findPoints(String keycloakId) {
+        User user = findByKeycloakId(keycloakId);
+        return user.getPoints();
+    }
+
+    public void equipBorder(UserId userId, UUID perkId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        PerkId borderId = new PerkId(perkId);
+        if (!user.hasPerk(borderId)) {
+            throw new IllegalArgumentException("User does not own this border");
+        }
+        user.equipBorder(borderId);
+        userRepository.save(user);
+    }
+
+    public void equipTheme(UserId userId, UUID perkId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        PerkId themeId = new PerkId(perkId);
+        if (!user.hasPerk(themeId)) {
+            throw new IllegalArgumentException("User does not own this theme");
+        }
+        user.equipTheme(themeId);
+        userRepository.save(user);
+    }
+
+    public void equipTitle(UserId userId, UUID perkId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        PerkId titleId = new PerkId(perkId);
+        if (!user.hasPerk(titleId)) {
+            throw new IllegalArgumentException("User does not own this title");
+        }
+        user.equipTitle(new PerkId(perkId));
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unequipBorder(UserId userId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        user.unequipBorder();
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unequipTheme(UserId userId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        user.unequipTheme();
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unequipTitle(UserId userId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        user.unequipTitle();
+        userRepository.save(user);
+    }
+
     public void sendFriendRequest(UUID receiver, String loggedInUserKeycloakId) {
         User receiverUser = findById(receiver);
         User senderUser = findByKeycloakId(loggedInUserKeycloakId);
@@ -257,5 +334,23 @@ public class UserService implements UsersApi {
         }
         user.unblock(new UserId(unblockId));
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserCosmeticsDto getUserCosmetics(UserId userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(userId::notFound);
+
+        UserCosmetics cosmetics = user.getCosmetics();
+
+        return new UserCosmeticsDto(
+                cosmetics.getUnlockedPerkIds().stream()
+                        .map(PerkId::id)
+                        .collect(java.util.stream.Collectors.toSet()),
+                cosmetics.getEquippedBorderId() != null ? cosmetics.getEquippedBorderId().id() : null,
+                cosmetics.getEquippedThemeId() != null ? cosmetics.getEquippedThemeId().id() : null,
+                cosmetics.getEquippedTitleId() != null ? cosmetics.getEquippedTitleId().id() : null
+        );
     }
 }

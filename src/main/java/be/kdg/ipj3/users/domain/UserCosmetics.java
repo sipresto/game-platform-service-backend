@@ -45,6 +45,18 @@ public class UserCosmetics {
         this.equippedTitleId = perkId;
     }
 
+    public void unequipBorder() {
+        this.equippedBorderId = null;
+    }
+
+    public void unequipTheme() {
+        this.equippedThemeId = null;
+    }
+
+    public void unequipTitle() {
+        this.equippedTitleId = null;
+    }
+
     public PerkId getEquippedBorderId() {
         return equippedBorderId;
     }
@@ -55,5 +67,9 @@ public class UserCosmetics {
 
     public PerkId getEquippedTitleId() {
         return equippedTitleId;
+    }
+
+    public Set<PerkId> getUnlockedPerkIds() {
+        return unlockedPerkIds;
     }
 }
