@@ -12,6 +12,6 @@ public record UpdatePreferenceDto(
         NotificationChannel channel,
 
         @NotNull
-        Boolean enabled
+        boolean enabled
 ) {
 }

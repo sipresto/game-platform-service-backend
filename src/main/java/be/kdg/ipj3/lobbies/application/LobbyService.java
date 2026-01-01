@@ -96,7 +96,7 @@ public class LobbyService implements LobbyApi {
         return LobbyDetailDto.fromDomain(lobby, playerDtos);
     }
 
-    public void ResetLobbyTimer(UUID activeGameId){
+    public void resetLobbyTimer(UUID activeGameId){
         var lobby = lobbyRepository.findByGameId(activeGameId);
         if(lobby.isEmpty()){
             logger.warning("Lobby with active game id " + activeGameId + " is empty");
@@ -151,8 +151,8 @@ public class LobbyService implements LobbyApi {
         }
     }
 
-    public void deleteLobby(UUID gameId){
-        lobbyRepository.deleteLobbyByGameId(gameId);
+    public void deleteLobby(UUID lobbyGameId){
+        lobbyRepository.deleteLobbyByGameId(lobbyGameId);
     }
 
     @Transactional(readOnly = true)

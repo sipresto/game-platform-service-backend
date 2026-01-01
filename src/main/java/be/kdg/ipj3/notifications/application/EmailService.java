@@ -1,7 +1,7 @@
 package be.kdg.ipj3.notifications.application;
 
 import be.kdg.ipj3.notifications.shared.NotificationType;
-import be.kdg.ipj3.shared.domain.exceptions.EmailSendException;
+import be.kdg.ipj3.notifications.shared.EmailSendException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;

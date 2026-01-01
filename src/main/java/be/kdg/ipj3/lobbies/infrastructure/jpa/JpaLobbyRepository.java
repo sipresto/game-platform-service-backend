@@ -17,7 +17,6 @@ public interface JpaLobbyRepository extends JpaRepository<JpaLobbyEntity, UUID> 
     List<JpaLobbyEntity> findByStatusAndGameId(@Param("status") String status, @Param("gameId") UUID gameId);
 
     @Modifying
-    @Transactional
     @Query("DELETE FROM JpaLobbyEntity l WHERE l.activeGameUrl IS NOT NULL AND l.activeGameUrl LIKE %:gameId%")
     void deleteByActiveGameUrlContaining(@Param("gameId") String gameId);
 
@@ -25,5 +24,7 @@ public interface JpaLobbyRepository extends JpaRepository<JpaLobbyEntity, UUID> 
 
     @Query("SELECT l FROM JpaLobbyEntity l WHERE l.activeGameUrl IS NOT NULL AND l.activeGameUrl LIKE %:gameId%")
     List<JpaLobbyEntity> findByGameId(@Param("gameId") String gameId);
+
+    List<JpaLobbyEntity> deleteJpaLobbyEntitiesByActiveGameUrlContaining(String activeGameUrl);
 
 }

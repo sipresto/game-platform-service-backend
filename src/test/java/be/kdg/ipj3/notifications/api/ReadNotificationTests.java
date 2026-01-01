@@ -6,6 +6,7 @@ import be.kdg.ipj3.notifications.domain.NotificationRepository;
 import be.kdg.ipj3.notifications.shared.NotificationType;
 import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.UserCosmetics;
 import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,6 +66,7 @@ public class ReadNotificationTests {
                 "username",
                 List.of(),
                 List.of(),
+                new UserCosmetics(),
                 0,
                 new Profile("username", "Bio"),
                 "Test@gmail.com"

@@ -7,7 +7,7 @@ import java.util.Optional;
 public interface UserNotificationPreferencesRepository {
     Optional<UserNotificationPreferences> findByUserId(UserId userId);
 
-    void save(UserNotificationPreferences preferences);
+    UserNotificationPreferences save(UserNotificationPreferences preferences);
 
     void deleteAll();
 }

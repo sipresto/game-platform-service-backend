@@ -12,12 +12,7 @@ public enum NotificationType {
             return a.getDescription().equals(b.getDescription());
         }
     },
-    ACHIEVEMENT(true, false) {
-        @Override
-        public boolean isDuplicate(Notification a, Notification b) {
-            return a.getDescription().equals(b.getDescription());
-        }
-    },
+    ACHIEVEMENT(true, false),
     CHAT_MESSAGE(true, false) {
         @Override
         public boolean isDuplicate(Notification a, Notification b) {

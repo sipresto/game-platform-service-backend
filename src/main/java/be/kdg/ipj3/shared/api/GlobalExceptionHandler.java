@@ -1,8 +1,8 @@
 package be.kdg.ipj3.shared.api;
 
 import be.kdg.ipj3.lobbies.shared.GameServiceUnavailableException;
-import be.kdg.ipj3.shared.domain.exceptions.EmailSendException;
-import be.kdg.ipj3.shared.domain.exceptions.GameNotFoundException;
+import be.kdg.ipj3.notifications.shared.EmailSendException;
+import be.kdg.ipj3.shop.shared.GameNotFoundException;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.social.shared.InvalidChatRequestException;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(GameNotFoundException.class)
-    public ResponseEntity<ApiError> handleNotCorrectUserLoggedIn(GameNotFoundException ex) {
+    public ResponseEntity<ApiError> handleActiveGameNotFound(GameNotFoundException ex) {
         ApiError body = new ApiError(
                 HttpStatus.BAD_REQUEST.value(),
                 "Game wasn't found",
@@ -30,11 +30,11 @@ public class GlobalExceptionHandler {
                 List.of(),
                 Instant.now()
         );
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(EmailSendException.class)
-    public ResponseEntity<ApiError> handleNotCorrectUserLoggedIn(EmailSendException ex) {
+    public ResponseEntity<ApiError> handleEmailNotSent(EmailSendException ex) {
         ApiError body = new ApiError(
                 HttpStatus.EXPECTATION_FAILED.value(),
                 "No email could be sent",
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
                 List.of(),
                 Instant.now()
         );
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(body);
     }
 
     @ExceptionHandler(SecurityException.class)

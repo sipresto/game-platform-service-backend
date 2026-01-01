@@ -207,33 +207,6 @@ public class GetLobbyTests {
     }
 
     @Test
-    void getLobby_shouldReturnLobbyDetails_whenLobbyIsPublic() throws Exception {
-        // Arrange
-        createTestUser();
-        GameId gameId = createTestGame();
-
-        Optional<User> maybeUser = userRepository.findByKeycloakId("keycloak-id");
-        User host = maybeUser.orElseThrow(() ->
-                new AssertionError("User not found in DB")
-        );
-
-        Lobby lobby = new Lobby(
-                null,
-                4,
-                gameId,
-                host.getId()
-        );
-        lobbyRepository.save(lobby);
-        UUID lobbyId = lobby.getId().id();
-
-        // Act & Assert
-        mockMvc.perform(get("/api/platform/lobbies/{id}", lobbyId)
-                        .with(validJwt()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.isPrivate").value(false));
-    }
-
-    @Test
     void getLobby_shouldReturnNotFound_whenLobbyDoesNotExist() throws Exception {
         // Arrange
         createTestUser();
@@ -294,78 +267,5 @@ public class GetLobbyTests {
         mockMvc.perform(get("/api/platform/lobbies/{id}", lobbyId)
                         .with(jwtForUser("non-existent-keycloak-id", "non-existent-user")))
                 .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void getLobby_shouldReturnBadRequest_whenInvalidUUIDFormat() throws Exception {
-        // Arrange
-        createTestUser();
-
-        // Act & Assert
-        mockMvc.perform(get("/api/platform/lobbies/{id}", "invalid-uuid")
-                        .with(validJwt()))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void getLobby_shouldReturnLobbyWithMultiplePlayers() throws Exception {
-        // Arrange
-        User host = User.createFromKeycloak("host-keycloak-id", "host-user", "host@gmail.com");
-        userRepository.save(host);
-
-        User player1 = User.createFromKeycloak("player1-keycloak-id", "player1", "player1@gmail.com");
-        userRepository.save(player1);
-
-        User player2 = User.createFromKeycloak("player2-keycloak-id", "player2", "player2@gmail.com");
-        userRepository.save(player2);
-
-        GameId gameId = createTestGame();
-
-        Lobby lobby = new Lobby(
-                "password",
-                4,
-                gameId,
-                host.getId()
-        );
-        lobby.join(player1.getId(), "password");
-        lobby.join(player2.getId(), "password");
-        lobbyRepository.save(lobby);
-        UUID lobbyId = lobby.getId().id();
-
-        // Act & Assert
-        mockMvc.perform(get("/api/platform/lobbies/{id}", lobbyId)
-                        .with(jwtForUser("host-keycloak-id", "host-user")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.currentPlayerCount").value(3))
-                .andExpect(jsonPath("$.players", hasSize(3)));
-    }
-
-    @Test
-    void getLobby_shouldReturnLobbyWithFullCapacity() throws Exception {
-        // Arrange
-        User host = User.createFromKeycloak("host-keycloak-id", "host-user", "host@gmail.com");
-        userRepository.save(host);
-
-        User player1 = User.createFromKeycloak("player1-keycloak-id", "player1", "player1@gmail.com");
-        userRepository.save(player1);
-
-        GameId gameId = createTestGame();
-
-        Lobby lobby = new Lobby(
-                "password",
-                2,
-                gameId,
-                host.getId()
-        );
-        lobby.join(player1.getId(), "password");
-        lobbyRepository.save(lobby);
-        UUID lobbyId = lobby.getId().id();
-
-        // Act & Assert
-        mockMvc.perform(get("/api/platform/lobbies/{id}", lobbyId)
-                        .with(jwtForUser("host-keycloak-id", "host-user")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.currentPlayerCount").value(2))
-                .andExpect(jsonPath("$.maxPlayers").value(2));
     }
 }

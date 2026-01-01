@@ -3,7 +3,7 @@ package be.kdg.ipj3.shop.infrastructure.stripe;
 import be.kdg.ipj3.catalog.shared.GamePurchaseDto;
 import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.shared.domain.Money;
-import be.kdg.ipj3.shared.domain.exceptions.GameNotFoundException;
+import be.kdg.ipj3.shop.shared.GameNotFoundException;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
