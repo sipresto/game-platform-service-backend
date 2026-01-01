@@ -73,7 +73,7 @@ public class GetPreferencesTests extends BaseIntegrationTest {
     }
 
     @Test
-    void getPreferences_shouldReturnNewPreferences_whenUserLoggedIn() throws Exception {
+    void getPreferences_shouldReturnCorrectPreferences_whenPreferencesExist() throws Exception {
         // Arrange
         User user = createTestUser("keycloakId", "username", "Test@gmail.com");
 
