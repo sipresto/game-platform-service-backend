@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -35,7 +36,7 @@ public class GetAchievementProgressByKeycloakIdTests extends BaseIntegrationTest
     }
 
     @Test
-    void getAchievementProgressByKeycloakId_shouldReturnFilledAchievementProgressDtoList_WhenThereAreAchievements() throws Exception {
+    void getAchievementProgressByUserId_shouldReturnFilledAchievementProgressDtoList_WhenThereAreAchievements() throws Exception {
         // Arrange
         List<AchievementId> achievementIds = List.of(
                 AchievementId.create(),
@@ -138,7 +139,7 @@ public class GetAchievementProgressByKeycloakIdTests extends BaseIntegrationTest
     }
 
     @Test
-    void getAchievementProgressByKeycloakId_shouldReturnEmptyAchievementProgressDtoList_WhenThereAreNoAchievements() throws Exception {
+    void getAchievementProgressByUserId_shouldReturnEmptyAchievementProgressDtoList_WhenThereAreNoAchievements() throws Exception {
         // Arrange
         GameId gameId = GameId.create();
 
@@ -165,5 +166,34 @@ public class GetAchievementProgressByKeycloakIdTests extends BaseIntegrationTest
                         .with(validJwt("keycloakId", "username")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void getAchievementProgressByKeycloakId_shouldReturnNotFound_WhenUserIdIsIncorrect() throws Exception {
+        // Arrange
+        GameId gameId = GameId.create();
+
+        List<Achievement> achievements = List.of();
+
+        Game game = new Game(
+                gameId,
+                "Game 1",
+                "Description",
+                Money.of(BigDecimal.valueOf(20.00)),
+                "/api/game",
+                "/game",
+                "A rule",
+                achievements,
+                List.of(Category.CARDGAME),
+                "",
+                Instant.now(),
+                true
+        );
+        gameRepository.save(game);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/platform/achievements/user/" + UUID.randomUUID())
+                        .with(validJwt()))
+                .andExpect(status().isNotFound());
     }
 }

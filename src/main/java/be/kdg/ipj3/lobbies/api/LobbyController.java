@@ -24,8 +24,10 @@ public class LobbyController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LobbyListDto>> getAllOpenLobbies() {
-        List<Lobby> lobbies = lobbyService.findAllOpenLobbies();
+    public ResponseEntity<List<LobbyListDto>> getAllOpenLobbies(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        List<Lobby> lobbies = lobbyService.findAllOpenLobbies(jwt.getSubject());
 
         List<LobbyListDto> dtos = lobbies.stream()
                 .map(LobbyListDto::fromDomain)
@@ -92,10 +94,11 @@ public class LobbyController {
 
     @GetMapping("game/{gameId}")
     public ResponseEntity<List<LobbyListDto>> getOpenLobbiesForGame(
-            @PathVariable UUID gameId
+            @PathVariable UUID gameId,
+            @AuthenticationPrincipal Jwt jwt
     ) {
 
-        var openLobbies = lobbyService.findOpenLobbiesForGame(gameId);
+        var openLobbies = lobbyService.findOpenLobbiesForGame(gameId, jwt.getSubject());
 
         var dto = openLobbies.stream()
                 .map(LobbyListDto::fromDomain)
@@ -105,8 +108,11 @@ public class LobbyController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LobbyDetailDto> getLobby(@PathVariable UUID id) {
-        LobbyDetailDto lobbyDetail = lobbyService.getLobbyDetails(id);
+    public ResponseEntity<LobbyDetailDto> getLobby(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        LobbyDetailDto lobbyDetail = lobbyService.getLobbyDetails(id, jwt.getSubject());
 
         return ResponseEntity.ok(lobbyDetail);
     }

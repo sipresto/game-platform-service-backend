@@ -1,10 +1,13 @@
 package be.kdg.ipj3.notifications.api;
 
 import be.kdg.ipj3.notifications.api.dto.NotificationDto;
+import be.kdg.ipj3.notifications.api.dto.NotificationPreferencesDto;
+import be.kdg.ipj3.notifications.api.dto.UpdatePreferenceDto;
 import be.kdg.ipj3.notifications.application.NotificationService;
 import be.kdg.ipj3.notifications.domain.NotificationChannel;
 import be.kdg.ipj3.notifications.domain.UserNotificationPreferences;
 import be.kdg.ipj3.notifications.shared.NotificationType;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -45,24 +48,25 @@ public class NotificationController {
         return ResponseEntity.ok().build();
     }
 
-    // TODO: dto gebruiken?
     @GetMapping("/preferences")
-    public ResponseEntity<Map<NotificationType, Map<NotificationChannel, Boolean>>> getPreferences(
+    public ResponseEntity<NotificationPreferencesDto> getPreferences(
             @AuthenticationPrincipal Jwt jwt
     ) {
         UserNotificationPreferences prefs = notificationService.getPreferencesByKeycloakId(jwt.getSubject());
-        return ResponseEntity.ok(prefs.getPreferences());
+        return ResponseEntity.ok(NotificationPreferencesDto.fromDomain(prefs));
     }
 
-    // TODO: dto gebruiken?
-    @PutMapping("/preferences/{notificationType}/{channel}")
+    @PutMapping("/preferences")
     public ResponseEntity<Void> updatePreference(
             @AuthenticationPrincipal Jwt jwt,
-            @PathVariable NotificationType notificationType,
-            @PathVariable NotificationChannel channel,
-            @RequestParam boolean enabled
+            @Valid @RequestBody UpdatePreferenceDto dto
     ) {
-        notificationService.updatePreferences(jwt.getSubject(), notificationType, channel, enabled);
+        notificationService.updatePreferences(
+                jwt.getSubject(),
+                dto.notificationType(),
+                dto.channel(),
+                dto.enabled()
+        );
         return ResponseEntity.ok().build();
     }
 }

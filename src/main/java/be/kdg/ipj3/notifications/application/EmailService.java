@@ -1,6 +1,7 @@
 package be.kdg.ipj3.notifications.application;
 
 import be.kdg.ipj3.notifications.shared.NotificationType;
+import be.kdg.ipj3.notifications.shared.EmailSendException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
@@ -115,12 +116,5 @@ public class EmailService {
             case YOUR_TURN -> "email/your-turn";
             case CHAT_MESSAGE -> null;
         };
-    }
-}
-
-//TODO: in domain of shared zetten en opvangen, want er is nu geen foutafhandeling
-class EmailSendException extends RuntimeException {
-    public EmailSendException(String message, Throwable cause) {
-        super(message, cause);
     }
 }

@@ -9,8 +9,10 @@ import be.kdg.ipj3.lobbies.infrastructure.jpa.JpaLobbyEntity;
 import be.kdg.ipj3.lobbies.infrastructure.jpa.JpaLobbyRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class LobbyRepositoryImpl implements LobbyRepository {
@@ -54,12 +56,27 @@ public class LobbyRepositoryImpl implements LobbyRepository {
     }
 
     @Override
-    public void deleteById(LobbyId id) {
-        jpaLobbyRepository.deleteById(id.id());
+    public void deleteLobbyByGameId(UUID gameId) {
+        jpaLobbyRepository.deleteByActiveGameUrlContaining(gameId.toString());
     }
 
     @Override
     public void deleteAll() {
         jpaLobbyRepository.deleteAll();
+    }
+
+    @Override
+    public void deleteById(LobbyId lobbyId) {
+        jpaLobbyRepository.deleteById(lobbyId.id());
+    }
+
+    @Override
+    public List<Lobby> findByLastActivityBeforeInstant(Instant cutoff) {
+        return jpaLobbyRepository.findJpaLobbyEntitiesByLastActivityAtBefore(cutoff).stream().map(JpaLobbyEntity::toDomain).toList();
+    }
+
+    @Override
+    public Optional<Lobby> findByGameId(UUID activeGameId) {
+        return jpaLobbyRepository.findByGameId(activeGameId.toString()).stream().map(JpaLobbyEntity::toDomain).findFirst();
     }
 }

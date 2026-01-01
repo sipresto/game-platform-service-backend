@@ -3,6 +3,7 @@ package be.kdg.ipj3.shop.infrastructure.stripe;
 import be.kdg.ipj3.catalog.shared.GamePurchaseDto;
 import be.kdg.ipj3.catalog.shared.GamesApi;
 import be.kdg.ipj3.shared.domain.Money;
+import be.kdg.ipj3.shop.shared.GameNotFoundException;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
@@ -33,9 +34,8 @@ public class StripeService {
 
     public Charge charge(UUID gameId, String stripeToken) throws StripeException {
         GamePurchaseDto game = gamesApi.findGameDtoById(gameId).orElse(null);
-        // TODO: maybe throw an exception here
         if (game == null) {
-            return null;
+            throw new GameNotFoundException("Game with id: " + gameId + " wasn't found!");
         }
 
         Money total = game.price();

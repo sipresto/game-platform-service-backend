@@ -12,8 +12,11 @@ import be.kdg.ipj3.lobbies.domain.LobbyStatus;
 import be.kdg.ipj3.lobbies.shared.GameServiceUnavailableException;
 import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
+import be.kdg.ipj3.lobbies.shared.LobbyApi;
 import be.kdg.ipj3.sessions.shared.SessionId;
 import be.kdg.ipj3.sessions.shared.SessionsApi;
+import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
+import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
@@ -28,7 +31,7 @@ import java.util.logging.Logger;
 
 @Service
 @Transactional
-public class LobbyService {
+public class LobbyService implements LobbyApi {
     private final GameClient gameClient;
     private final LobbyRepository lobbyRepository;
     private final GamesApi gamesApi;
@@ -47,6 +50,9 @@ public class LobbyService {
 
     public Lobby createLobby(String keycloakId, String password, int maxPlayers, UUID gameIdParam) {
         var hostId = usersApi.findIdByKeycloakId(keycloakId);
+        if(hostId == null){
+            throw new UserNotFoundException(keycloakId);
+        }
 
         var gameId = gamesApi.findGameById(gameIdParam).getId();
 
@@ -60,6 +66,10 @@ public class LobbyService {
     public void joinLobby(UUID id, String keycloakId, String password) {
 
         var playerId = usersApi.findIdByKeycloakId(keycloakId);
+        if(playerId == null){
+            throw new UserNotFoundException(keycloakId);
+        }
+
         var lobbyId = new LobbyId(id);
         Lobby lobby = lobbyRepository.findById(lobbyId)
                 .orElseThrow(lobbyId::notFound);
@@ -75,7 +85,11 @@ public class LobbyService {
     }
 
 
-    public LobbyDetailDto getLobbyDetails(UUID lobbyId) {
+    public LobbyDetailDto getLobbyDetails(UUID lobbyId, String keycloakId) {
+        var id = usersApi.findIdByKeycloakId(keycloakId);
+        if(id == null){
+            throw new UserNotFoundException(keycloakId);
+        }
         Lobby lobby = findLobbyById(lobbyId);
 
         List<PlayerDto> playerDtos = lobby.getPlayers().stream()
@@ -94,9 +108,24 @@ public class LobbyService {
         return LobbyDetailDto.fromDomain(lobby, playerDtos);
     }
 
+    public void resetLobbyTimer(UUID activeGameId){
+        var lobby = lobbyRepository.findByGameId(activeGameId);
+        if(lobby.isEmpty()){
+            logger.warning("Lobby with active game id " + activeGameId + " is empty");
+        }
+        else{
+            var presentLobby = lobby.get();
+            presentLobby.resetTimer();
+            lobbyRepository.save(presentLobby);
+        }
+    }
 
     public String startGame(UUID id, String requestorKeycloakId, Difficulty difficulty) {
         var requestor = usersApi.findIdByKeycloakId(requestorKeycloakId);
+        if(requestor == null){
+            throw new UserNotFoundException(requestorKeycloakId);
+        }
+
         var lobbyId = new LobbyId(id);
 
         Lobby lobby = lobbyRepository.findById(lobbyId)
@@ -131,9 +160,6 @@ public class LobbyService {
             lobby.startGame(gameUrl);
             lobbyRepository.save(lobby);
 
-            // TODO: cleanup job to remove after a period because polling
-            //lobbyRepository.deleteById(lobbyId);
-
             return gameUrl;
         } catch (Exception e) {
             logger.warning(e.toString());
@@ -141,15 +167,27 @@ public class LobbyService {
         }
     }
 
+    public void deleteLobby(UUID lobbyGameId){
+        lobbyRepository.deleteLobbyByGameId(lobbyGameId);
+    }
+
     @Transactional(readOnly = true)
-    public List<Lobby> findAllOpenLobbies() {
+    public List<Lobby> findAllOpenLobbies(String keycloakId) {
+        var userId = usersApi.findIdByKeycloakId(keycloakId);
+        if(userId == null){
+            throw new UserNotFoundException(keycloakId);
+        }
         return lobbyRepository.findByStatus(LobbyStatus.OPEN);
     }
 
     @Transactional(readOnly = true)
-    public List<Lobby> findOpenLobbiesForGame(UUID id) {
+    public List<Lobby> findOpenLobbiesForGame(UUID id, String keycloakId) {
 
         var gameId = gamesApi.findGameById(id).getId();
+        var user = usersApi.findIdByKeycloakId(keycloakId);
+        if(user == null){
+            throw new UserNotFoundException(keycloakId);
+        }
 
         return lobbyRepository.findByStatusAndGameId(LobbyStatus.OPEN, gameId);
     }
@@ -157,12 +195,20 @@ public class LobbyService {
     public void leaveLobby(UUID id, String keycloakId) {
 
         var playerId = usersApi.findIdByKeycloakId(keycloakId);
+        if(playerId == null){
+            throw new UserNotFoundException(keycloakId);
+        }
         var lobbyId = new LobbyId(id);
 
         Lobby lobby = lobbyRepository.findById(lobbyId)
                 .orElseThrow(lobbyId::notFound);
 
-        lobby.leave(playerId);
-        lobbyRepository.save(lobby);
+        boolean readyToDelete = lobby.leave(playerId);
+        if(readyToDelete){
+            lobbyRepository.deleteById(lobby.getId());
+        }
+        else{
+            lobbyRepository.save(lobby);
+        }
     }
 }

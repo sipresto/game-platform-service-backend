@@ -5,6 +5,7 @@ import be.kdg.ipj3.users.shared.UserId;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -20,8 +21,9 @@ public class Lobby {
     private final List<UserId> players = new ArrayList<>();
     private LobbyStatus status;
     private String activeGameUrl;
+    private Instant lastActivityAt;
 
-    public Lobby(LobbyId id, String password, int maxPlayers, GameId game, UserId host, List<UserId> players, LobbyStatus status, String activeGameUrl) {
+    public Lobby(LobbyId id, String password, int maxPlayers, GameId game, UserId host, List<UserId> players, LobbyStatus status, String activeGameUrl, Instant lastActivityAt) {
         this.id = id;
         this.password = password;
         this.maxPlayers = maxPlayers;
@@ -30,10 +32,11 @@ public class Lobby {
         this.players.addAll(players);
         this.status = status;
         this.activeGameUrl = activeGameUrl;
+        this.lastActivityAt = lastActivityAt;
     }
 
     public Lobby(String password, int maxPlayers, GameId game, UserId host) {
-        this(LobbyId.create(), password, maxPlayers, game, host, List.of(host), LobbyStatus.OPEN, null);
+        this(LobbyId.create(), password, maxPlayers, game, host, List.of(host), LobbyStatus.OPEN, null, Instant.now());
     }
 
     public void join(UserId player, String providedPassword) {
@@ -52,16 +55,23 @@ public class Lobby {
         }
 
         players.add(player);
+        resetTimer();
     }
 
-    public void leave(UserId player) {
-        players.remove(player);
+    public Instant getLastActivityAt() {
+        return lastActivityAt;
+    }
 
+    public boolean leave(UserId player) {
+        players.remove(player);
+        resetTimer();
         if (players.isEmpty()) {
-            this.status = LobbyStatus.CLOSED;
+            return true;
         } else if (host.equals(player)) {
             host = players.getFirst();
+            return false;
         }
+        return false;
     }
 
     public void validateReadyToStart(UserId requestor) {
@@ -76,9 +86,14 @@ public class Lobby {
         }
     }
 
+    public void resetTimer(){
+        lastActivityAt = Instant.now();
+    }
+
     public void startGame(String gameUrl) {
         this.status = LobbyStatus.IN_GAME;
         this.activeGameUrl = gameUrl;
+        resetTimer();
     }
 
     public boolean isPrivate() {

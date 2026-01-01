@@ -92,7 +92,6 @@ public class CompleteAchievementTests {
         return user.getId();
     }
 
-    //TODO: Check if points were added to user
     @Test
     void completeAchievement_shouldMarkProgressAsCompleted_whenAchievementExists() {
         // Arrange
@@ -109,12 +108,16 @@ public class CompleteAchievementTests {
         // Assert
         Optional<AchievementProgress> progress = progressRepository
                 .findByUserIdAndAchievementId(userId, achievementId);
-
         assertThat(progress).isPresent();
+
 
         @SuppressWarnings("OptionalGetWithoutIsPresent")
         AchievementProgress actualProgress = progress.get();
         assertThat(actualProgress.getCompletedAt()).isCloseTo(timestamp, within(5, ChronoUnit.MILLIS));
+
+        @SuppressWarnings("OptionalGetWithoutIsPresent")
+        User user = userRepository.findById(userId).get();
+        assertThat(user.getPoints() == 10);
     }
 
     @Test
