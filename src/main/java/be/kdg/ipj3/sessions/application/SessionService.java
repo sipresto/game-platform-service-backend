@@ -39,10 +39,10 @@ public class SessionService implements SessionsApi {
     }
 
     @Transactional(readOnly = true)
-    public List<Session> findFinishedSessionsByUserId(UUID userId, String keycloakId) {
-        usersApi.findIdByKeycloakId(keycloakId);
+    public List<Session> findFinishedSessionsByUserId(String keycloakId) {
+        var userId = usersApi.findIdByKeycloakId(keycloakId);
 
-        return sessionRepository.findFinishedSessionsByUserId(new UserId(userId));
+        return sessionRepository.findFinishedSessionsByUserId(userId);
     }
 
     @Transactional(readOnly = true)

@@ -22,12 +22,11 @@ public class SessionController {
         this.sessionService = sessionService;
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user")
     public ResponseEntity<List<SessionDto>> getSessionsByUserId(
-            @PathVariable UUID userId,
             @AuthenticationPrincipal Jwt jwt
     ) {
-        List<SessionDto> dtos = sessionService.findFinishedSessionsByUserId(userId, jwt.getSubject()).stream()
+        List<SessionDto> dtos = sessionService.findFinishedSessionsByUserId(jwt.getSubject()).stream()
                 .map(SessionDto::fromDomain)
                 .toList();
 
