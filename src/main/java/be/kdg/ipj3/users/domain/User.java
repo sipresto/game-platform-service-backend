@@ -1,12 +1,14 @@
 package be.kdg.ipj3.users.domain;
 
 import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.perks.shared.PerkId;
 import be.kdg.ipj3.users.shared.UserId;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 @AggregateRoot
 public class User {
@@ -23,15 +25,19 @@ public class User {
     private final String email;
     private final List<FriendRequest> incomingFriendRequests;
     private final List<FriendRequest> outgoingFriendRequests;
+    private final List<UserId> blockedUsers;
+
+    private final UserCosmetics cosmetics;
 
     public User(UserId id, String keycloakId, String username, List<GameId> ownedGames,
-                List<GameId> favoriteGames, int points, Profile profile,
+                List<GameId> favoriteGames, UserCosmetics cosmetics, int points, Profile profile,
                 VisibilitySettings visibilitySettings, String email) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
         this.ownedGames = ownedGames != null ? new ArrayList<>(ownedGames) : new ArrayList<>();
         this.favoriteGames = favoriteGames != null ? new ArrayList<>(favoriteGames) : new ArrayList<>();
+        this.cosmetics = cosmetics != null ? cosmetics : new UserCosmetics();
         this.points = points;
         this.profile = profile;
         this.visibilitySettings = visibilitySettings;
@@ -39,17 +45,18 @@ public class User {
         this.email = email;
         this.incomingFriendRequests = new ArrayList<>();
         this.outgoingFriendRequests = new ArrayList<>();
+        this.blockedUsers = new ArrayList<>();
     }
 
     public User(UserId id, String keycloakId, String username, Profile profile, int points, String email) {
         this(id, keycloakId, username,
-                new ArrayList<>(), new ArrayList<>(),
+                new ArrayList<>(), new ArrayList<>(), new UserCosmetics(),
                 points, profile, VisibilitySettings.defaultPublic(), email);
     }
 
     public User(UserId id, String keycloakId, String username, List<GameId> ownedGames,
-                List<GameId> favoriteGames, int points, Profile profile, String email) {
-        this(id, keycloakId, username, ownedGames, favoriteGames, points, profile,
+                List<GameId> favoriteGames, UserCosmetics cosmetics, int points, Profile profile, String email) {
+        this(id, keycloakId, username, ownedGames, favoriteGames, cosmetics, points, profile,
                 VisibilitySettings.defaultPublic(), email);
     }
 
@@ -57,6 +64,7 @@ public class User {
         return new User(UserId.create(), keycloakId, keycloakUsername,
                 List.of(),
                 List.of(),
+                new UserCosmetics(),
                 0, new Profile(keycloakUsername, ""), email);
     }
 
@@ -206,6 +214,10 @@ public class User {
         this.points += points;
     }
 
+    public void removePoints(int points) {
+        this.points -= points;
+    }
+
     public void addIncomingFriendRequest(FriendRequest friendRequest) {
         this.incomingFriendRequests.add(friendRequest);
     }
@@ -273,5 +285,71 @@ public class User {
 
     public List<FriendRequest> getOutgoingFriendRequests() {
         return new ArrayList<>(outgoingFriendRequests);
+    }
+
+    public void removeFriend(UserId id) {
+        if (!friends.contains(id)) {
+            throw new IllegalArgumentException("You aren't friends with this user");
+        }
+        else {
+            friends.remove(id);
+        }
+    }
+
+    public List<UserId> getBlockedUsers() {
+        return new ArrayList<>(blockedUsers);
+    }
+
+    public void block(UserId userId) {
+        if (friends.contains(userId)) {
+            removeFriend(userId);
+        }
+        blockedUsers.add(userId);
+    }
+
+    public void unblock(UserId unblockId) {
+        if (blockedUsers.contains(unblockId)) {
+            blockedUsers.remove(unblockId);
+        }
+        else {
+            throw new IllegalArgumentException("This user is not blocked");
+        }
+    }
+
+    public void addPerk(PerkId perkId) {
+        this.cosmetics.unlockPerk(perkId);
+    }
+
+    public boolean hasPerk(PerkId perkId) {
+        return this.cosmetics.hasPerk(perkId);
+    }
+
+    public void equipBorder(PerkId perkId) {
+        this.cosmetics.equipBorder(perkId);
+    }
+
+    public void equipTheme(PerkId perkId) {
+        this.cosmetics.equipTheme(perkId);
+    }
+
+    public void equipTitle(PerkId perkId) {
+        this.cosmetics.equipTitle(perkId);
+    }
+
+    public void unequipBorder() {
+        this.cosmetics.unequipBorder();
+    }
+
+    public void unequipTheme() {
+        this.cosmetics.unequipTheme();
+    }
+
+    public void unequipTitle() {
+        this.cosmetics.unequipTitle();
+    }
+
+
+    public UserCosmetics getCosmetics() {
+        return cosmetics;
     }
 }

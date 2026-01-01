@@ -26,9 +26,13 @@ public record UserDto(
         List<OutgoingFriendRequestDto> outgoingFriendRequests,
         List<UUID> ownedGames,
         List<UUID> favoriteGames,
-        @NotBlank String email
+        @NotBlank String email,
+        UUID equippedBorderId,
+        UUID equippedThemeId,
+        UUID equippedTitleId
 ) {
     public static UserDto fromDomain(User user) {
+        var cosmetics = user.getCosmetics();
         return new UserDto(
                 user.getId().id(),
                 user.getKeycloakId(),
@@ -46,7 +50,10 @@ public record UserDto(
                         .map(GameId::id).toList(),
                 user.getFavoriteGames().stream()
                         .map(GameId::id).toList(),
-                user.getEmail()
+                user.getEmail(),
+                cosmetics.getEquippedBorderId() != null ? cosmetics.getEquippedBorderId().id() : null,
+                cosmetics.getEquippedThemeId() != null ? cosmetics.getEquippedThemeId().id() : null,
+                cosmetics.getEquippedTitleId() != null ? cosmetics.getEquippedTitleId().id() : null
         );
     }
 

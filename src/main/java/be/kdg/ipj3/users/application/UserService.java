@@ -1,27 +1,25 @@
 package be.kdg.ipj3.users.application;
 
 import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.perks.shared.PerkId;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.domain.*;
-import be.kdg.ipj3.users.shared.EmailUserDto;
-import be.kdg.ipj3.users.shared.SmallUserDto;
-import be.kdg.ipj3.users.shared.UserId;
-import be.kdg.ipj3.users.shared.UsersApi;
+import be.kdg.ipj3.users.shared.*;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional
 public class UserService implements UsersApi {
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, ApplicationEventPublisher eventPublisher) {
         this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -115,7 +113,8 @@ public class UserService implements UsersApi {
                 .orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
     }
 
-    public void updatePrivacySettingsByKeycloakId(Visibility visibility, User user) {
+    public void updatePrivacySettingsByKeycloakId(Visibility visibility, String keycloakId) {
+        User user = findByKeycloakId(keycloakId);
         user.updateVisibility(visibility);
         userRepository.save(user);
     }
@@ -175,6 +174,93 @@ public class UserService implements UsersApi {
                 .displayName();
     }
 
+    @Override
+    public boolean checkBlock(Set<UserId> participantIds) {
+        return participantIds.stream()
+                .map(userRepository::findById)
+                .flatMap(Optional::stream)
+                .anyMatch(user ->
+                        user.getBlockedUsers().stream()
+                                .anyMatch(participantIds::contains)
+                );
+    }
+
+    @Override
+    public void purchasePerk(UUID perkIdParam, int pointCost, UserId userId) {
+        User user = findById(userId.id());
+        int availablePoints = user.getPoints();
+
+        if (availablePoints < pointCost) {
+            throw new IllegalArgumentException("Not enough points to purchase this perk");
+        }
+
+        var perkId = new PerkId(perkIdParam);
+        if (user.hasPerk(perkId)) {
+            throw new IllegalArgumentException("User already owns this perk");
+        }
+
+        user.removePoints(pointCost);
+        user.addPerk(perkId);
+
+        userRepository.save(user);
+    }
+
+    public int findPoints(String keycloakId) {
+        User user = findByKeycloakId(keycloakId);
+        return user.getPoints();
+    }
+
+    public void equipBorder(UserId userId, UUID perkId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        PerkId borderId = new PerkId(perkId);
+        if (!user.hasPerk(borderId)) {
+            throw new IllegalArgumentException("User does not own this border");
+        }
+        user.equipBorder(borderId);
+        userRepository.save(user);
+    }
+
+    public void equipTheme(UserId userId, UUID perkId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        PerkId themeId = new PerkId(perkId);
+        if (!user.hasPerk(themeId)) {
+            throw new IllegalArgumentException("User does not own this theme");
+        }
+        user.equipTheme(themeId);
+        userRepository.save(user);
+    }
+
+    public void equipTitle(UserId userId, UUID perkId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        PerkId titleId = new PerkId(perkId);
+        if (!user.hasPerk(titleId)) {
+            throw new IllegalArgumentException("User does not own this title");
+        }
+        user.equipTitle(new PerkId(perkId));
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unequipBorder(UserId userId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        user.unequipBorder();
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unequipTheme(UserId userId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        user.unequipTheme();
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unequipTitle(UserId userId) {
+        User user = userRepository.findById(userId).orElseThrow(userId::notFound);
+        user.unequipTitle();
+        userRepository.save(user);
+    }
+
     public void sendFriendRequest(UUID receiver, String loggedInUserKeycloakId) {
         User receiverUser = findById(receiver);
         User senderUser = findByKeycloakId(loggedInUserKeycloakId);
@@ -183,10 +269,16 @@ public class UserService implements UsersApi {
         senderUser.addOutgoingFriendRequest(new FriendRequest(receiverUser.getId()));
         userRepository.save(receiverUser);
         userRepository.save(senderUser);
+
+        eventPublisher.publishEvent(new FriendRequestSentEvent(
+                senderUser.getId(),
+                receiverUser.getId(),
+                senderUser.getProfile().displayName()
+        ));
     }
 
-    public void acceptFriendRequest(UUID receiver, UUID sender) {
-        User receiverUser = findById(receiver);
+    public void acceptFriendRequest(String keycloakId, UUID sender) {
+        User receiverUser = findByKeycloakId(keycloakId);
         User senderUser = findById(sender);
         receiverUser.acceptFriendRequest(senderUser.getId());
         senderUser.addFriend(receiverUser.getId());
@@ -195,12 +287,70 @@ public class UserService implements UsersApi {
         userRepository.save(senderUser);
     }
 
-    public void rejectFriendRequest(UUID receiver, UUID sender) {
-        User receiverUser = findById(receiver);
+    public void rejectFriendRequest(String keycloakId, UUID sender) {
+        User receiverUser = findByKeycloakId(keycloakId);
         User senderUser = findById(sender);
         receiverUser.removeIncomingFriendRequest(senderUser.getId());
         senderUser.removeOutgoingFriendRequest(receiverUser.getId());
         userRepository.save(receiverUser);
         userRepository.save(senderUser);
+    }
+
+    public void removeFriend(String keycloakId, UUID friendId) {
+        User user = findByKeycloakId(keycloakId);
+        if(user.getId().id().equals(friendId)) {
+            throw new IllegalArgumentException("FriendId can't be the same as UserId");
+        }
+        User friend = findById(friendId);
+        user.removeFriend(friend.getId());
+        friend.removeFriend(user.getId());
+        userRepository.save(user);
+        userRepository.save(friend);
+    }
+
+    public void blockUser(String keycloakId, UUID blockId) {
+        User user = findByKeycloakId(keycloakId);
+        if (user.getId().id().equals(blockId)) {
+            throw new IllegalArgumentException("You can't block yourself");
+        }
+        User blockUser = findById(blockId);
+        user.block(blockUser.getId());
+        if(blockUser.getFriends().contains(user.getId())) {
+            blockUser.removeFriend(user.getId());
+            userRepository.save(blockUser);
+        }
+        userRepository.save(user);
+    }
+
+    public List<User> findBlockedUsers(String keycloakId) {
+        User user = findByKeycloakId(keycloakId);
+        return new ArrayList<>(userRepository.findBlockedUsers(user.getId()));
+    }
+
+    public void unblockUser(String keycloakId, UUID unblockId) {
+        User user = findByKeycloakId(keycloakId);
+        if (user.getId().id().equals(unblockId)) {
+            throw new IllegalArgumentException("You can't unblock yourself");
+        }
+        user.unblock(new UserId(unblockId));
+        userRepository.save(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserCosmeticsDto getUserCosmetics(UserId userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(userId::notFound);
+
+        UserCosmetics cosmetics = user.getCosmetics();
+
+        return new UserCosmeticsDto(
+                cosmetics.getUnlockedPerkIds().stream()
+                        .map(PerkId::id)
+                        .collect(java.util.stream.Collectors.toSet()),
+                cosmetics.getEquippedBorderId() != null ? cosmetics.getEquippedBorderId().id() : null,
+                cosmetics.getEquippedThemeId() != null ? cosmetics.getEquippedThemeId().id() : null,
+                cosmetics.getEquippedTitleId() != null ? cosmetics.getEquippedTitleId().id() : null
+        );
     }
 }

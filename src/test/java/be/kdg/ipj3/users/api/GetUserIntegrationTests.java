@@ -1,22 +1,13 @@
 package be.kdg.ipj3.users.api;
 
-import be.kdg.ipj3.users.domain.Visibility;
-import be.kdg.ipj3.users.domain.VisibleField;
-import be.kdg.ipj3.users.domain.VisibilitySettings;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
-import org.junit.jupiter.api.BeforeEach;
+import be.kdg.ipj3.BaseIntegrationTest;
+import be.kdg.ipj3.users.domain.*;
+import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,53 +15,14 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@AutoConfigureMockMvc
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-public class FindUserIntegrationTests {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private JpaUserRepository userRepository;
-
-    @BeforeEach
-    void setUp() {
-        userRepository.deleteAll();
-    }
-
-    private JwtRequestPostProcessor validJwt(String subject, String username) {
-        return jwt()
-                .jwt(builder -> builder
-                        .subject(subject)
-                        .claim("preferred_username", username))
-                .authorities(new SimpleGrantedAuthority("ROLE_PLAYER"));
-    }
-
-    private UUID createUser(String keycloakId, String username) {
-        UUID userId = UUID.randomUUID();
-        Map<VisibleField, Visibility> visibility = VisibilitySettings.defaultPublic().fieldVisibilities();
-
-        JpaUserEntity userEntity = new JpaUserEntity(
-                userId,
-                keycloakId,
-                username,
-                new JpaProfile(username, "Test bio", null, null),
-                100,
-                "Test@gmail.com",
-                visibility
-        );
-        userRepository.save(userEntity);
-        return userId;
-    }
+public class GetUserIntegrationTests extends BaseIntegrationTest {
 
     @Test
     void findUser_shouldReturnUser_whenAuthenticated() throws Exception {
         // Arrange
         String keycloakId = "test-keycloak-id";
         String username = "testuser";
-        UUID userId = createUser(keycloakId, username);
+        User user = createTestUser(keycloakId, username, "Test@gmail.com");
 
         // Act & Assert
         mockMvc.perform(get("/api/platform/users/me")
@@ -78,11 +30,11 @@ public class FindUserIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(userId.toString()))
+                .andExpect(jsonPath("$.id").value(user.getId().id().toString()))
                 .andExpect(jsonPath("$.keycloakId").value(keycloakId))
                 .andExpect(jsonPath("$.username").value(username))
                 .andExpect(jsonPath("$.profile.displayName").value(username))
-                .andExpect(jsonPath("$.profile.bio").value("Test bio"));
+                .andExpect(jsonPath("$.profile.bio").value("bio"));
     }
 
     @Test
@@ -95,9 +47,10 @@ public class FindUserIntegrationTests {
 
     @Test
     void findUser_shouldReturnForbidden_whenWrongRole() throws Exception {
+        // Arrange
         String keycloakId = "test-keycloak-id";
         String username = "testuser";
-        createUser(keycloakId, username);
+        createTestUser(keycloakId, username, "Test@gmail.com");
 
         // Act & Assert
         mockMvc.perform(get("/api/platform/users/me")
@@ -117,20 +70,24 @@ public class FindUserIntegrationTests {
         String friendKeycloakId = "friend-keycloak";
         String keycloakId = "test-keycloak-id";
         String username = "testuser";
-        UUID userId = createUser(keycloakId, username);
+        createTestUser(keycloakId, username, "Test@gmail.com");
 
         Map<VisibleField, Visibility> privateVisibility = VisibilitySettings.defaultPublic().fieldVisibilities();
         privateVisibility.put(VisibleField.PROFILE, Visibility.PRIVATE);
         privateVisibility.put(VisibleField.POINTS, Visibility.PRIVATE);
+        var privateVisibilitySettings = new VisibilitySettings(privateVisibility);
 
-        JpaUserEntity friend = new JpaUserEntity(
-                friendId,
+        User friend = new User(
+                new UserId(friendId),
                 friendKeycloakId,
                 "friend",
-                new JpaProfile("Friend", "Private bio", null, null),
+                List.of(),
+                List.of(),
+                null,
                 200,
-                "friend@example.com",
-                privateVisibility
+                new Profile("Friend", "Private bio", null, null),
+                privateVisibilitySettings,
+                "friend@example.com"
         );
         userRepository.save(friend);
 
@@ -147,14 +104,13 @@ public class FindUserIntegrationTests {
     void getUserById_shouldShowAllData_whenViewerIsOwner() throws Exception {
         String keycloakId = "test-keycloak-id";
         String username = "testuser";
-        UUID userId = createUser(keycloakId, username);
+        User user = createTestUser(keycloakId, username, "Test@gmail.com");
 
-        // Act & Assert
-        mockMvc.perform(get("/api/platform/users/{userId}", userId)
+        mockMvc.perform(get("/api/platform/users/{userId}", user.getId().id())
                         .with(validJwt(keycloakId, username)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("testuser"))
-                .andExpect(jsonPath("$.profile.bio").value("Test bio"))
+                .andExpect(jsonPath("$.profile.bio").value("bio"))
                 .andExpect(jsonPath("$.points").value(100));
     }
 }

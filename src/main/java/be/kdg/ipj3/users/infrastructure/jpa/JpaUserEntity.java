@@ -1,18 +1,13 @@
 package be.kdg.ipj3.users.infrastructure.jpa;
 
 import be.kdg.ipj3.catalog.shared.GameId;
-import be.kdg.ipj3.users.domain.User;
-import be.kdg.ipj3.users.domain.Visibility;
-import be.kdg.ipj3.users.domain.VisibleField;
-import be.kdg.ipj3.users.domain.VisibilitySettings;
+import be.kdg.ipj3.perks.shared.PerkId;
+import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.shared.UserId;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -33,6 +28,23 @@ public class JpaUserEntity {
 
     @Column
     private String email;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "user_unlocked_perks",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "perk_id")
+    private Set<UUID> unlockedPerks = new HashSet<>();
+
+    @Column(name = "equipped_border_id")
+    private UUID equippedBorderId;
+
+    @Column(name = "equipped_theme_id")
+    private UUID equippedThemeId;
+
+    @Column(name = "equipped_title_id")
+    private UUID equippedTitleId;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
@@ -85,11 +97,20 @@ public class JpaUserEntity {
     @Enumerated(EnumType.STRING)
     private Map<VisibleField, Visibility> visibilitySettings = new HashMap<>();
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "blocked_users",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "blocked_user_id")
+    private final List<UUID> blockedUsers = new ArrayList<>();
+
     protected JpaUserEntity() {
     } // for JPA
 
     public JpaUserEntity(UUID id, String keycloakId, String username, JpaProfile profile,
-                         int points, String email, Map<VisibleField, Visibility> visibilitySettings) {
+                         int points, String email, Map<VisibleField, Visibility> visibilitySettings,
+                         Set<UUID> unlockedPerks, UUID equippedBorderId, UUID equippedThemeId, UUID equippedTitleId) {
         this.id = id;
         this.keycloakId = keycloakId;
         this.username = username;
@@ -97,10 +118,23 @@ public class JpaUserEntity {
         this.points = points;
         this.email = email;
         this.visibilitySettings = visibilitySettings != null ? new HashMap<>(visibilitySettings) : new HashMap<>();
+        this.unlockedPerks = new HashSet<>(unlockedPerks);
+        this.equippedBorderId = equippedBorderId;
+        this.equippedThemeId = equippedThemeId;
+        this.equippedTitleId = equippedTitleId;
     }
 
     public static JpaUserEntity fromDomain(User user) {
         Map<VisibleField, Visibility> visibilityMap = user.getVisibilitySettings().fieldVisibilities();
+        UserCosmetics cosmetics = user.getCosmetics();
+
+        Set<UUID> unlockedIds = cosmetics.getUnlockedPerkIds().stream()
+                .map(PerkId::id)
+                .collect(Collectors.toSet());
+
+        UUID borderId = cosmetics.getEquippedBorderId() != null ? cosmetics.getEquippedBorderId().id() : null;
+        UUID themeId = cosmetics.getEquippedThemeId() != null ? cosmetics.getEquippedThemeId().id() : null;
+        UUID titleId = cosmetics.getEquippedTitleId() != null ? cosmetics.getEquippedTitleId().id() : null;
 
         JpaUserEntity jpaUserEntity = new JpaUserEntity(
                 user.getId().id(),
@@ -109,7 +143,11 @@ public class JpaUserEntity {
                 JpaProfile.fromDomain(user.getProfile()),
                 user.getPoints(),
                 user.getEmail(),
-                visibilityMap
+                visibilityMap,
+                unlockedIds,
+                borderId,
+                themeId,
+                titleId
         );
 
         user.getOwnedGames().stream()
@@ -132,11 +170,31 @@ public class JpaUserEntity {
                 .map(JpaFriendRequest::fromDomain)
                 .forEach(jpaUserEntity.outgoingFriendRequests::add);
 
+        user.getBlockedUsers().stream()
+                .map(UserId::id)
+                .forEach(jpaUserEntity::addBlockedUser);
+
         return jpaUserEntity;
     }
 
     public User toDomain() {
         VisibilitySettings visibilitySettings = new VisibilitySettings(new HashMap<>(this.visibilitySettings));
+
+        UserCosmetics cosmetics = new UserCosmetics();
+
+        if (this.unlockedPerks != null) {
+            this.unlockedPerks.forEach(uuid -> cosmetics.unlockPerk(new PerkId(uuid)));
+        }
+
+        if (this.equippedBorderId != null) {
+            cosmetics.equipBorder(new PerkId(this.equippedBorderId));
+        }
+        if (this.equippedThemeId != null) {
+            cosmetics.equipTheme(new PerkId(this.equippedThemeId));
+        }
+        if (this.equippedTitleId != null) {
+            cosmetics.equipTitle(new PerkId(this.equippedTitleId));
+        }
 
         User user = new User(
                 new UserId(id),
@@ -144,6 +202,7 @@ public class JpaUserEntity {
                 username,
                 new ArrayList<>(),
                 new ArrayList<>(),
+                cosmetics,
                 points,
                 profile.toDomain(),
                 visibilitySettings,
@@ -170,6 +229,10 @@ public class JpaUserEntity {
                 .map(JpaFriendRequest::toDomain)
                 .forEach(user::addOutgoingFriendRequest);
 
+        blockedUsers.stream()
+                .map(UserId::new)
+                .forEach(user::block);
+
         return user;
     }
 
@@ -183,6 +246,10 @@ public class JpaUserEntity {
 
     private void addFriend(UUID friendId) {
         this.friends.add(friendId);
+    }
+
+    private void addBlockedUser(UUID blockedUserId) {
+        this.blockedUsers.add(blockedUserId);
     }
 
     public UUID getId() {

@@ -1,104 +1,63 @@
 package be.kdg.ipj3.users.api;
 
-import be.kdg.ipj3.users.domain.Visibility;
-import be.kdg.ipj3.users.domain.VisibilitySettings;
-import be.kdg.ipj3.users.domain.VisibleField;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
-import org.junit.jupiter.api.BeforeEach;
+import be.kdg.ipj3.BaseIntegrationTest;
+import be.kdg.ipj3.users.domain.User;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-class SendFriendRequestIntegrationTests {
-
-    @Autowired private MockMvc mockMvc;
-    @Autowired private JpaUserRepository userRepository;
-
-    @BeforeEach
-    void setUp() {
-        userRepository.deleteAll();
-    }
-
-    private JpaUserEntity createUser(String keycloakId, String username) {
-        Map<VisibleField, Visibility> visibility = VisibilitySettings.defaultPublic().fieldVisibilities();
-        return userRepository.save(new JpaUserEntity(
-                UUID.randomUUID(), keycloakId, username,
-                new JpaProfile(username, "Bio", null, null), 0, "Test@gmail.com", visibility
-        ));
-    }
-
-    private JwtRequestPostProcessor jwtForUser(String keycloakId) {
-        return jwt().jwt(b -> b.subject(keycloakId).claim("preferred_username", "user"))
-                .authorities(new SimpleGrantedAuthority("ROLE_PLAYER"));
-    }
+class SendFriendRequestIntegrationTests extends BaseIntegrationTest {
 
     @Test
-    @Transactional
     void sendFriendRequest_ShouldSucceed_WhenUsersExist() throws Exception {
         // Arrange
-        JpaUserEntity sender = createUser("kc-otherUser", "otherUser");
-        JpaUserEntity receiver = createUser("kc-receiver", "receiver");
+        User sender = createTestUser("kc-otherUser", "otherUser", "other@gmail.com");
+        User receiver = createTestUser("kc-receiver", "receiver", "receiver@gmail.com");
 
         // Act
-        mockMvc.perform(post("/api/platform/users/{receiverId}/send-friend-request", receiver.getId())
-                        .with(jwtForUser(sender.getKeycloakId())))
+        mockMvc.perform(post("/api/platform/users/{receiverId}/send-friend-request", receiver.getId().id())
+                        .with(validJwt(sender.getKeycloakId(), "otherUser")))
                 .andExpect(status().isNoContent());
 
         // Assert
-        JpaUserEntity updatedReceiver = userRepository.findById(receiver.getId()).orElseThrow();
-        assertThat(updatedReceiver.toDomain().getIncomingFriendRequests())
+        User updatedReceiver = userRepository.findById(receiver.getId()).orElseThrow();
+        assertThat(updatedReceiver.getIncomingFriendRequests())
                 .hasSize(1)
                 .extracting(req -> req.otherUser().id())
-                .contains(sender.getId());
+                .contains(sender.getId().id());
     }
 
     @Test
     void sendFriendRequest_ShouldFail_WhenReceiverNotFound() throws Exception {
         // Arrange
-        JpaUserEntity sender = createUser("kc-otherUser", "otherUser");
+        User sender = createTestUser("kc-otherUser", "otherUser", "other@gmail.com");
 
         // Act & Assert
         mockMvc.perform(post("/api/platform/users/{receiverId}/send-friend-request", UUID.randomUUID())
-                        .with(jwtForUser(sender.getKeycloakId())))
+                        .with(validJwt(sender.getKeycloakId(), "otherUser")))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void sendFriendRequest_ShouldFail_WhenUnauthorized() throws Exception {
-        JpaUserEntity receiver = createUser("kc-receiver", "receiver");
+        User receiver = createTestUser("kc-receiver", "receiver", "receiver@gmail.com");
 
-        mockMvc.perform(post("/api/platform/users/{receiverId}/send-friend-request", receiver.getId()))
+        mockMvc.perform(post("/api/platform/users/{receiverId}/send-friend-request", receiver.getId().id()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    @Transactional
     void sendFriendRequest_ShouldFail_WhenSendingToSelf() throws Exception {
         // Arrange
-        JpaUserEntity user = createUser("kc-user", "user");
+        User user = createTestUser("kc-user", "user", "user@gmail.com");
 
         // Act & Assert
-        mockMvc.perform(post("/api/platform/users/{receiverId}/send-friend-request", user.getId())
-                        .with(jwtForUser(user.getKeycloakId())))
+        mockMvc.perform(post("/api/platform/users/{receiverId}/send-friend-request", user.getId().id())
+                        .with(validJwt(user.getKeycloakId(), "user")))
                 .andExpect(status().isBadRequest());
     }
 }

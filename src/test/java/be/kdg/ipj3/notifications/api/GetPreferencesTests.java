@@ -1,10 +1,8 @@
 package be.kdg.ipj3.notifications.api;
 
+import be.kdg.ipj3.BaseIntegrationTest;
 import be.kdg.ipj3.notifications.domain.NotificationRepository;
-import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
-import be.kdg.ipj3.users.domain.UserRepository;
-import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,31 +14,17 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
-import java.util.List;
-
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@SpringBootTest
-@Import(TestcontainersConfiguration.class)
-@TestPropertySource("classpath:application-test.properties")
-public class GetPreferencesTests {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private UserRepository userRepository;
+public class GetPreferencesTests extends BaseIntegrationTest {
 
     @Autowired
     private NotificationRepository notificationRepository;
 
     @BeforeEach
     void setup() {
-        userRepository.deleteAll();
         notificationRepository.deleteAll();
     }
 
@@ -69,11 +53,11 @@ public class GetPreferencesTests {
     @Test
     void getPreferences_shouldReturnUserPreferences() throws Exception {
         // Arrange
-        createUser();
+        User user = createTestUser("keycloakId", "username", "Test@gmail.com");
 
         // Act & Assert
         mockMvc.perform(get("/api/platform/notifications/preferences")
-                        .with(validJwt()))
+                        .with(validJwt(user.getKeycloakId(), user.getUsername())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.preferences.FRIEND_REQUEST.IN_APP").value(true))
                 .andExpect(jsonPath("$.preferences.FRIEND_REQUEST.EMAIL").value(true))
