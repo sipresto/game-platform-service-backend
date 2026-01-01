@@ -21,7 +21,7 @@ public class SessionController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<SessionDto>> getSessionsByLoggedInUserKeycloakId(
+    public ResponseEntity<List<SessionDto>> findFinishedSessionsByKeycloakId(
             @AuthenticationPrincipal Jwt jwt
     ) {
         List<SessionDto> dtos = sessionService.findFinishedSessionsByUserId(jwt.getSubject()).stream()
