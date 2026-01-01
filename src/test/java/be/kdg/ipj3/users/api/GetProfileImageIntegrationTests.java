@@ -1,21 +1,11 @@
 package be.kdg.ipj3.users.api;
 
+import be.kdg.ipj3.BaseIntegrationTest;
 import be.kdg.ipj3.users.domain.*;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaProfile;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserEntity;
-import be.kdg.ipj3.users.infrastructure.jpa.JpaUserRepository;
 import be.kdg.ipj3.users.shared.UserId;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -26,55 +16,11 @@ import java.util.UUID;
 
 import static javax.imageio.ImageIO.write;
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@AutoConfigureMockMvc
-@SpringBootTest
-@TestPropertySource("classpath:application-test.properties")
-public class GetProfileImageIntegrationTests {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    private UUID testUserId;
-    private String testKeycloakId;
-    private final String testEmail = "test@example.com";
-
-    @BeforeEach
-    void setUp() {
-        userRepository.deleteAll();
-
-        testUserId = UUID.randomUUID();
-        testKeycloakId = "test-keycloak-id-" + UUID.randomUUID();
-
-        User user = new User(
-                new UserId(testUserId),
-                testKeycloakId,
-                "testuser",
-                List.of(),
-                List.of(),
-                0,
-                new Profile("Test User", "Test bio", null, null),
-                VisibilitySettings.defaultPublic(),
-                testEmail
-        );
-        userRepository.save(user);
-    }
-
-    private JwtRequestPostProcessor validJwt() {
-        return jwt()
-                .jwt(builder -> builder
-                        .subject(testKeycloakId)
-                        .claim("preferred_username", "testuser")
-                        .claim("email", testEmail))
-                .authorities(new SimpleGrantedAuthority("ROLE_PLAYER"));
-    }
+public class GetProfileImageIntegrationTests extends BaseIntegrationTest {
 
     private MockMultipartFile createTestImageFile(String filename, String contentType, byte[] content) {
         return new MockMultipartFile(
@@ -102,7 +48,7 @@ public class GetProfileImageIntegrationTests {
         return baos.toByteArray();
     }
 
-    private void uploadTestImage() throws Exception {
+    private void uploadTestImage(User user) throws Exception {
         MockMultipartFile imageFile = createValidTestImage();
         mockMvc.perform(multipart("/api/platform/users/me/profile-image")
                         .file(imageFile)
@@ -110,17 +56,18 @@ public class GetProfileImageIntegrationTests {
                             request.setMethod("PUT");
                             return request;
                         })
-                        .with(validJwt())
+                        .with(validJwt(user.getKeycloakId(), user.getUsername()))
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andExpect(status().isOk());
     }
 
     @Test
     void getProfileImage_shouldReturnImage_whenUserHasImage() throws Exception {
-        uploadTestImage();
+        User user = createTestUser("kc-id", "testuser", "test@example.com");
+        uploadTestImage(user);
 
-        mockMvc.perform(get("/api/platform/users/profile-image/{userId}", testUserId)
-                        .with(validJwt())
+        mockMvc.perform(get("/api/platform/users/profile-image/{userId}", user.getId().id())
+                        .with(validJwt(user.getKeycloakId(), user.getUsername()))
                         .accept(MediaType.ALL))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "image/png"))
@@ -129,8 +76,10 @@ public class GetProfileImageIntegrationTests {
 
     @Test
     void getProfileImage_shouldReturnDefaultImage_whenUserHasNoImage() throws Exception {
-        mockMvc.perform(get("/api/platform/users/profile-image/{userId}", testUserId)
-                        .with(validJwt())
+        User user = createTestUser("kc-id", "testuser", "test@example.com");
+
+        mockMvc.perform(get("/api/platform/users/profile-image/{userId}", user.getId().id())
+                        .with(validJwt(user.getKeycloakId(), user.getUsername()))
                         .accept(MediaType.ALL))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "image/svg+xml"))
@@ -153,23 +102,25 @@ public class GetProfileImageIntegrationTests {
         Map<VisibleField, Visibility> privateVisibility = VisibilitySettings.defaultPublic().fieldVisibilities();
         privateVisibility.put(VisibleField.PROFILE, Visibility.PRIVATE);
         var privateVisibilitySettings = new VisibilitySettings(privateVisibility);
+
         User privateUser = new User(
-                new UserId(testUserId),
-                testKeycloakId,
+                new UserId(UUID.randomUUID()),
+                "kc-private",
                 "testuser",
                 List.of(),
                 List.of(),
+                null,
                 0,
                 new Profile("Test User", "Test bio", null, null),
                 privateVisibilitySettings,
-                testEmail
+                "test@example.com"
         );
         userRepository.save(privateUser);
 
-        uploadTestImage();
+        uploadTestImage(privateUser);
 
-        mockMvc.perform(get("/api/platform/users/profile-image/{userId}", testUserId)
-                        .with(validJwt())
+        mockMvc.perform(get("/api/platform/users/profile-image/{userId}", privateUser.getId().id())
+                        .with(validJwt(privateUser.getKeycloakId(), privateUser.getUsername()))
                         .accept(MediaType.ALL))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "image/png"));

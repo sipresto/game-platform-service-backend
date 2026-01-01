@@ -1,42 +1,21 @@
 package be.kdg.ipj3.notifications.api;
 
+import be.kdg.ipj3.BaseIntegrationTest;
 import be.kdg.ipj3.notifications.domain.NotificationRepository;
 import be.kdg.ipj3.notifications.domain.UserNotificationPreferences;
 import be.kdg.ipj3.notifications.domain.UserNotificationPreferencesRepository;
-import be.kdg.ipj3.users.domain.Profile;
 import be.kdg.ipj3.users.domain.User;
-import be.kdg.ipj3.users.domain.UserRepository;
-import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.utility.TestcontainersConfiguration;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@SpringBootTest
-@Import(TestcontainersConfiguration.class)
-@TestPropertySource("classpath:application-test.properties")
-public class UpdateNotificationPreferencesTests {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private UserRepository userRepository;
+public class UpdateNotificationPreferencesTests extends BaseIntegrationTest {
 
     @Autowired
     private NotificationRepository notificationRepository;
@@ -46,70 +25,46 @@ public class UpdateNotificationPreferencesTests {
 
     @BeforeEach
     void setup() {
-        userRepository.deleteAll();
         notificationRepository.deleteAll();
         preferencesRepository.deleteAll();
-    }
-
-    private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor validJwt() {
-        return jwt().authorities(() -> "ROLE_PLAYER")
-                .jwt(builder -> builder
-                        .subject("keycloakId")
-                        .claim("preferred_username", "username"));
-    }
-
-    private UserId createUser() {
-        UserId userId = UserId.create();
-        User user = new User(
-                userId,
-                "keycloakId",
-                "username",
-                List.of(),
-                List.of(),
-                0,
-                new Profile("username", "Bio"),
-                "Test@gmail.com"
-        );
-        userRepository.save(user);
-        return userId;
     }
 
     @Test
     void updatePreference_shouldUpdateUserPreference() throws Exception {
         // Arrange
-        UserId userId = createUser();
+        User user = createTestUser("keycloakId", "username", "Test@gmail.com");
 
         // Act & Assert
         mockMvc.perform(put("/api/platform/notifications/preferences/FRIEND_REQUEST/EMAIL")
                         .param("enabled", "false")
-                        .with(validJwt()))
+                        .with(validJwt(user.getKeycloakId(), user.getUsername())))
                 .andExpect(status().isOk());
 
-        Optional<UserNotificationPreferences> preferences = preferencesRepository.findByUserId(userId);
+        Optional<UserNotificationPreferences> preferences = preferencesRepository.findByUserId(user.getId());
         assertTrue(preferences.isPresent());
     }
 
     @Test
     void updatePreference_shouldReturnBadRequest_whenNotificationTypeIsInvalid() throws Exception {
         // Arrange
-        createUser();
+        User user = createTestUser("keycloakId", "username", "Test@gmail.com");
 
         // Act & Assert
         mockMvc.perform(put("/api/platform/notifications/preferences/INVALID_TYPE/EMAIL")
                         .param("enabled", "false")
-                        .with(validJwt()))
+                        .with(validJwt(user.getKeycloakId(), user.getUsername())))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void updatePreference_shouldReturnBadRequest_whenChannelIsInvalid() throws Exception {
         // Arrange
-        createUser();
+        User user = createTestUser("keycloakId", "username", "Test@gmail.com");
 
         // Act & Assert
         mockMvc.perform(put("/api/platform/notifications/preferences/FRIEND_REQUEST/INVALID_CHANNEL")
                         .param("enabled", "false")
-                        .with(validJwt()))
+                        .with(validJwt(user.getKeycloakId(), user.getUsername())))
                 .andExpect(status().isBadRequest());
     }
 

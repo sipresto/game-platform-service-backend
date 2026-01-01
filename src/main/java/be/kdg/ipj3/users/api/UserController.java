@@ -137,7 +137,7 @@ public class UserController {
      * Gets a user by their ID with visibility-aware data
      */
     @GetMapping("/{userId}")
-    public ResponseEntity<PublicUserDto> getUserById(
+    public ResponseEntity<PublicUserDto> findUserById(
             @PathVariable UUID userId,
             @AuthenticationPrincipal Jwt jwt
     ) {
@@ -261,5 +261,12 @@ public class UserController {
     ) {
         var friends = userService.findBlockedUsers(jwt.getSubject()).stream().map(BlockedUserDto::fromDomain).toList();
         return ResponseEntity.ok(friends);
+    }
+
+    @GetMapping("/me/points")
+    public ResponseEntity<Integer> getPoints(@AuthenticationPrincipal Jwt jwt) {
+        String keycloakId = jwt.getSubject();
+        var points = userService.findPoints(keycloakId);
+        return ResponseEntity.ok(points);
     }
 }
