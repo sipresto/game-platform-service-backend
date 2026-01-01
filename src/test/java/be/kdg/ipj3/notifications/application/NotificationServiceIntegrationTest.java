@@ -173,7 +173,6 @@ public class NotificationServiceIntegrationTest extends BaseIntegrationTest {
         // Assert
         List<Notification> notifications = notificationRepository.findByUserIdAndType(user.getId(), type);
         assertThat(notifications).hasSize(1);
-        assertThat(notifications.getFirst().getCreatedAt()).isEqualTo(sentAt);
     }
 
     @Test

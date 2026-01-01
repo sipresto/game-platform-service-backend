@@ -15,6 +15,7 @@ import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.lobbies.shared.LobbyApi;
 import be.kdg.ipj3.sessions.shared.SessionId;
 import be.kdg.ipj3.sessions.shared.SessionsApi;
+import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
@@ -48,6 +49,9 @@ public class LobbyService implements LobbyApi {
 
     public Lobby createLobby(String keycloakId, String password, int maxPlayers, UUID gameIdParam) {
         var hostId = usersApi.findIdByKeycloakId(keycloakId);
+        if(hostId == null){
+            throw new NotFoundException("User with keycloak id [" + keycloakId + "] not found");
+        }
 
         var gameId = gamesApi.findGameById(gameIdParam).getId();
 
@@ -61,6 +65,10 @@ public class LobbyService implements LobbyApi {
     public void joinLobby(UUID id, String keycloakId, String password) {
 
         var playerId = usersApi.findIdByKeycloakId(keycloakId);
+        if(playerId == null){
+            throw new NotFoundException("User with keycloak id [" + keycloakId + "] not found");
+        }
+
         var lobbyId = new LobbyId(id);
         Lobby lobby = lobbyRepository.findById(lobbyId)
                 .orElseThrow(lobbyId::notFound);
@@ -77,7 +85,10 @@ public class LobbyService implements LobbyApi {
 
 
     public LobbyDetailDto getLobbyDetails(UUID lobbyId, String keycloakId) {
-        usersApi.findIdByKeycloakId(keycloakId);
+        var id = usersApi.findIdByKeycloakId(keycloakId);
+        if(id == null){
+            throw new NotFoundException("User with keycloak id [" + keycloakId + "] not found");
+        }
         Lobby lobby = findLobbyById(lobbyId);
 
         List<PlayerDto> playerDtos = lobby.getPlayers().stream()
@@ -110,6 +121,10 @@ public class LobbyService implements LobbyApi {
 
     public String startGame(UUID id, String requestorKeycloakId, Difficulty difficulty) {
         var requestor = usersApi.findIdByKeycloakId(requestorKeycloakId);
+        if(requestor == null){
+            throw new NotFoundException("User with keycloak id [" + requestorKeycloakId + "] not found");
+        }
+
         var lobbyId = new LobbyId(id);
 
         Lobby lobby = lobbyRepository.findById(lobbyId)
@@ -157,7 +172,10 @@ public class LobbyService implements LobbyApi {
 
     @Transactional(readOnly = true)
     public List<Lobby> findAllOpenLobbies(String keycloakId) {
-        usersApi.findIdByKeycloakId(keycloakId);
+        var userId = usersApi.findIdByKeycloakId(keycloakId);
+        if(userId == null){
+            throw new NotFoundException("User with keycloak id [" + keycloakId + "] not found");
+        }
         return lobbyRepository.findByStatus(LobbyStatus.OPEN);
     }
 
@@ -165,7 +183,10 @@ public class LobbyService implements LobbyApi {
     public List<Lobby> findOpenLobbiesForGame(UUID id, String keycloakId) {
 
         var gameId = gamesApi.findGameById(id).getId();
-        usersApi.findIdByKeycloakId(keycloakId);
+        var user = usersApi.findIdByKeycloakId(keycloakId);
+        if(user == null){
+            throw new NotFoundException("User with keycloak id [" + keycloakId + "] not found");
+        }
 
         return lobbyRepository.findByStatusAndGameId(LobbyStatus.OPEN, gameId);
     }
@@ -173,6 +194,9 @@ public class LobbyService implements LobbyApi {
     public void leaveLobby(UUID id, String keycloakId) {
 
         var playerId = usersApi.findIdByKeycloakId(keycloakId);
+        if(playerId == null){
+            throw new NotFoundException("User with keycloak id [" + keycloakId + "] not found");
+        }
         var lobbyId = new LobbyId(id);
 
         Lobby lobby = lobbyRepository.findById(lobbyId)
