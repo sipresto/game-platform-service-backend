@@ -64,7 +64,8 @@ class RegisterGameTests {
                         )),
                 List.of("NATIVE"),
                 "",
-                Instant.now()
+                Instant.now(),
+                2
         );
     }
 
@@ -90,7 +91,8 @@ class RegisterGameTests {
                 List.of(Category.NATIVE),
                 "",
                 Instant.now(),
-                false
+                false,
+                2
         );
 
         gameRepository.save(game);

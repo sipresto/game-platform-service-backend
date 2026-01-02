@@ -48,15 +48,15 @@ public class LobbyService implements LobbyApi {
         this.sessionsApi = sessionsApi;
     }
 
-    public Lobby createLobby(String keycloakId, String password, int maxPlayers, UUID gameIdParam) {
+    public Lobby createLobby(String keycloakId, String password, UUID gameIdParam) {
         var hostId = usersApi.findIdByKeycloakId(keycloakId);
         if(hostId == null){
             throw new UserNotFoundException(keycloakId);
         }
 
-        var gameId = gamesApi.findGameById(gameIdParam).getId();
+        var game = gamesApi.findGameById(gameIdParam);
 
-        Lobby lobby = new Lobby(password, maxPlayers, gameId, hostId);
+        Lobby lobby = new Lobby(password, game.getMaxPlayers(), game.getId(), hostId);
 
         lobbyRepository.save(lobby);
 

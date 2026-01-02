@@ -47,7 +47,6 @@ public class LobbyController {
         Lobby createdLobby = lobbyService.createLobby(
                 keycloakId,
                 dto.password(),
-                dto.maxPlayers(),
                 dto.gameId()
         );
 

@@ -82,7 +82,8 @@ public class GetUserLibraryTests {
                 List.of(),
                 List.of(Category.NATIVE),
                 "",
-                Instant.now()
+                Instant.now(),
+                2
         );
         gameRepository.save(game);
         return game;
