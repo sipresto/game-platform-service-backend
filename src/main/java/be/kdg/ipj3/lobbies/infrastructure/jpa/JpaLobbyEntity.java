@@ -7,6 +7,7 @@ import be.kdg.ipj3.lobbies.domain.LobbyStatus;
 import be.kdg.ipj3.users.shared.UserId;
 import jakarta.persistence.*;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,6 +30,9 @@ public class JpaLobbyEntity {
     @Column(nullable = false)
     private UUID hostId;
 
+    @Column(name = "last_activity_at")
+    private Instant lastActivityAt;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "lobby_players",
@@ -46,7 +50,7 @@ public class JpaLobbyEntity {
     protected JpaLobbyEntity() {
     } //for JPA
 
-    public JpaLobbyEntity(UUID id, String password, int maxPlayers, UUID gameId, UUID hostId, List<UUID> players, String status, String activeGameUrl) {
+    public JpaLobbyEntity(UUID id, String password, int maxPlayers, UUID gameId, UUID hostId, List<UUID> players, String status, String activeGameUrl, Instant lastActivityAt) {
         this.id = id;
         this.password = password;
         this.maxPlayers = maxPlayers;
@@ -55,6 +59,7 @@ public class JpaLobbyEntity {
         this.players = players;
         this.status = status;
         this.activeGameUrl = activeGameUrl;
+        this.lastActivityAt = lastActivityAt;
     }
 
     public static JpaLobbyEntity fromDomain(Lobby lobby) {
@@ -68,7 +73,8 @@ public class JpaLobbyEntity {
                         .map(UserId::id)
                         .collect(Collectors.toList()),
                 lobby.getStatus().name(),
-                lobby.getActiveGameUrl()
+                lobby.getActiveGameUrl(),
+                lobby.getLastActivityAt()
         );
     }
 
@@ -83,7 +89,8 @@ public class JpaLobbyEntity {
                         .map(UserId::new)
                         .collect(Collectors.toList()),
                 LobbyStatus.valueOf(this.status),
-                this.activeGameUrl
+                this.activeGameUrl,
+                this.lastActivityAt
         );
     }
 

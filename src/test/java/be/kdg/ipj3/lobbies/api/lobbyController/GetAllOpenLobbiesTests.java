@@ -3,6 +3,8 @@ package be.kdg.ipj3.lobbies.api.lobbyController;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.domain.Lobby;
 import be.kdg.ipj3.lobbies.domain.LobbyRepository;
+import be.kdg.ipj3.users.domain.User;
+import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,11 +33,15 @@ public class GetAllOpenLobbiesTests {
     private MockMvc mockMvc;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private LobbyRepository lobbyRepository;
 
     @BeforeEach
     void setUp() {
         lobbyRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     private JwtRequestPostProcessor validJwt() {
@@ -63,10 +69,16 @@ public class GetAllOpenLobbiesTests {
         lobbyRepository.save(lobby2);
     }
 
+    private void createTestUser() {
+        User user = User.createFromKeycloak("keycloak-id", "test-user", "Test@gmail.com");
+        userRepository.save(user);
+    }
+
     @Test
     void getAllOpenLobbies_shouldReturnListOfLobbies_whenLobbiesExist() throws Exception {
         // Arrange
         createTestLobbies();
+        createTestUser();
 
         // Act & Assert
         mockMvc.perform(get("/api/platform/lobbies")
@@ -81,6 +93,8 @@ public class GetAllOpenLobbiesTests {
 
     @Test
     void getAllOpenLobbies_shouldReturnEmptyList_whenNoLobbiesExist() throws Exception {
+        createTestUser();
+
         // Act & Assert
         mockMvc.perform(get("/api/platform/lobbies")
                         .with(validJwt()))
@@ -89,8 +103,7 @@ public class GetAllOpenLobbiesTests {
                 .andExpect(jsonPath("$", hasSize(0)));
     }
 
-    // TODO: Change user auto-registration before enabling
-    /*@Test
+    @Test
     void getAllOpenLobbies_shouldReturnNotFound_whenUserNotRegistered() throws Exception {
         // Arrange
         createTestLobbies();
@@ -99,7 +112,7 @@ public class GetAllOpenLobbiesTests {
         mockMvc.perform(get("/api/platform/lobbies")
                         .with(validJwt()))
                 .andExpect(status().isNotFound());
-    }*/
+    }
 
     @Test
     void getAllOpenLobbies_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {

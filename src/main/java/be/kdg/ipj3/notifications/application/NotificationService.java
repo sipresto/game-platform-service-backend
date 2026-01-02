@@ -45,7 +45,7 @@ public class NotificationService {
         }
 
         UserNotificationPreferences preferences = preferencesRepository.findByUserId(userId)
-                .orElse(new UserNotificationPreferences(userId));
+                .orElse(preferencesRepository.save(new UserNotificationPreferences(userId)));
 
         if (preferences.shouldSendViaChannel(type, NotificationChannel.IN_APP)) {
             handleInAppNotification(notification);

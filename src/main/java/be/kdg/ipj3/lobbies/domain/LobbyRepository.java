@@ -3,8 +3,10 @@ package be.kdg.ipj3.lobbies.domain;
 import be.kdg.ipj3.catalog.shared.GameId;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface LobbyRepository {
@@ -19,7 +21,13 @@ public interface LobbyRepository {
 
     List<Lobby> findAll();
 
-    void deleteById(LobbyId id);
+    void deleteLobbyByGameId(UUID gameId);
 
     void deleteAll();
+
+    void deleteById(LobbyId lobbyId);
+
+    List<Lobby> findByLastActivityBeforeInstant(Instant cutoff);
+
+    Optional<Lobby> findByGameId(UUID gameId);
 }

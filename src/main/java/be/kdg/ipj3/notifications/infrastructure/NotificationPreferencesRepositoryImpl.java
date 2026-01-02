@@ -24,8 +24,9 @@ public class NotificationPreferencesRepositoryImpl implements UserNotificationPr
     }
 
     @Override
-    public void save(UserNotificationPreferences preferences) {
+    public UserNotificationPreferences save(UserNotificationPreferences preferences) {
         jpaPreferencesRepository.save(JpaUserNotificationPreferencesEntity.fromDomain(preferences));
+        return preferences;
     }
 
     @Override

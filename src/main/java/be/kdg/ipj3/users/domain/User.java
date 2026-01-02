@@ -301,9 +301,7 @@ public class User {
     }
 
     public void block(UserId userId) {
-        if (friends.contains(userId)) {
-            removeFriend(userId);
-        }
+        handleBlock(userId);
         blockedUsers.add(userId);
     }
 
@@ -313,6 +311,18 @@ public class User {
         }
         else {
             throw new IllegalArgumentException("This user is not blocked");
+        }
+    }
+
+    public void handleBlock(UserId blockerId) {
+        if (friends.contains(blockerId)) {
+            removeFriend(blockerId);
+        }
+        if (incomingFriendRequests.stream().anyMatch(friendRequest -> friendRequest.otherUser().equals(blockerId))) {
+            removeIncomingFriendRequest(blockerId);
+        }
+        if (outgoingFriendRequests.stream().anyMatch(friendRequest -> friendRequest.otherUser().equals(blockerId))) {
+            removeOutgoingFriendRequest(blockerId);
         }
     }
 
@@ -347,7 +357,6 @@ public class User {
     public void unequipTitle() {
         this.cosmetics.unequipTitle();
     }
-
 
     public UserCosmetics getCosmetics() {
         return cosmetics;

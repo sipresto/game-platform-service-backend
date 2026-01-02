@@ -19,6 +19,29 @@ import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(GameNotFoundException.class)
+    public ResponseEntity<ApiError> handleActiveGameNotFound(GameNotFoundException ex) {
+        ApiError body = new ApiError(
+                HttpStatus.BAD_REQUEST.value(),
+                "Game wasn't found",
+                ex.getMessage(),
+                List.of(),
+                Instant.now()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(EmailSendException.class)
+    public ResponseEntity<ApiError> handleEmailNotSent(EmailSendException ex) {
+        ApiError body = new ApiError(
+                HttpStatus.EXPECTATION_FAILED.value(),
+                "No email could be sent",
+                ex.getMessage(),
+                List.of(),
+                Instant.now()
+        );
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(body);
+    }
 
     @ExceptionHandler(SecurityException.class)
     public ResponseEntity<ApiError> handleNotCorrectUserLoggedIn(SecurityException ex) {

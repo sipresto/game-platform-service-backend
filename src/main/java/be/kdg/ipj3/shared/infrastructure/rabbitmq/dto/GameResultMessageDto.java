@@ -12,7 +12,8 @@ public record GameResultMessageDto(
         String winnerId,
         Difficulty difficulty,
         String status,
-        Instant completedAt
+        Instant completedAt,
+        boolean endOfGame
 ) {
 }
 

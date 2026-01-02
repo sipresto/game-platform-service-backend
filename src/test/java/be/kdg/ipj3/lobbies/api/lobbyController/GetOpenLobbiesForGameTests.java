@@ -97,7 +97,6 @@ public class GetOpenLobbiesForGameTests {
         lobbyRepository.save(lobby);
     }
 
-    // TODO: Update when url gets updated
     @Test
     void getOpenLobbiesForGame_shouldReturnListOfLobbies_whenLobbiesExist() throws Exception {
         // Arrange
@@ -147,8 +146,7 @@ public class GetOpenLobbiesForGameTests {
                 .andExpect(status().isNotFound());
     }
 
-    // TODO: Change user auto-registration before enabling
-    /*@Test
+    @Test
     void getAllOpenLobbies_shouldReturnNotFound_whenUserNotRegistered() throws Exception {
         // Arrange
         GameId gameId = createTestGame();
@@ -158,8 +156,8 @@ public class GetOpenLobbiesForGameTests {
         // Act & Assert
         mockMvc.perform(get("/api/platform/lobbies/{gameId}", UUID.randomUUID())
                         .with(validJwt()))
-                .andExpect(status().isUnauthorized());
-    }*/
+                .andExpect(status().isNotFound());
+    }
 
     @Test
     void getAllOpenLobbies_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
