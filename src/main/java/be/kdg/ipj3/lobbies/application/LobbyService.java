@@ -15,7 +15,6 @@ import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.lobbies.shared.LobbyApi;
 import be.kdg.ipj3.sessions.shared.SessionId;
 import be.kdg.ipj3.sessions.shared.SessionsApi;
-import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
@@ -75,6 +74,40 @@ public class LobbyService implements LobbyApi {
                 .orElseThrow(lobbyId::notFound);
 
         lobby.join(playerId, password);
+
+        lobbyRepository.save(lobby);
+    }
+
+    public void addBot(UUID id, String keycloakId, Difficulty difficulty) {
+        var playerId = usersApi.findIdByKeycloakId(keycloakId);
+        if(playerId == null){
+            throw new UserNotFoundException(keycloakId);
+        }
+
+        var lobbyId = new LobbyId(id);
+        Lobby lobby = lobbyRepository.findById(lobbyId)
+                .orElseThrow(lobbyId::notFound);
+
+        if (lobby.getHost().equals(playerId)) {
+            lobby.addBot(difficulty);
+        }
+
+        lobbyRepository.save(lobby);
+    }
+
+    public void removeBot(UUID id, String keycloakId, int botNumber) {
+        var playerId = usersApi.findIdByKeycloakId(keycloakId);
+        if(playerId == null){
+            throw new UserNotFoundException(keycloakId);
+        }
+
+        var lobbyId = new LobbyId(id);
+        Lobby lobby = lobbyRepository.findById(lobbyId)
+                .orElseThrow(lobbyId::notFound);
+
+        if (lobby.getHost() == playerId) {
+            lobby.removeBot(botNumber);
+        }
 
         lobbyRepository.save(lobby);
     }

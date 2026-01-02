@@ -4,6 +4,7 @@ import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.domain.Lobby;
 import be.kdg.ipj3.lobbies.domain.LobbyId;
 import be.kdg.ipj3.lobbies.domain.LobbyStatus;
+import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.users.shared.UserId;
 import jakarta.persistence.*;
 
@@ -46,11 +47,19 @@ public class JpaLobbyEntity {
 
     private String activeGameUrl;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "bots",
+            joinColumns = @JoinColumn(name = "lobby_id")
+    )
+    @Column(name = "bot")
+    private List<Difficulty> bots;
+
 
     protected JpaLobbyEntity() {
     } //for JPA
 
-    public JpaLobbyEntity(UUID id, String password, int maxPlayers, UUID gameId, UUID hostId, List<UUID> players, String status, String activeGameUrl, Instant lastActivityAt) {
+    public JpaLobbyEntity(UUID id, String password, int maxPlayers, UUID gameId, UUID hostId, List<UUID> players, String status, String activeGameUrl, Instant lastActivityAt, List<Difficulty> bots) {
         this.id = id;
         this.password = password;
         this.maxPlayers = maxPlayers;
@@ -60,6 +69,7 @@ public class JpaLobbyEntity {
         this.status = status;
         this.activeGameUrl = activeGameUrl;
         this.lastActivityAt = lastActivityAt;
+        this.bots = bots;
     }
 
     public static JpaLobbyEntity fromDomain(Lobby lobby) {
@@ -74,7 +84,8 @@ public class JpaLobbyEntity {
                         .collect(Collectors.toList()),
                 lobby.getStatus().name(),
                 lobby.getActiveGameUrl(),
-                lobby.getLastActivityAt()
+                lobby.getLastActivityAt(),
+                lobby.getBots()
         );
     }
 
@@ -90,7 +101,8 @@ public class JpaLobbyEntity {
                         .collect(Collectors.toList()),
                 LobbyStatus.valueOf(this.status),
                 this.activeGameUrl,
-                this.lastActivityAt
+                this.lastActivityAt,
+                this.bots
         );
     }
 

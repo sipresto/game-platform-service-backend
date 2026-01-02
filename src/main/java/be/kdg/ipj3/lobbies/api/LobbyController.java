@@ -66,6 +66,30 @@ public class LobbyController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/{id}/addBot")
+    public ResponseEntity<Void> addBot(
+            @PathVariable UUID id,
+            @RequestBody AddBotDto dto,
+            @AuthenticationPrincipal Jwt token
+    ) {
+        String keycloakId = token.getSubject();
+
+        lobbyService.addBot(id, keycloakId, dto.difficulty());
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/removeBot")
+    public ResponseEntity<Void> removeBot(
+            @PathVariable UUID id,
+            @RequestBody RemoveBotDto dto,
+            @AuthenticationPrincipal Jwt token
+    ) {
+        String keycloakId = token.getSubject();
+
+        lobbyService.removeBot(id, keycloakId, dto.botNumber());
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/{id}/leave")
     public ResponseEntity<Void> leaveLobby(
             @PathVariable UUID id,
