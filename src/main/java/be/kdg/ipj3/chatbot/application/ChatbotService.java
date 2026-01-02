@@ -18,7 +18,7 @@ import java.time.Duration;
 public class ChatbotService {
     private final RestClient restClient;
 
-    public ChatbotService(RestClient.Builder builder, @Value("${rag.api.url:http://localhost:8001}") String ragApiUrl) {
+    public ChatbotService(RestClient.Builder builder, @Value("${rag.api.url}") String ragApiUrl) {
         HttpClient httpClient = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .connectTimeout(Duration.ofSeconds(20))

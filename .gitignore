@@ -38,3 +38,5 @@ build/
 */*/postgresql
 */*/rabbitmq
 /src/main/resources/secret.properties
+/game-platform-backend/infrastructure/rag-chatbot/
+/game-platform-backend/infrastructure/rag-data/
