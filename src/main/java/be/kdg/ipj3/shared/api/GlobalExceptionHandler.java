@@ -1,5 +1,7 @@
 package be.kdg.ipj3.shared.api;
 
+import be.kdg.ipj3.notifications.shared.EmailSendException;
+import be.kdg.ipj3.shop.shared.GameNotFoundException;
 import be.kdg.ipj3.users.shared.ServiceUnavailableException;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.social.shared.InvalidChatRequestException;
