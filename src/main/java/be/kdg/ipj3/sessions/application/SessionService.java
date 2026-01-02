@@ -28,6 +28,10 @@ public class SessionService implements SessionsApi {
         this.usersApi = usersApi;
     }
 
+    public void saveSession(Session session){
+        sessionRepository.save(session);
+    }
+
     @Override
     public void createSession(UUID id, UUID gameId, List<UUID> players, Difficulty difficulty) {
         List<UserId> playerIds = players.stream()
