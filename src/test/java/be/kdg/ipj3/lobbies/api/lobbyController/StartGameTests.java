@@ -125,6 +125,7 @@ public class StartGameTests {
                 hostId
         );
         lobby.join(userId, "password");
+        lobby.addBot(Difficulty.EASY);
         lobbyRepository.save(lobby);
 
         return lobby.getId();
@@ -141,13 +142,9 @@ public class StartGameTests {
 
         doNothing().when(gameClient).startGame(any(), any());
 
-        GameStartDto dto = new GameStartDto(Difficulty.EASY);
-
         // Act & Assert
         mockMvc.perform(post("/api/platform/lobbies/{id}/start", lobbyId.id())
-                        .with(validJwt())
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(dto)))
+                        .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.url", startsWith("/game/")));
@@ -175,13 +172,10 @@ public class StartGameTests {
 
         doThrow(new RestClientException("Service unavailable")).when(gameClient).startGame(any(), any());
 
-        GameStartDto dto = new GameStartDto(Difficulty.EASY);
 
         // Act & Assert
         mockMvc.perform(post("/api/platform/lobbies/{id}/start", lobbyId.id())
-                        .with(validJwt())
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(dto)))
+                        .with(validJwt()))
                 .andExpect(status().isServiceUnavailable());
     }
 
