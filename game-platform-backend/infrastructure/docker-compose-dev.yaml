@@ -89,7 +89,7 @@ services:
       - ./keycloak-data/dev/import:/opt/keycloak/data/import:ro
 
   # ---------------------
-  # AI PLAYER SERVICE
+  # AI SERVICES
   # ---------------------
   ai_player:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team4/ai-player
@@ -98,6 +98,7 @@ services:
       - "8000:8000"
     networks:
       - dev
+
 
   rag_backend:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team4/chatbot-and-recommendation-system:latest
@@ -110,9 +111,7 @@ services:
     depends_on:
       - rag_postgres
       - rag_ollama
-      - bge-m3
     environment:
-      # --- Database Connection ---
       - RAG_API_URL=http://rag_backend:8000
       - POSTGRES_HOST=rag_postgres
       - POSTGRES_PORT=5432
@@ -120,26 +119,22 @@ services:
       - POSTGRES_USER=raguser
       - POSTGRES_PASSWORD=ragpassword
 
-      # --- Ollama / AI ---
       - OLLAMA_BASE_URL=http://rag_ollama:11434
-      - CHAT_MODEL=gpt-oss:20b-cloud       # Matches what we auto-pull in rag_ollama
-      - EMBEDDING_MODEL=bge-m3     # Matches what we auto-pull in rag_ollama
-      - KEEP_ALIVE=-1              # Keep model loaded in memory
+      - CHAT_MODEL=gpt-oss:20b-cloud
+      - EMBEDDING_MODEL=bge-m3
+      - KEEP_ALIVE=-1
+      - OLLAMA_API_KEY=ddfeeca60f0648ada277e4355bfa43c9.Cyv4e-_jCW2XulHnbiHY1c0j
 
-      # --- CORS & Security ---
-      - ALLOWED_ORIGINS=* # Allow all origins for dev (fixes 'allowed_origins' error)
+      - ALLOWED_ORIGINS=*
 
-      # --- RAG Settings (Fixes chunk/retriever errors) ---
       - CHUNK_SIZE=800
       - CHUNK_SIZE_MIN=50
       - CHUNK_OVERLAP=100
       - RETRIEVER_K=5
 
-      # --- File Uploads (Fixes data_path/max_file_size errors) ---
-      - DATA_PATH=/data            # Where files are stored inside container
-      - MAX_FILE_SIZE=52428800     # 50MB
+      - DATA_PATH=/data
+      - MAX_FILE_SIZE=52428800
 
-      # --- Rate Limiting (Fixes rate_limit errors) ---
       - RATE_LIMIT_CHAT=100
       - RATE_LIMIT_CHAT_WINDOW=60
       - RATE_LIMIT_UPLOAD=50
@@ -170,14 +165,10 @@ services:
     volumes:
       - ./rag-data/postgres:/var/lib/postgresql/data
       - ./rag-chatbot/db/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-
-  bge-m3:
-    image: mdelapenya/bge-m3:0.3.13-567m
-    container_name: bge-m3
-    ports:
-      - "8002:8000"
     networks:
       - dev
+
+
   # ---------------------
   # Chess B and F
   # ---------------------

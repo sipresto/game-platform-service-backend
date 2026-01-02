@@ -1,11 +1,15 @@
 package be.kdg.ipj3.chatbot.application;
 
 import be.kdg.ipj3.chatbot.api.dto.ChatbotRequestDto;
+import be.kdg.ipj3.chatbot.api.dto.ChatbotUploadResponseDto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.net.http.HttpClient;
 import java.time.Duration;
@@ -38,5 +42,17 @@ public class ChatbotService {
                 .body(request)
                 .retrieve()
                 .body(String.class);
+    }
+
+    public ChatbotUploadResponseDto uploadDocument(MultipartFile file) {
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", file.getResource());
+
+        return restClient.post()
+                .uri("/api/upload")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(body)
+                .retrieve()
+                .body(ChatbotUploadResponseDto.class);
     }
 }
