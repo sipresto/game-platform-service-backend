@@ -105,7 +105,7 @@ public class LobbyService implements LobbyApi {
         Lobby lobby = lobbyRepository.findById(lobbyId)
                 .orElseThrow(lobbyId::notFound);
 
-        if (lobby.getHost() == playerId) {
+        if (lobby.getHost().equals(playerId)) {
             lobby.removeBot(botNumber);
         }
 
@@ -153,7 +153,7 @@ public class LobbyService implements LobbyApi {
         }
     }
 
-    public String startGame(UUID id, String requestorKeycloakId, Difficulty difficulty) {
+    public String startGame(UUID id, String requestorKeycloakId) {
         var requestor = usersApi.findIdByKeycloakId(requestorKeycloakId);
         if(requestor == null){
             throw new UserNotFoundException(requestorKeycloakId);
@@ -176,6 +176,11 @@ public class LobbyService implements LobbyApi {
             PlatformPlayerDto playerDto = PlatformPlayerDto.fromDto(smallUserDto);
 
             players.add(playerDto);
+        }
+        Difficulty difficulty = Difficulty.EASY;
+
+        if (!lobby.getBots().isEmpty()) {
+            difficulty = lobby.getBots().getFirst();
         }
 
         SessionId sessionId = SessionId.create();

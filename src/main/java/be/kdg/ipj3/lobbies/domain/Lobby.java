@@ -87,6 +87,9 @@ public class Lobby {
         if (players.isEmpty()) {
             throw new IllegalStateException("Cannot start an empty lobby.");
         }
+        if (this.bots.size() + this.players.size() != maxPlayers) {
+            throw new IllegalStateException("Not the correct amount of players.");
+        }
     }
 
     public void resetTimer(){

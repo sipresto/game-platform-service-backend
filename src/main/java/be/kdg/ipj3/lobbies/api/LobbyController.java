@@ -104,12 +104,11 @@ public class LobbyController {
     @PostMapping("/{id}/start")
     public ResponseEntity<GameUrlDto> startGame(
             @PathVariable UUID id,
-            @RequestBody GameStartDto dto,
             @AuthenticationPrincipal Jwt token
     ) {
         String keycloakId = token.getSubject();
 
-        String gameUrl = lobbyService.startGame(id, keycloakId, dto.difficulty());
+        String gameUrl = lobbyService.startGame(id, keycloakId);
 
         return ResponseEntity.ok(new GameUrlDto(gameUrl));
     }
