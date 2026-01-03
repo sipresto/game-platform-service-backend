@@ -175,8 +175,15 @@ public class LobbyService implements LobbyApi {
                 );
             }
 
-                gameClient.startGame(serviceUrl, dto);
-            String gameUrl = gamesApi.findFrontendUrlByGameId(gameId) + "/" + sessionId.id();
+            String frontendUrl = gamesApi.findFrontendUrlByGameId(gameId);
+
+            if (gamesApi.isExternalGame(gameId) && !frontendUrl.endsWith("/game")) {
+                frontendUrl = frontendUrl + "/game";
+            }
+
+            String gameUrl = frontendUrl + "/" + sessionId.id();
+
+            gameClient.startGame(serviceUrl, dto);
 
             List<UUID> playerList = lobby.getPlayers().stream()
                     .map(UserId::id)
