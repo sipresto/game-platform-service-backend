@@ -68,7 +68,8 @@ public class EvaluateAchievementsAfterGameTests {
                 List.of(),
                 List.of(Category.NATIVE),
                 "",
-                Instant.now()
+                Instant.now(),
+                2
         );
         gameRepository.save(game);
 

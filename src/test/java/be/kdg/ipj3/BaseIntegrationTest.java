@@ -102,7 +102,7 @@ public abstract class BaseIntegrationTest {
         Game game = new Game(
                 GameId.create(), name, "Desc", Money.of(price),
                 "/api", "/game", "Rules", List.of(), List.of(Category.NATIVE),
-                "", Instant.now()
+                "", Instant.now(), 2
         );
         gameRepository.save(game);
         return game;

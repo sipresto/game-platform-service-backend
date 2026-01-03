@@ -1,6 +1,7 @@
 package be.kdg.ipj3.lobbies.domain;
 
 import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.users.shared.UserId;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
@@ -22,8 +23,9 @@ public class Lobby {
     private LobbyStatus status;
     private String activeGameUrl;
     private Instant lastActivityAt;
+    private final List<Difficulty> bots = new ArrayList<>();
 
-    public Lobby(LobbyId id, String password, int maxPlayers, GameId game, UserId host, List<UserId> players, LobbyStatus status, String activeGameUrl, Instant lastActivityAt) {
+    public Lobby(LobbyId id, String password, int maxPlayers, GameId game, UserId host, List<UserId> players, LobbyStatus status, String activeGameUrl, Instant lastActivityAt, List<Difficulty> bots) {
         this.id = id;
         this.password = password;
         this.maxPlayers = maxPlayers;
@@ -33,10 +35,11 @@ public class Lobby {
         this.status = status;
         this.activeGameUrl = activeGameUrl;
         this.lastActivityAt = lastActivityAt;
+        this.bots.addAll(bots);
     }
 
     public Lobby(String password, int maxPlayers, GameId game, UserId host) {
-        this(LobbyId.create(), password, maxPlayers, game, host, List.of(host), LobbyStatus.OPEN, null, Instant.now());
+        this(LobbyId.create(), password, maxPlayers, game, host, List.of(host), LobbyStatus.OPEN, null, Instant.now(), List.of());
     }
 
     public void join(UserId player, String providedPassword) {
@@ -84,6 +87,9 @@ public class Lobby {
         if (players.isEmpty()) {
             throw new IllegalStateException("Cannot start an empty lobby.");
         }
+        if (this.bots.size() + this.players.size() != maxPlayers) {
+            throw new IllegalStateException("Not the correct amount of players.");
+        }
     }
 
     public void resetTimer(){
@@ -130,5 +136,19 @@ public class Lobby {
 
     public UserId getHost() {
         return host;
+    }
+
+    public void addBot(Difficulty difficulty) {
+        bots.add(difficulty);
+    }
+
+    public void removeBot(int botNumber) {
+        if(botNumber >= 0 && botNumber < players.size()) {
+            bots.remove(botNumber);
+        }
+    }
+
+    public List<Difficulty> getBots() {
+        return bots;
     }
 }
