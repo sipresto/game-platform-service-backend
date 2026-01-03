@@ -11,7 +11,6 @@ import be.kdg.ipj3.catalog.shared.AchievementId;
 import be.kdg.ipj3.catalog.shared.CountTrigger;
 import be.kdg.ipj3.catalog.shared.CountingStrategy;
 import be.kdg.ipj3.catalog.shared.GameId;
-import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.users.domain.User;
@@ -91,13 +90,13 @@ public class EvaluateAchievementsAfterGameTests {
     }
 
     private GameContext createTestGameContext(GameId gameId, UserId userId, UserId winnerId,
-                                              SessionStatus sessionStatus, Difficulty difficulty) {
+                                              SessionStatus sessionStatus) {
         return new GameContext(
                 gameId,
                 userId,
                 winnerId,
                 sessionStatus,
-                difficulty
+                false
         );
     }
 
@@ -115,7 +114,7 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_ANY);
 
         UserId userId = createTestUser();
-        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN, null);
+        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -145,7 +144,7 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_PLAYER);
 
         UserId userId = createTestUser();
-        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN, null);
+        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -169,7 +168,7 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_AI);
 
         UserId userId = createTestUser();
-        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN, null);
+        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -190,7 +189,7 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 3, CountingStrategy.STREAK, CountTrigger.WIN_OR_DRAW_ANY);
 
         UserId userId = createTestUser();
-        GameContext winContext = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN, null);
+        GameContext winContext = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -215,8 +214,8 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 3, CountingStrategy.STREAK, CountTrigger.WIN_OR_DRAW_ANY);
 
         UserId userId = createTestUser();
-        GameContext winContext = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN, null);
-        GameContext loseContext = createTestGameContext(game.getId(), userId, UserId.create(), SessionStatus.PLAYER_WIN, null);
+        GameContext winContext = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN);
+        GameContext loseContext = createTestGameContext(game.getId(), userId, UserId.create(), SessionStatus.PLAYER_WIN);
 
         AchievementId achievementId = game.getAchievements().getFirst().getId();
 
@@ -242,7 +241,7 @@ public class EvaluateAchievementsAfterGameTests {
         createTestAchievement(game, 1, CountingStrategy.INCREMENT, CountTrigger.WIN_ANY);
 
         UserId userId = UserId.create();
-        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN, null);
+        GameContext context = createTestGameContext(game.getId(), userId, userId, SessionStatus.PLAYER_WIN);
 
         // Act
         achievementProgressService.evaluateAchievementsAfterGame(context);
