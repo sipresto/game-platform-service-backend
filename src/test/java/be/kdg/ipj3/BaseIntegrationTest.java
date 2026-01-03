@@ -10,6 +10,7 @@ import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.perks.domain.PerkRepository;
 import be.kdg.ipj3.sessions.domain.Session;
 import be.kdg.ipj3.sessions.domain.SessionRepository;
+import be.kdg.ipj3.sessions.shared.SessionId;
 import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.shared.domain.Money;
 import be.kdg.ipj3.shop.domain.IPurchaseRepository;
@@ -117,9 +118,7 @@ public abstract class BaseIntegrationTest {
 
     // -- Session Helper --
     protected Session createTestSession(UserId userId, Difficulty difficulty) {
-        Session session = new Session(
-                GameId.create(), List.of(userId), difficulty, SessionStatus.PLAYER_WIN, userId
-        );
+        Session session = new Session(SessionId.create(), GameId.create(), List.of(userId), difficulty, SessionStatus.PLAYER_WIN, userId, Instant.now());
         sessionRepository.save(session);
         return session;
     }

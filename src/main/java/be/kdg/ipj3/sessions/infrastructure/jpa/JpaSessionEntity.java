@@ -41,7 +41,6 @@ public class JpaSessionEntity {
 
     private UUID winnerId;
 
-    @Column(nullable = false)
     private Instant completedAt;
 
     protected JpaSessionEntity() {
