@@ -177,10 +177,6 @@ public class LobbyService implements LobbyApi {
 
             String frontendUrl = gamesApi.findFrontendUrlByGameId(gameId);
 
-            if (gamesApi.isExternalGame(gameId) && !frontendUrl.endsWith("/game")) {
-                frontendUrl = frontendUrl + "/game";
-            }
-
             String gameUrl = frontendUrl + "/" + sessionId.id();
 
             gameClient.startGame(serviceUrl, dto);
