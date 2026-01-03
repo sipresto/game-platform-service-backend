@@ -15,7 +15,6 @@ import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.lobbies.shared.LobbyApi;
 import be.kdg.ipj3.sessions.shared.SessionId;
 import be.kdg.ipj3.sessions.shared.SessionsApi;
-import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
@@ -144,13 +143,39 @@ public class LobbyService implements LobbyApi {
 
             players.add(playerDto);
         }
-
         SessionId sessionId = SessionId.create();
         GameStartRequestDto dto = new GameStartRequestDto(sessionId.id(), players, difficulty);
 
         try {
-            //TODO if category is external frontendurl met http request naar chess
-            gameClient.startGame(serviceUrl, dto);
+            if (gamesApi.isExternalGame(gameId)) {
+                serviceUrl = serviceUrl.replace("{gameId}", sessionId.id().toString());
+
+                UUID whiteId = null;
+                String whiteName = null;
+                UUID blackId = null;
+                String blackName = null;
+
+                if (!players.isEmpty()) {
+                    whiteId = players.getFirst().id();
+                    whiteName = players.getFirst().username();
+                }
+                if (players.size() >= 2) {
+                    blackId = players.get(1).id();
+                    blackName = players.get(1).username();
+                }
+
+                dto = new GameStartRequestDto(
+                        sessionId.id(),
+                        players,
+                        whiteId,
+                        whiteName,
+                        blackId,
+                        blackName,
+                        difficulty
+                );
+            }
+
+                gameClient.startGame(serviceUrl, dto);
             String gameUrl = gamesApi.findFrontendUrlByGameId(gameId) + "/" + sessionId.id();
 
             List<UUID> playerList = lobby.getPlayers().stream()

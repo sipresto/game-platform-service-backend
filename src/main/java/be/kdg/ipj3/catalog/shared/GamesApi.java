@@ -9,8 +9,6 @@ import java.util.UUID;
 
 @NamedInterface
 public interface GamesApi {
-    List<Game> findAllGames();
-
     Game findGameById(UUID id);
 
     boolean existsById(UUID id);
@@ -26,4 +24,6 @@ public interface GamesApi {
     String findFrontendUrlByGameId(UUID id);
 
     Optional<GamePurchaseDto> findGameDtoById(UUID id);
+
+    boolean isExternalGame(UUID id);
 }

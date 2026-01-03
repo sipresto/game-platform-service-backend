@@ -119,7 +119,7 @@ public class Game {
         this.lastRegistration = registrationTime;
     }
 
-    public void deactivate() {
-        this.isActive = false;
+    public List<Category> getCategory() {
+        return categories;
     }
 }

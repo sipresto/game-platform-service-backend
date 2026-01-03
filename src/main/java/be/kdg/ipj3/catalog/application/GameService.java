@@ -30,11 +30,6 @@ public class GameService implements GamesApi {
     }
 
     @Transactional(readOnly = true)
-    public List<Game> findAllGames() {
-        return gameRepository.findAllGames();
-    }
-
-    @Transactional(readOnly = true)
     public String findBackendUrlByGameId(UUID id) {
         var gameId = new GameId(id);
         return gameRepository.findBackendUrlByGameId(gameId)
@@ -164,5 +159,13 @@ public class GameService implements GamesApi {
             game = dto.toDomain();
             gameRepository.save(game);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isExternalGame(UUID id) {
+        var gameId = new GameId(id);
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(gameId::notFound);
+        return game.getCategories().contains(Category.EXTERNAL);
     }
 }
