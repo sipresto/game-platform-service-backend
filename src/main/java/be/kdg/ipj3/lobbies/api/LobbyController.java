@@ -47,7 +47,6 @@ public class LobbyController {
         Lobby createdLobby = lobbyService.createLobby(
                 keycloakId,
                 dto.password(),
-                dto.maxPlayers(),
                 dto.gameId()
         );
 
@@ -67,6 +66,30 @@ public class LobbyController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/{id}/addBot")
+    public ResponseEntity<Void> addBot(
+            @PathVariable UUID id,
+            @RequestBody AddBotDto dto,
+            @AuthenticationPrincipal Jwt token
+    ) {
+        String keycloakId = token.getSubject();
+
+        lobbyService.addBot(id, keycloakId, dto.difficulty());
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/removeBot")
+    public ResponseEntity<Void> removeBot(
+            @PathVariable UUID id,
+            @RequestBody RemoveBotDto dto,
+            @AuthenticationPrincipal Jwt token
+    ) {
+        String keycloakId = token.getSubject();
+
+        lobbyService.removeBot(id, keycloakId, dto.botNumber());
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/{id}/leave")
     public ResponseEntity<Void> leaveLobby(
             @PathVariable UUID id,
@@ -81,12 +104,11 @@ public class LobbyController {
     @PostMapping("/{id}/start")
     public ResponseEntity<GameUrlDto> startGame(
             @PathVariable UUID id,
-            @RequestBody GameStartDto dto,
             @AuthenticationPrincipal Jwt token
     ) {
         String keycloakId = token.getSubject();
 
-        String gameUrl = lobbyService.startGame(id, keycloakId, dto.difficulty());
+        String gameUrl = lobbyService.startGame(id, keycloakId);
 
         return ResponseEntity.ok(new GameUrlDto(gameUrl));
     }

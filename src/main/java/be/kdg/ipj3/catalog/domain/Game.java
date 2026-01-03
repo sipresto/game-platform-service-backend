@@ -26,10 +26,11 @@ public class Game {
     private final String imageUrl;
     private Instant lastRegistration;
     private boolean isActive;
+    private final int maxPlayers;
 
     public Game(GameId id, String name, String description, Money price, String backendUrl, String frontendUrl,
                 String rules, List<Achievement> achievements, List<Category> categories, String imageUrl,
-                Instant lastRegistration, boolean isActive) {
+                Instant lastRegistration, boolean isActive, int maxPlayers) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -42,11 +43,12 @@ public class Game {
         this.imageUrl = imageUrl;
         this.lastRegistration = lastRegistration;
         this.isActive = isActive;
+        this.maxPlayers = maxPlayers;
     }
 
     public Game(GameId id, String name, String description, Money price, String backendUrl, String frontendUrl,
                 String rules, List<Achievement> achievements, List<Category> categories, String imageUrl,
-                Instant lastRegistration) {
+                Instant lastRegistration, int maxPlayers) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -59,6 +61,7 @@ public class Game {
         this.imageUrl = imageUrl;
         this.lastRegistration = lastRegistration;
         this.isActive = true;
+        this.maxPlayers = maxPlayers;
     }
 
     public GameId getId() {
@@ -107,6 +110,10 @@ public class Game {
 
     public boolean isActive() {
         return isActive;
+    }
+
+    public int getMaxPlayers() {
+        return maxPlayers;
     }
 
     public void addAchievement(String name, String code, String description, Integer requiredValue, int points,

@@ -91,7 +91,8 @@ public class GetAchievementProgressByKeycloakIdTests extends BaseIntegrationTest
                 List.of(Category.CARDGAME),
                 null,
                 Instant.now(),
-                true
+                true,
+                2
         );
         gameRepository.save(game);
 
@@ -155,7 +156,8 @@ public class GetAchievementProgressByKeycloakIdTests extends BaseIntegrationTest
                 List.of(Category.CARDGAME),
                 "",
                 Instant.now(),
-                true
+                true,
+                2
         );
         gameRepository.save(game);
 
@@ -187,7 +189,8 @@ public class GetAchievementProgressByKeycloakIdTests extends BaseIntegrationTest
                 List.of(Category.CARDGAME),
                 "",
                 Instant.now(),
-                true
+                true,
+                2
         );
         gameRepository.save(game);
 

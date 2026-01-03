@@ -59,12 +59,15 @@ public class JpaGameEntity {
     @Column(nullable = false)
     private Instant lastRegistration;
 
+    @Column(nullable = false)
+    private int maxPlayers;
+
     protected JpaGameEntity() {
     } // for JPA
 
 
     public JpaGameEntity(UUID id, String name, String description, BigDecimal price, String backendUrl, String frontendUrl,
-                         String rules, List<Category> categories, String imageUrl, Instant lastRegistration) {
+                         String rules, List<Category> categories, String imageUrl, Instant lastRegistration, int maxPlayers) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -75,6 +78,7 @@ public class JpaGameEntity {
         this.categories = categories;
         this.imageUrl = imageUrl;
         this.lastRegistration = lastRegistration;
+        this.maxPlayers = maxPlayers;
     }
 
     public static JpaGameEntity fromDomain(Game game) {
@@ -88,7 +92,8 @@ public class JpaGameEntity {
                 game.getRules(),
                 game.getCategories(),
                 game.getImageUrl(),
-                game.getLastRegistration()
+                game.getLastRegistration(),
+                game.getMaxPlayers()
         );
 
         game.getAchievements().stream()
@@ -115,7 +120,8 @@ public class JpaGameEntity {
                 achievements,
                 new ArrayList<>(this.categories),
                 this.imageUrl,
-                this.lastRegistration
+                this.lastRegistration,
+                this.maxPlayers
         );
     }
 

@@ -41,7 +41,7 @@ public class AchievementMessageHandler {
                     userId,
                     winnerId,
                     SessionStatus.fromStringOrNull(dto.status()),
-                    dto.difficulty()
+                    dto.players().size() < 2
             ));
         }
     }

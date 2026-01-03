@@ -60,7 +60,8 @@ public class GetAllGamesByFilterTests {
                 List.of(),
                 List.of(Category.CARDGAME),
                 "",
-                Instant.now()
+                Instant.now(),
+                2
         );
         gameRepository.save(game);
 

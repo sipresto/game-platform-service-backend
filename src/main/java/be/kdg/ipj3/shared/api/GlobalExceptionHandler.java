@@ -1,8 +1,8 @@
 package be.kdg.ipj3.shared.api;
 
-import be.kdg.ipj3.lobbies.shared.GameServiceUnavailableException;
 import be.kdg.ipj3.notifications.shared.EmailSendException;
 import be.kdg.ipj3.shop.shared.GameNotFoundException;
+import be.kdg.ipj3.users.shared.ServiceUnavailableException;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import be.kdg.ipj3.social.shared.InvalidChatRequestException;
 import org.springframework.http.HttpStatus;
@@ -166,8 +166,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
-    @ExceptionHandler(GameServiceUnavailableException.class)
-    public ResponseEntity<ApiError> handleGameServiceUnavailable(GameServiceUnavailableException ex) {
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<ApiError> handleGameServiceUnavailable(ServiceUnavailableException ex) {
         ApiError body = new ApiError(
                 HttpStatus.SERVICE_UNAVAILABLE.value(),
                 "Service Unavailable",

@@ -82,7 +82,8 @@ public class CreateLobbyTests {
                 List.of(),
                 List.of(Category.NATIVE),
                 "",
-                Instant.now()
+                Instant.now(),
+                2
         );
         gameRepository.save(game);
         return game.getId();
@@ -93,7 +94,7 @@ public class CreateLobbyTests {
         // Arrange
         createTestUser();
         GameId gameId = createTestGame();
-        CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
+        CreateLobbyDto dto = new CreateLobbyDto("password", gameId.id());
 
         // Act & Assert
         mockMvc.perform(post("/api/platform/lobbies")
@@ -126,7 +127,7 @@ public class CreateLobbyTests {
     void createLobby_shouldReturnNotFound_whenInvalidGameId() throws Exception {
         createTestUser();
         GameId gameId = GameId.create();  // not persisted
-        CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
+        CreateLobbyDto dto = new CreateLobbyDto("password", gameId.id());
 
         mockMvc.perform(post("/api/platform/lobbies")
                         .with(validJwt())
@@ -140,7 +141,7 @@ public class CreateLobbyTests {
         // Arrange
         GameId gameId = createTestGame();
 
-        CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
+        CreateLobbyDto dto = new CreateLobbyDto("password", gameId.id());
 
         // Act & Assert
         mockMvc.perform(post("/api/platform/lobbies")
@@ -154,7 +155,7 @@ public class CreateLobbyTests {
     void createLobby_shouldReturnUnauthorized_whenNotAuthenticated() throws Exception {
         createTestUser();
         GameId gameId = createTestGame();
-        CreateLobbyDto dto = new CreateLobbyDto("password", 2, gameId.id());
+        CreateLobbyDto dto = new CreateLobbyDto("password", gameId.id());
 
         mockMvc.perform(post("/api/platform/lobbies")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -165,15 +166,14 @@ public class CreateLobbyTests {
     @Test
     void createLobby_shouldReturnBadRequest_whenInvalidDto() throws Exception {
         createTestUser();
-        GameId gameId = createTestGame();
+        createTestGame();
 
         String invalidDto = """
                 {
                   "password": "password",
-                  "maxPlayers": 30,
-                  "gameId": "%s"
+                  "gameId": "halo"
                 }
-                """.formatted(gameId.id());
+                """;
 
         mockMvc.perform(post("/api/platform/lobbies")
                         .with(validJwt())

@@ -25,7 +25,8 @@ public record RegisterGameDto(
         List<RegisterAchievementDto> achievements,
         List<String> categories,
         String imageUrl,
-        @NotNull Instant timestamp
+        @NotNull Instant timestamp,
+        @NotNull int maxPlayers
 ) {
     public Game toDomain() {
         return new Game(
@@ -44,7 +45,8 @@ public record RegisterGameDto(
                         .filter(Objects::nonNull)
                         .toList(),
                 imageUrl,
-                timestamp
+                timestamp,
+                maxPlayers
         );
     }
 }

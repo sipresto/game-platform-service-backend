@@ -1,11 +1,10 @@
 package be.kdg.ipj3.achievementProgress.domain;
 
 import be.kdg.ipj3.catalog.shared.GameId;
-import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.users.shared.UserId;
 
-public record GameContext(GameId game, UserId player, UserId winner, SessionStatus result, Difficulty difficulty) {
+public record GameContext(GameId game, UserId player, UserId winner, SessionStatus result, boolean isAgainstAi) {
 
     public boolean isWinner() {
         return winner != null && winner.equals(player);
@@ -16,6 +15,6 @@ public record GameContext(GameId game, UserId player, UserId winner, SessionStat
     }
 
     public boolean isAgainstAI() {
-        return difficulty != null;
+        return isAgainstAi;
     }
 }

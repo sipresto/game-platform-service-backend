@@ -55,7 +55,8 @@ public class GetGameByIdTests {
                 List.of(),
                 List.of(Category.CARDGAME, Category.NATIVE, Category.STRATEGY),
                 "",
-                Instant.now()
+                Instant.now(),
+                2
         );
 
         gameRepository.save(game);

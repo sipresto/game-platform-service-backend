@@ -89,7 +89,7 @@ services:
       - ./keycloak-data/dev/import:/opt/keycloak/data/import:ro
 
   # ---------------------
-  # AI PLAYER SERVICE
+  # AI SERVICES
   # ---------------------
   ai_player:
     image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team4/ai-player
@@ -98,6 +98,76 @@ services:
       - "8000:8000"
     networks:
       - dev
+
+
+  rag_backend:
+    image: registry.gitlab.com/kdg-ti/integratieproject-j3/teams-25-26/team4/chatbot-and-recommendation-system:latest
+    pull_policy: always
+    container_name: rag_backend
+    ports:
+      - "8001:8000"
+    networks:
+      - dev
+    depends_on:
+      - rag_postgres
+      - rag_ollama
+    environment:
+      - RAG_API_URL=http://rag_backend:8000
+      - POSTGRES_HOST=rag_postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=ragdb
+      - POSTGRES_USER=raguser
+      - POSTGRES_PASSWORD=ragpassword
+
+      - OLLAMA_BASE_URL=http://rag_ollama:11434
+      - CHAT_MODEL=gpt-oss:20b-cloud
+      - EMBEDDING_MODEL=bge-m3
+      - KEEP_ALIVE=-1
+      - OLLAMA_API_KEY=ddfeeca60f0648ada277e4355bfa43c9.Cyv4e-_jCW2XulHnbiHY1c0j
+
+      - ALLOWED_ORIGINS=*
+
+      - CHUNK_SIZE=800
+      - CHUNK_SIZE_MIN=50
+      - CHUNK_OVERLAP=100
+      - RETRIEVER_K=5
+
+      - DATA_PATH=/data
+      - MAX_FILE_SIZE=52428800
+
+      - RATE_LIMIT_CHAT=100
+      - RATE_LIMIT_CHAT_WINDOW=60
+      - RATE_LIMIT_UPLOAD=50
+      - RATE_LIMIT_UPLOAD_WINDOW=300
+      - RATE_LIMIT_DEFAULT=100
+      - RATE_LIMIT_DEFAULT_WINDOW=60
+
+  # ------------------
+  # RAG INFRASTRUCTURE
+  # ------------------
+  rag_ollama:
+    image: ollama/ollama:latest
+    container_name: rag_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./rag-data/ollama:/root/.ollama
+    networks:
+      - dev
+
+  rag_postgres:
+    image: pgvector/pgvector:pg16
+    container_name: rag_postgres
+    environment:
+      POSTGRES_USER: "raguser"
+      POSTGRES_PASSWORD: "ragpassword"
+      POSTGRES_DB: "ragdb"
+    volumes:
+      - ./rag-data/postgres:/var/lib/postgresql/data
+      - ./rag-chatbot/db/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - dev
+
 
   # ---------------------
   # Chess B and F
