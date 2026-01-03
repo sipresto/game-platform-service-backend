@@ -149,6 +149,7 @@ public class LobbyService implements LobbyApi {
         GameStartRequestDto dto = new GameStartRequestDto(sessionId.id(), players, difficulty);
 
         try {
+            //TODO if category is external frontendurl met http request naar chess
             gameClient.startGame(serviceUrl, dto);
             String gameUrl = gamesApi.findFrontendUrlByGameId(gameId) + "/" + sessionId.id();
 
