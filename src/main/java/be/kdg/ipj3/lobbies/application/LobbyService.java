@@ -187,8 +187,39 @@ public class LobbyService implements LobbyApi {
         GameStartRequestDto dto = new GameStartRequestDto(sessionId.id(), players, difficulty);
 
         try {
+            if (gamesApi.isExternalGame(gameId)) {
+                serviceUrl = serviceUrl.replace("{gameId}", sessionId.id().toString());
+
+                UUID whiteId = null;
+                String whiteName = null;
+                UUID blackId = null;
+                String blackName = null;
+
+                if (!players.isEmpty()) {
+                    whiteId = players.getFirst().id();
+                    whiteName = players.getFirst().username();
+                }
+                if (players.size() >= 2) {
+                    blackId = players.get(1).id();
+                    blackName = players.get(1).username();
+                }
+
+                dto = new GameStartRequestDto(
+                        sessionId.id(),
+                        players,
+                        whiteId,
+                        whiteName,
+                        blackId,
+                        blackName,
+                        difficulty
+                );
+            }
+
+            String frontendUrl = gamesApi.findFrontendUrlByGameId(gameId);
+
+            String gameUrl = frontendUrl + "/" + sessionId.id();
+
             gameClient.startGame(serviceUrl, dto);
-            String gameUrl = gamesApi.findFrontendUrlByGameId(gameId) + "/" + sessionId.id();
 
             List<UUID> playerList = lobby.getPlayers().stream()
                     .map(UserId::id)

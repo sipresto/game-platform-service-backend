@@ -33,12 +33,8 @@ public class Session {
         this.completedAt = completedAt;
     }
 
-    public Session(GameId game, List<UserId> players, Difficulty difficulty, SessionStatus status, UserId winner) {
-        this(SessionId.create(), game, players, difficulty, status, winner, Instant.now());
-    }
-
     public Session(SessionId id, GameId game, List<UserId> players, Difficulty difficulty) {
-        this(id, game, players, difficulty, SessionStatus.IN_PROGRESS, null, Instant.now());
+        this(id, game, players, difficulty, SessionStatus.IN_PROGRESS, null, null);
     }
 
     public SessionId getId() {

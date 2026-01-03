@@ -9,6 +9,7 @@ public class RabbitMQTopologySessions {
 
     public static final String SESSION_GAME_RESULTS_QUEUE = "sessions-game-results-queue";
     public static final String SESSION_GAME_REMATCH_QUEUE = "session-game-rematch-queue";
+    public static final String SESSION_GAME_START_QUEUE = "session-game-start-queue";
 
     @Bean
     Queue sessionsGameResultsQueue() {
@@ -32,6 +33,18 @@ public class RabbitMQTopologySessions {
         return BindingBuilder.bind(sessionsGameRematchQueue)
                 .to(gameEventsExchange)
                 .with("game.rematch.*");
+    }
+
+    @Bean
+    Queue sessionsGameStartQueue() {
+        return QueueBuilder.durable(SESSION_GAME_START_QUEUE).build();
+    }
+
+    @Bean
+    Binding sessionsStartBinding(Queue sessionsGameStartQueue, TopicExchange gameEventsExchange) {
+        return BindingBuilder.bind(sessionsGameStartQueue)
+                .to(gameEventsExchange)
+                .with("game.start.*");
     }
 }
 

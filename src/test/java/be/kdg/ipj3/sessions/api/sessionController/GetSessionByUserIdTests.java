@@ -4,25 +4,26 @@ import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.sessions.domain.Session;
 import be.kdg.ipj3.sessions.domain.SessionRepository;
+import be.kdg.ipj3.sessions.shared.SessionId;
 import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.users.domain.User;
 import be.kdg.ipj3.users.domain.UserRepository;
 import be.kdg.ipj3.users.shared.UserId;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.utility.TestcontainersConfiguration;
 
+import java.time.Instant;
 import java.util.List;
 
-
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -66,19 +67,23 @@ public class GetSessionByUserIdTests {
 
     private void createTestSessions(UserId userId) {
         Session session1 = new Session(
+                SessionId.create(),
                 GameId.create(),
                 List.of(userId),
                 Difficulty.EASY,
                 SessionStatus.PLAYER_WIN,
-                userId
+                userId,
+                Instant.now()
         );
 
         Session session2 = new Session(
+                SessionId.create(),
                 GameId.create(),
                 List.of(userId),
                 Difficulty.HARD,
                 SessionStatus.AI_WIN,
-                null
+                null,
+                Instant.now()
         );
 
         sessionRepository.save(session1);
