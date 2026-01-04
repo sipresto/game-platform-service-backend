@@ -7,17 +7,16 @@ import be.kdg.ipj3.lobbies.api.dto.GameStartRequestDto.PlatformPlayerDto;
 import be.kdg.ipj3.lobbies.api.dto.LobbyDetailDto;
 import be.kdg.ipj3.lobbies.api.dto.PlayerDto;
 import be.kdg.ipj3.lobbies.domain.Lobby;
-import be.kdg.ipj3.lobbies.shared.LobbyId;
 import be.kdg.ipj3.lobbies.domain.LobbyRepository;
 import be.kdg.ipj3.lobbies.domain.LobbyStatus;
-import be.kdg.ipj3.social.shared.ChatsApi;
-import be.kdg.ipj3.users.shared.ServiceUnavailableException;
 import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.lobbies.shared.LobbyApi;
+import be.kdg.ipj3.lobbies.shared.LobbyId;
 import be.kdg.ipj3.sessions.shared.SessionId;
 import be.kdg.ipj3.sessions.shared.SessionsApi;
 import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
+import be.kdg.ipj3.social.shared.ChatsApi;
 import be.kdg.ipj3.users.shared.ServiceUnavailableException;
 import be.kdg.ipj3.users.shared.SmallUserDto;
 import be.kdg.ipj3.users.shared.UserId;
@@ -25,7 +24,10 @@ import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 @Service
@@ -270,7 +272,7 @@ public class LobbyService implements LobbyApi {
 
     public void invite(UUID lobbyUUID, String keycloakId, UUID receiverUUID) {
         var senderId = usersApi.findIdByKeycloakId(keycloakId);
-        if(senderId == null){
+        if (senderId == null) {
             throw new UserNotFoundException(keycloakId);
         }
 
