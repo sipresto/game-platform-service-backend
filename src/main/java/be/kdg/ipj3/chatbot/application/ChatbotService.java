@@ -83,18 +83,27 @@ public class ChatbotService implements ChatbotApi {
             }
         } catch (Exception e) {
             log.error("Failed to upload to RAG: {}", e.getMessage());
-            throw new ServiceUnavailableException("Could not upload to RAG API " + e);
+            throw new ServiceUnavailableException("Could not upload to RAG API: " + e);
         }
     }
 
     public String askAi(String userMessage) {
         ChatbotRequestDto request = new ChatbotRequestDto(userMessage);
 
-        return restClient.post()
-                .uri("/api/chat")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(request)
-                .retrieve()
-                .body(String.class);
+        try {
+            return restClient.post()
+                    .uri("/api/chat")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .onStatus(status -> status.value() == 422, (req, response) -> {
+                        throw new ServiceUnavailableException("Validation error from RAG API");
+                    })
+                    .body(String.class);
+        } catch (Exception e) {
+            log.error("Failed to call chatbot API: {}", e.getMessage());
+            throw new ServiceUnavailableException("Could not call chatbot API: " + e);
+        }
     }
 }
