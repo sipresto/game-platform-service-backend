@@ -318,8 +318,14 @@ public class UserService implements UsersApi {
         user.block(blockUser.getId());
         blockUser.handleBlock(user.getId());
 
+        eventPublisher.publishEvent(new ChatBlockEvent(
+                user.getId(),
+                blockUser.getId()
+        ));
+
         userRepository.save(user);
         userRepository.save(blockUser);
+
     }
 
     public List<User> findBlockedUsers(String keycloakId) {
@@ -333,6 +339,12 @@ public class UserService implements UsersApi {
             throw new IllegalArgumentException("You can't unblock yourself");
         }
         user.unblock(new UserId(unblockId));
+
+        eventPublisher.publishEvent(new ChatUnblockEvent(
+                user.getId(),
+                new UserId(unblockId)
+        ));
+
         userRepository.save(user);
     }
 

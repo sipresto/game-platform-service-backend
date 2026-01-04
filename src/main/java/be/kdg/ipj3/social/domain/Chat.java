@@ -19,17 +19,20 @@ public class Chat {
     private final Set<UserId> participants = new HashSet<>();
     private final List<Message> messages = new ArrayList<>();
     private Instant lastMessageAt;
+    private boolean blocked;
 
-    public Chat(ChatId id, String name, Instant lastMessageAt) {
+    public Chat(ChatId id, String name, Instant lastMessageAt, boolean blocked) {
         this.id = id;
         this.name = name;
         this.lastMessageAt = lastMessageAt;
+        this.blocked = blocked;
     }
 
     public Chat(String name, Set<UserId> participants) {
         this.id = ChatId.create();
         this.name = name;
         participants.forEach(this::addParticipant);
+        this.blocked = false;
     }
 
     public ChatId getId() {
@@ -52,6 +55,10 @@ public class Chat {
         return lastMessageAt;
     }
 
+    public boolean isBlocked() {
+        return blocked;
+    }
+
     public void addParticipant(UserId userId) {
         participants.add(userId);
     }
@@ -68,5 +75,13 @@ public class Chat {
         lastMessageAt = Instant.now();
         Message message = new Message(senderId, content, lastMessageAt);
         messages.add(message);
+    }
+
+    public void block() {
+        this.blocked = true;
+    }
+
+    public void unblock() {
+        this.blocked = false;
     }
 }

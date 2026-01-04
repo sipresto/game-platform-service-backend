@@ -4,7 +4,6 @@ import be.kdg.ipj3.lobbies.shared.LobbyId;
 import be.kdg.ipj3.users.shared.UserId;
 import org.springframework.modulith.NamedInterface;
 
-import java.util.Set;
 
 @NamedInterface
 public interface ChatsApi {
