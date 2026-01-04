@@ -16,8 +16,8 @@ public record VisibilitySettings(Map<VisibleField, Visibility> fieldVisibilities
         map.put(VisibleField.PROFILE, Visibility.PUBLIC);
         map.put(VisibleField.POINTS, Visibility.PUBLIC);
         map.put(VisibleField.FAVORITE_GAMES, Visibility.PUBLIC);
-        map.put(VisibleField.OWNED_GAMES, Visibility.FRIENDS_ONLY);
-        map.put(VisibleField.FRIENDS_LIST, Visibility.FRIENDS_ONLY);
+        map.put(VisibleField.OWNED_GAMES, Visibility.PUBLIC);
+        map.put(VisibleField.FRIENDS_LIST, Visibility.PUBLIC);
         return new VisibilitySettings(map);
     }
 
