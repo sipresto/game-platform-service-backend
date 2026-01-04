@@ -139,7 +139,7 @@ public class LobbyController {
         return ResponseEntity.ok(lobbyDetail);
     }
 
-    @PostMapping("/{lobbyId}/invite")
+    @PatchMapping("/{lobbyId}/invite")
     public ResponseEntity<Void> inviteToLobby(
             @PathVariable UUID lobbyId,
             @RequestBody InvitePlayerDto dto,

@@ -163,9 +163,12 @@ public class ChatService implements ChatsApi {
                 });
 
         String roomName = "Join me in room " + lobbyId.id().toString().toUpperCase().substring(30);
-        String passwordText = (password.isEmpty()) ? "It's public" : "The password is \"" + password + "\"!";
+        String passwordText = (password == null || password.isEmpty()) ? "It's public" : "The password is \"" + password + "\"";
 
-        String message = "Come play " + gameName + "with me! " + roomName + passwordText;
+        String message = """
+                Come play %s with me!
+                %s! %s!
+                """.formatted(gameName, roomName, passwordText);
         sendMessage(keycloakId, chat.getId(), message);
     }
 }
