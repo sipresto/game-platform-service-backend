@@ -1,11 +1,13 @@
 package be.kdg.ipj3.social.application;
 
+import be.kdg.ipj3.lobbies.shared.LobbyId;
 import be.kdg.ipj3.social.api.dto.ChatDto;
 import be.kdg.ipj3.social.api.dto.ChatListDto;
 import be.kdg.ipj3.social.domain.Chat;
 import be.kdg.ipj3.social.domain.ChatId;
 import be.kdg.ipj3.social.domain.ChatRepository;
 import be.kdg.ipj3.social.domain.Message;
+import be.kdg.ipj3.social.shared.ChatsApi;
 import be.kdg.ipj3.social.shared.InvalidChatRequestException;
 import be.kdg.ipj3.social.shared.ChatMessageSentEvent;
 import be.kdg.ipj3.users.shared.UserId;
@@ -22,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class ChatService {
+public class ChatService implements ChatsApi {
     private final ChatRepository chatRepository;
     private final UsersApi usersApi;
     private final ApplicationEventPublisher eventPublisher;
@@ -83,6 +85,10 @@ public class ChatService {
             throw new InvalidChatRequestException("Not enough participants");
         }
 
+        if (usersApi.checkBlock(participantIds)) {
+            throw new InvalidChatRequestException("One of the users has blocked another user in this chat");
+        }
+
         Chat chat = chatRepository.findByExactParticipants(participantIds)
                 .orElseGet(() -> {
                     Chat newChat = new Chat(null, participantIds);
@@ -91,9 +97,6 @@ public class ChatService {
                 });
 
         String chatName = buildChatName(participantIds, currentUser);
-        if (usersApi.checkBlock(participantIds)) {
-            throw new InvalidChatRequestException("One of the users has blocked another user in this chat");
-        }
         var usernames = chat.getParticipants().stream()
                 .collect(Collectors.toMap(
                         userId -> userId,
@@ -140,5 +143,32 @@ public class ChatService {
                 .filter(userId -> !userId.equals(currentUser))
                 .map(usersApi::findDisplayNameById)
                 .collect(Collectors.joining(", "));
+    }
+
+    @Override
+    public void sendInvite(String keycloakId, String gameName, String password, LobbyId lobbyId, UserId senderId, UserId receiverId) {
+        Set<UserId> participantIds = new HashSet<>();
+        participantIds.add(senderId);
+        participantIds.add(receiverId);
+
+        if (usersApi.checkBlock(participantIds)) {
+            throw new InvalidChatRequestException("One of the users has blocked another user in this chat");
+        }
+
+        var chat = chatRepository.findByExactParticipants(participantIds)
+                .orElseGet(() -> {
+                    Chat newChat = new Chat(null, participantIds);
+                    chatRepository.save(newChat);
+                    return newChat;
+                });
+
+        String roomName = "Join me in room " + lobbyId.id().toString().toUpperCase().substring(30);
+        String passwordText = (password == null || password.isEmpty()) ? "It's public" : "The password is \"" + password + "\"";
+
+        String message = """
+                Come play %s with me!
+                %s! %s!
+                """.formatted(gameName, roomName, passwordText);
+        sendMessage(keycloakId, chat.getId(), message);
     }
 }

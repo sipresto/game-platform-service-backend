@@ -1,6 +1,7 @@
 package be.kdg.ipj3.lobbies.domain;
 
 import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.lobbies.shared.LobbyId;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;

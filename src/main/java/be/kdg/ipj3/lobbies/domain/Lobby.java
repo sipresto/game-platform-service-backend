@@ -2,6 +2,7 @@ package be.kdg.ipj3.lobbies.domain;
 
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
+import be.kdg.ipj3.lobbies.shared.LobbyId;
 import be.kdg.ipj3.users.shared.UserId;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
