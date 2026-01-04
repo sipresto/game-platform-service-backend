@@ -3,6 +3,7 @@ package be.kdg.ipj3.users.application;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.perks.shared.PerkId;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
+import be.kdg.ipj3.social.shared.ChatsApi;
 import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.shared.*;
 import org.springframework.context.ApplicationEventPublisher;
@@ -16,10 +17,12 @@ import java.util.*;
 public class UserService implements UsersApi {
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final ChatsApi chatsApi;
 
-    public UserService(UserRepository userRepository, ApplicationEventPublisher eventPublisher) {
+    public UserService(UserRepository userRepository, ApplicationEventPublisher eventPublisher, ChatsApi chatsApi) {
         this.userRepository = userRepository;
         this.eventPublisher = eventPublisher;
+        this.chatsApi = chatsApi;
     }
 
     /**
@@ -318,8 +321,11 @@ public class UserService implements UsersApi {
         user.block(blockUser.getId());
         blockUser.handleBlock(user.getId());
 
+        chatsApi.blockChat(user.getId(), blockUser.getId());
+
         userRepository.save(user);
         userRepository.save(blockUser);
+
     }
 
     public List<User> findBlockedUsers(String keycloakId) {
@@ -333,6 +339,7 @@ public class UserService implements UsersApi {
             throw new IllegalArgumentException("You can't unblock yourself");
         }
         user.unblock(new UserId(unblockId));
+        chatsApi.unblockChat(user.getId(), new UserId(unblockId));
         userRepository.save(user);
     }
 

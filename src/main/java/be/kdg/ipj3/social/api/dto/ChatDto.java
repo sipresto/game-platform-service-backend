@@ -15,7 +15,8 @@ public record ChatDto(
         UUID id,
         String name,
         Set<ParticipantDto> participants,
-        List<MessageDto> messages
+        List<MessageDto> messages,
+        boolean blocked
 ) {
     public record ParticipantDto(
             UUID id,
@@ -62,7 +63,8 @@ public record ChatDto(
                 chat.getId().id(),
                 chat.getName() != null ? chat.getName() : chatName,
                 participants,
-                messageDtos
+                messageDtos,
+                chat.isBlocked()
         );
     }
 }

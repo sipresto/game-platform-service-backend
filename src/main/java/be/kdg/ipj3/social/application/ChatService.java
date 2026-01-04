@@ -171,4 +171,35 @@ public class ChatService implements ChatsApi {
                 """.formatted(gameName, roomName, passwordText);
         sendMessage(keycloakId, chat.getId(), message);
     }
+
+    @Override
+    public void blockChat(UserId blockerId, UserId blockedId) {
+        Set<UserId> participantIds = new HashSet<>();
+        participantIds.add(blockerId);
+        participantIds.add(blockedId);
+
+
+        var chat = chatRepository.findByExactParticipants(participantIds);
+
+        if (chat.isEmpty()) {
+            return;
+        }
+
+        chat.get().block();
+    }
+
+    @Override
+    public void unblockChat(UserId unblockerId, UserId unblockedId) {
+        Set<UserId> participantIds = new HashSet<>();
+        participantIds.add(unblockerId);
+        participantIds.add(unblockedId);
+
+
+        var chat = chatRepository.findByExactParticipants(participantIds);
+
+        if (chat.isEmpty()) {
+            return;
+        }
+        chat.get().unblock();
+    }
 }

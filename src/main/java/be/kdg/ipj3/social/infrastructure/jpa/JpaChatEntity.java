@@ -37,14 +37,17 @@ public class JpaChatEntity {
 
     private Instant lastMessageAt;
 
+    private boolean blocked;
+
     protected JpaChatEntity() {
     } // for JPA
 
-    public JpaChatEntity(UUID id, String name, Set<UUID> participantIds, Instant lastMessageAt) {
+    public JpaChatEntity(UUID id, String name, Set<UUID> participantIds, Instant lastMessageAt, boolean blocked) {
         this.id = id;
         this.name = name;
         this.participantIds = participantIds;
         this.lastMessageAt = lastMessageAt;
+        this.blocked = blocked;
     }
 
     public static JpaChatEntity fromDomain(Chat chat) {
@@ -52,7 +55,7 @@ public class JpaChatEntity {
                 .map(UserId::id)
                 .collect(Collectors.toSet());
 
-        JpaChatEntity jpaChat = new JpaChatEntity(chat.getId().id(), chat.getName(), participantIds, chat.getLastMessageAt());
+        JpaChatEntity jpaChat = new JpaChatEntity(chat.getId().id(), chat.getName(), participantIds, chat.getLastMessageAt(), chat.isBlocked());
 
         chat.getMessages().stream()
                 .map(msg -> JpaMessageEntity.fromDomain(msg, jpaChat))
@@ -62,7 +65,7 @@ public class JpaChatEntity {
     }
 
     public Chat toDomain() {
-        Chat chat = new Chat(new ChatId(id), name, lastMessageAt);
+        Chat chat = new Chat(new ChatId(id), name, lastMessageAt, blocked);
 
         participantIds.stream()
                 .map(UserId::new)
