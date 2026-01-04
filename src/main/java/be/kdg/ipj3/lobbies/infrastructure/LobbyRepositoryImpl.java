@@ -7,6 +7,7 @@ import be.kdg.ipj3.lobbies.domain.LobbyRepository;
 import be.kdg.ipj3.lobbies.domain.LobbyStatus;
 import be.kdg.ipj3.lobbies.infrastructure.jpa.JpaLobbyEntity;
 import be.kdg.ipj3.lobbies.infrastructure.jpa.JpaLobbyRepository;
+import be.kdg.ipj3.users.shared.UserId;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -78,5 +79,11 @@ public class LobbyRepositoryImpl implements LobbyRepository {
     @Override
     public Optional<Lobby> findByGameId(UUID activeGameId) {
         return jpaLobbyRepository.findByGameId(activeGameId.toString()).stream().map(JpaLobbyEntity::toDomain).findFirst();
+    }
+
+    @Override
+    public Optional<Lobby> findCurrentLobbyByUserId(UserId userId) {
+        return jpaLobbyRepository.findOpenByUserId(userId.id())
+                .map(JpaLobbyEntity::toDomain);
     }
 }
