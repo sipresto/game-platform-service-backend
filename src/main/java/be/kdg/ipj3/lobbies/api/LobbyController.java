@@ -1,5 +1,6 @@
 package be.kdg.ipj3.lobbies.api;
 
+import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.api.dto.*;
 import be.kdg.ipj3.lobbies.application.LobbyService;
 import be.kdg.ipj3.lobbies.domain.Lobby;
@@ -114,17 +115,24 @@ public class LobbyController {
     }
 
 
-    @GetMapping("game/{gameId}")
-    public ResponseEntity<List<LobbyListDto>> getOpenLobbiesForGame(
+    @GetMapping("/game/{gameId}")
+    public ResponseEntity<OpenLobbiesDto> getOpenLobbiesForGame(
             @PathVariable UUID gameId,
             @AuthenticationPrincipal Jwt jwt
     ) {
 
         var openLobbies = lobbyService.findOpenLobbiesForGame(gameId, jwt.getSubject());
+        LobbyDetailDto currentLobby = lobbyService.findCurrentLobbyDetailDtoForPlayer(jwt.getSubject());
+        String differentGameName = null;
+        if (currentLobby != null && !currentLobby.gameId().equals(gameId)) {
+            differentGameName = lobbyService.findGameName(new GameId(currentLobby.gameId()));
+        }
 
-        var dto = openLobbies.stream()
-                .map(LobbyListDto::fromDomain)
-                .toList();
+        var dto = new OpenLobbiesDto(
+                openLobbies.stream().map(LobbyListDto::fromDomain).toList(),
+                currentLobby,
+                differentGameName
+        );
 
         return ResponseEntity.ok(dto);
     }

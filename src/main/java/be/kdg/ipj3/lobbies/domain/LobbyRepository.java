@@ -1,6 +1,7 @@
 package be.kdg.ipj3.lobbies.domain;
 
 import be.kdg.ipj3.catalog.shared.GameId;
+import be.kdg.ipj3.users.shared.UserId;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -30,4 +31,6 @@ public interface LobbyRepository {
     List<Lobby> findByLastActivityBeforeInstant(Instant cutoff);
 
     Optional<Lobby> findByGameId(UUID gameId);
+
+    Optional<Lobby> findCurrentLobbyByUserId(UserId userId);
 }
