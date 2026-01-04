@@ -172,7 +172,6 @@ public class ChatService implements ChatsApi {
         sendMessage(keycloakId, chat.getId(), message);
     }
 
-    @Override
     public void blockChat(UserId blockerId, UserId blockedId) {
         Set<UserId> participantIds = new HashSet<>();
         participantIds.add(blockerId);
@@ -186,9 +185,9 @@ public class ChatService implements ChatsApi {
         }
 
         chat.get().block();
+        chatRepository.save(chat.get());
     }
 
-    @Override
     public void unblockChat(UserId unblockerId, UserId unblockedId) {
         Set<UserId> participantIds = new HashSet<>();
         participantIds.add(unblockerId);
@@ -201,5 +200,6 @@ public class ChatService implements ChatsApi {
             return;
         }
         chat.get().unblock();
+        chatRepository.save(chat.get());
     }
 }
