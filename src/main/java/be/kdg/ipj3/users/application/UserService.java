@@ -3,6 +3,7 @@ package be.kdg.ipj3.users.application;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.perks.shared.PerkId;
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
+import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.users.domain.*;
 import be.kdg.ipj3.users.shared.*;
 import org.springframework.context.ApplicationEventPublisher;
@@ -68,7 +69,8 @@ public class UserService implements UsersApi {
 
     @Override
     public void addFavorite(String id, UUID gameIdParam) {
-        var user = findByKeycloakId(id);
+        var user = findByKeycloakId(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
         var gameId = new GameId(gameIdParam);
         if (!user.getOwnedGames().contains(gameId)) {
             throw new IllegalArgumentException("You must own the game to add it to favorites.");
@@ -79,7 +81,8 @@ public class UserService implements UsersApi {
 
     @Override
     public void removeFavorite(String id, UUID gameId) {
-        var user = findByKeycloakId(id);
+        var user = findByKeycloakId(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
         user.removeFavorite(new GameId(gameId));
         userRepository.save(user);
     }
@@ -87,7 +90,8 @@ public class UserService implements UsersApi {
     @Transactional(readOnly = true)
     public List<GameId> findOwnedGamesById(UUID id, String viewerKeycloakId) {
         var target = findById(id);
-        var viewer = findByKeycloakId(viewerKeycloakId);
+        var viewer = findByKeycloakId(viewerKeycloakId)
+                .orElseThrow(() -> new UserNotFoundException(viewerKeycloakId));
 
         return target.getVisibleOwnedGames(viewer);
     }
@@ -108,26 +112,28 @@ public class UserService implements UsersApi {
     }
 
     @Transactional(readOnly = true)
-    public User findByKeycloakId(String keycloakId) {
-        return userRepository.findByKeycloakId(keycloakId)
-                .orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
+    public Optional<User> findByKeycloakId(String keycloakId) {
+        return userRepository.findByKeycloakId(keycloakId);
     }
 
     public void updatePrivacySettingsByKeycloakId(Visibility visibility, String keycloakId) {
-        User user = findByKeycloakId(keycloakId);
+        User user = findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         user.updateVisibility(visibility);
         userRepository.save(user);
     }
 
     public void updateFieldVisibility(String keycloakId, VisibleField field, Visibility visibility) {
-        User user = findByKeycloakId(keycloakId);
+        User user = findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         user.updateVisibilityForField(field, visibility);
         userRepository.save(user);
     }
 
     @Transactional(readOnly = true)
     public VisibilitySettings getVisibilitySettings(String keycloakId) {
-        User user = findByKeycloakId(keycloakId);
+        User user = findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         return user.getVisibilitySettings();
     }
 
@@ -147,8 +153,8 @@ public class UserService implements UsersApi {
     }
 
     @Transactional(readOnly = true)
-    public UserId findIdByKeycloakId(String keycloakId) {
-        return findByKeycloakId(keycloakId).getId();
+    public Optional<UserId> findIdByKeycloakId(String keycloakId) {
+        return findByKeycloakId(keycloakId).map(User::getId);
     }
 
     @Transactional(readOnly = true)
@@ -206,7 +212,8 @@ public class UserService implements UsersApi {
     }
 
     public int findPoints(String keycloakId) {
-        User user = findByKeycloakId(keycloakId);
+        User user = findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         return user.getPoints();
     }
 
@@ -263,7 +270,8 @@ public class UserService implements UsersApi {
 
     public void sendFriendRequest(UUID receiver, String loggedInUserKeycloakId) {
         User receiverUser = findById(receiver);
-        User senderUser = findByKeycloakId(loggedInUserKeycloakId);
+        User senderUser = findByKeycloakId(loggedInUserKeycloakId)
+                .orElseThrow(() -> new UserNotFoundException(loggedInUserKeycloakId));
         receiverUser.validateFriendRequests(senderUser.getId());
         receiverUser.addIncomingFriendRequest(new FriendRequest(senderUser.getId()));
         senderUser.addOutgoingFriendRequest(new FriendRequest(receiverUser.getId()));
@@ -278,7 +286,8 @@ public class UserService implements UsersApi {
     }
 
     public void acceptFriendRequest(String keycloakId, UUID sender) {
-        User receiverUser = findByKeycloakId(keycloakId);
+        User receiverUser = findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         User senderUser = findById(sender);
         receiverUser.acceptFriendRequest(senderUser.getId());
         senderUser.addFriend(receiverUser.getId());
@@ -288,7 +297,8 @@ public class UserService implements UsersApi {
     }
 
     public void rejectFriendRequest(String keycloakId, UUID sender) {
-        User receiverUser = findByKeycloakId(keycloakId);
+        User receiverUser = findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         User senderUser = findById(sender);
         receiverUser.removeIncomingFriendRequest(senderUser.getId());
         senderUser.removeOutgoingFriendRequest(receiverUser.getId());
@@ -297,7 +307,8 @@ public class UserService implements UsersApi {
     }
 
     public void removeFriend(String keycloakId, UUID friendId) {
-        User user = findByKeycloakId(keycloakId);
+        User user = findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         if(user.getId().id().equals(friendId)) {
             throw new IllegalArgumentException("FriendId can't be the same as UserId");
         }
@@ -309,7 +320,8 @@ public class UserService implements UsersApi {
     }
 
     public void blockUser(String keycloakId, UUID blockId) {
-        User user = findByKeycloakId(keycloakId);
+        User user = findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         if (user.getId().id().equals(blockId)) {
             throw new IllegalArgumentException("You can't block yourself");
         }
@@ -329,12 +341,14 @@ public class UserService implements UsersApi {
     }
 
     public List<User> findBlockedUsers(String keycloakId) {
-        User user = findByKeycloakId(keycloakId);
+        User user = findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         return new ArrayList<>(userRepository.findBlockedUsers(user.getId()));
     }
 
     public void unblockUser(String keycloakId, UUID unblockId) {
-        User user = findByKeycloakId(keycloakId);
+        User user = findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         if (user.getId().id().equals(unblockId)) {
             throw new IllegalArgumentException("You can't unblock yourself");
         }

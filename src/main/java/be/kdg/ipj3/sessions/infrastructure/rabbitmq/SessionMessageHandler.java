@@ -9,6 +9,7 @@ import be.kdg.ipj3.sessions.infrastructure.rabbitmq.dto.GameRematchDto;
 import be.kdg.ipj3.sessions.infrastructure.rabbitmq.dto.SessionStartDto;
 import be.kdg.ipj3.sessions.shared.SessionId;
 import be.kdg.ipj3.sessions.shared.SessionStatus;
+import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.shared.infrastructure.rabbitmq.dto.GameResultMessageDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
@@ -33,7 +34,7 @@ public class SessionMessageHandler {
     @RabbitListener(queues = RabbitMQTopologySessions.SESSION_GAME_RESULTS_QUEUE)
     void onGameResultMessageReceived(GameResultMessageDto dto) {
         UserId winnerId = dto.winnerId() != null
-                ? usersApi.findIdByKeycloakId(dto.winnerId())
+                ? usersApi.findIdByKeycloakId(dto.winnerId()).orElseThrow(() -> new UserNotFoundException(dto.winnerId()))
                 : null;
 
         sessionService.endSession(

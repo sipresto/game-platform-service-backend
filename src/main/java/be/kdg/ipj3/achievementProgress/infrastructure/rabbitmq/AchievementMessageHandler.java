@@ -7,6 +7,7 @@ import be.kdg.ipj3.achievementProgress.infrastructure.rabbitmq.dto.AchievementCo
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.sessions.shared.SessionsApi;
+import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.shared.infrastructure.rabbitmq.dto.GameResultMessageDto;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
@@ -30,11 +31,12 @@ public class AchievementMessageHandler {
     void onGameResultMessageReceived(GameResultMessageDto dto) {
         GameId gameId = sessionsApi.findGameIdBySessionId(dto.gameId());
         UserId winnerId = dto.winnerId() != null
-                ? usersApi.findIdByKeycloakId(dto.winnerId())
+                ? usersApi.findIdByKeycloakId(dto.winnerId()).orElseThrow(() -> new UserNotFoundException(dto.winnerId()))
                 : null;
 
         for (String player : dto.players()) {
-            UserId userId = usersApi.findIdByKeycloakId(player);
+            UserId userId = usersApi.findIdByKeycloakId(player)
+                    .orElseThrow(() -> new UserNotFoundException(dto.winnerId()));
 
             progressService.evaluateAchievementsAfterGame(new GameContext(
                     gameId,
@@ -48,7 +50,8 @@ public class AchievementMessageHandler {
 
     @RabbitListener(queues = RabbitMQTopologyAchievements.ACHIEVEMENT_COMPLETED_QUEUE)
     void onAchievementCompletedMessageReceived(AchievementCompletedDto dto) {
-        UserId userId = usersApi.findIdByKeycloakId(dto.userId());
+        UserId userId = usersApi.findIdByKeycloakId(dto.userId())
+                .orElseThrow(() -> new UserNotFoundException(dto.userId()));
         GameId gameId = sessionsApi.findGameIdBySessionId(dto.gameId());
 
         progressService.completeAchievement(userId, gameId, dto.code(), dto.timestamp());

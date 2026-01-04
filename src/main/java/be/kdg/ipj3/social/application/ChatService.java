@@ -1,6 +1,7 @@
 package be.kdg.ipj3.social.application;
 
 import be.kdg.ipj3.lobbies.shared.LobbyId;
+import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.social.api.dto.ChatDto;
 import be.kdg.ipj3.social.api.dto.ChatListDto;
 import be.kdg.ipj3.social.domain.Chat;
@@ -36,7 +37,8 @@ public class ChatService implements ChatsApi {
     }
 
     public List<ChatListDto> findChatListByKeycloakId(String keycloakId) {
-        UserId userId = usersApi.findIdByKeycloakId(keycloakId);
+        UserId userId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         return chatRepository.findChatsByUserId(userId).stream()
                 .map(chat -> {
@@ -51,7 +53,8 @@ public class ChatService implements ChatsApi {
     }
 
     public ChatDto findChatById(String keycloakId, ChatId chatId) {
-        UserId currentUser = usersApi.findIdByKeycloakId(keycloakId);
+        UserId currentUser = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(chatId::notFound);
@@ -74,7 +77,8 @@ public class ChatService implements ChatsApi {
     }
 
     public ChatDto createChat(String keycloakId, Set<UserId> participants) {
-        UserId currentUser = usersApi.findIdByKeycloakId(keycloakId);
+        UserId currentUser = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         Set<UserId> participantIds = new HashSet<>(participants);
         participantIds.add(currentUser);
@@ -107,7 +111,8 @@ public class ChatService implements ChatsApi {
     }
 
     public ChatDto sendMessage(String keycloakId, ChatId chatId, String content) {
-        UserId currentUser = usersApi.findIdByKeycloakId(keycloakId);
+        UserId currentUser = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(chatId::notFound);

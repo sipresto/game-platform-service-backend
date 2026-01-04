@@ -52,7 +52,8 @@ public class LobbyService implements LobbyApi {
     }
 
     public Lobby createLobby(String keycloakId, String password, UUID gameIdParam) {
-        var hostId = usersApi.findIdByKeycloakId(keycloakId);
+        var hostId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         if (hostId == null) {
             throw new UserNotFoundException(keycloakId);
         }
@@ -68,10 +69,8 @@ public class LobbyService implements LobbyApi {
 
     public void joinLobby(UUID id, String keycloakId, String password) {
 
-        var playerId = usersApi.findIdByKeycloakId(keycloakId);
-        if (playerId == null) {
-            throw new UserNotFoundException(keycloakId);
-        }
+        var playerId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         var lobbyId = new LobbyId(id);
         Lobby lobby = lobbyRepository.findById(lobbyId)
@@ -83,10 +82,8 @@ public class LobbyService implements LobbyApi {
     }
 
     public void addBot(UUID id, String keycloakId, Difficulty difficulty) {
-        var playerId = usersApi.findIdByKeycloakId(keycloakId);
-        if (playerId == null) {
-            throw new UserNotFoundException(keycloakId);
-        }
+        var playerId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         var lobbyId = new LobbyId(id);
         Lobby lobby = lobbyRepository.findById(lobbyId)
@@ -100,10 +97,8 @@ public class LobbyService implements LobbyApi {
     }
 
     public void removeBot(UUID id, String keycloakId, int botNumber) {
-        var playerId = usersApi.findIdByKeycloakId(keycloakId);
-        if (playerId == null) {
-            throw new UserNotFoundException(keycloakId);
-        }
+        var playerId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         var lobbyId = new LobbyId(id);
         Lobby lobby = lobbyRepository.findById(lobbyId)
@@ -123,10 +118,9 @@ public class LobbyService implements LobbyApi {
 
 
     public LobbyDetailDto getLobbyDetails(UUID lobbyId, String keycloakId) {
-        var id = usersApi.findIdByKeycloakId(keycloakId);
-        if (id == null) {
-            throw new UserNotFoundException(keycloakId);
-        }
+        usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
+
         Lobby lobby = findLobbyById(lobbyId);
 
         return getLobbyDetailDto(lobby);
@@ -144,10 +138,8 @@ public class LobbyService implements LobbyApi {
     }
 
     public String startGame(UUID id, String requestorKeycloakId) {
-        var requestor = usersApi.findIdByKeycloakId(requestorKeycloakId);
-        if (requestor == null) {
-            throw new UserNotFoundException(requestorKeycloakId);
-        }
+        var requestor = usersApi.findIdByKeycloakId(requestorKeycloakId)
+                .orElseThrow(() -> new UserNotFoundException(requestorKeycloakId));
 
         var lobbyId = new LobbyId(id);
 
@@ -232,31 +224,26 @@ public class LobbyService implements LobbyApi {
 
     @Transactional(readOnly = true)
     public List<Lobby> findAllOpenLobbies(String keycloakId) {
-        var userId = usersApi.findIdByKeycloakId(keycloakId);
-        if (userId == null) {
-            throw new UserNotFoundException(keycloakId);
-        }
+        usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
+
         return lobbyRepository.findByStatus(LobbyStatus.OPEN);
     }
 
     @Transactional(readOnly = true)
     public List<Lobby> findOpenLobbiesForGame(UUID id, String keycloakId) {
-
         var gameId = gamesApi.findGameById(id).getId();
-        var user = usersApi.findIdByKeycloakId(keycloakId);
-        if (user == null) {
-            throw new UserNotFoundException(keycloakId);
-        }
+
+        usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         return lobbyRepository.findByStatusAndGameId(LobbyStatus.OPEN, gameId);
     }
 
     public void leaveLobby(UUID id, String keycloakId) {
 
-        var playerId = usersApi.findIdByKeycloakId(keycloakId);
-        if (playerId == null) {
-            throw new UserNotFoundException(keycloakId);
-        }
+        var playerId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         var lobbyId = new LobbyId(id);
 
         Lobby lobby = lobbyRepository.findById(lobbyId)
@@ -271,10 +258,8 @@ public class LobbyService implements LobbyApi {
     }
 
     public void invite(UUID lobbyUUID, String keycloakId, UUID receiverUUID) {
-        var senderId = usersApi.findIdByKeycloakId(keycloakId);
-        if (senderId == null) {
-            throw new UserNotFoundException(keycloakId);
-        }
+        var senderId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         UserId receiverId = new UserId(receiverUUID);
         if (!usersApi.existsById(receiverUUID)) {
@@ -291,10 +276,8 @@ public class LobbyService implements LobbyApi {
     }
 
     public LobbyDetailDto findCurrentLobbyDetailDtoForPlayer(String keycloakId) {
-        var userId = usersApi.findIdByKeycloakId(keycloakId);
-        if (userId == null) {
-            throw new UserNotFoundException(keycloakId);
-        }
+        var userId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         Lobby lobby = lobbyRepository.findCurrentLobbyByUserId(userId)
                 .orElse(null);
 

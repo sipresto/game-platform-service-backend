@@ -1,5 +1,6 @@
 package be.kdg.ipj3.users.api;
 
+import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.users.api.dto.BlockedUserDto;
 import be.kdg.ipj3.users.api.dto.PublicUserDto;
 import be.kdg.ipj3.users.api.dto.UserDto;
@@ -112,7 +113,9 @@ public class UserController {
             @AuthenticationPrincipal Jwt jwt
     ) {
         List<User> users = userService.findAllPublicUsers();
-        User viewer = userService.findByKeycloakId(jwt.getSubject());
+        User viewer = userService.findByKeycloakId(jwt.getSubject())
+                .orElseThrow(() -> new UserNotFoundException(jwt.getSubject()));
+
         var userDtos = users.stream()
                 .filter(user -> !user.getBlockedUsers().contains(viewer.getId()))
                 .filter(user -> !viewer.getBlockedUsers().contains(user.getId()))
@@ -126,7 +129,9 @@ public class UserController {
      */
     @GetMapping("/friends")
     public ResponseEntity<List<PublicUserDto>> getFriendsForUser(@AuthenticationPrincipal Jwt jwt) {
-        var user = userService.findByKeycloakId(jwt.getSubject());
+        var user = userService.findByKeycloakId(jwt.getSubject())
+                .orElseThrow(() -> new UserNotFoundException(jwt.getSubject()));
+
         var friends = userService.findFriends(user);
         var friendDtos = friends.stream()
                 .map(friend -> PublicUserDto.fromDomain(friend, user))
@@ -143,7 +148,8 @@ public class UserController {
             @AuthenticationPrincipal Jwt jwt
     ) {
         User targetUser = userService.findById(userId);
-        var viewer = userService.findByKeycloakId(jwt.getSubject());
+        var viewer = userService.findByKeycloakId(jwt.getSubject())
+                .orElseThrow(() -> new UserNotFoundException(jwt.getSubject()));
 
         if(targetUser.getBlockedUsers().contains(viewer.getId()) || viewer.getBlockedUsers().contains(targetUser.getId())) {
             return ResponseEntity.ok(null);
