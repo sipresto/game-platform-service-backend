@@ -66,12 +66,25 @@ public class ChatbotService implements ChatbotApi {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("file", fileResource);
 
-        restClient.post()
-                .uri("/api/upload")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(body)
-                .retrieve()
-                .body(ChatbotUploadResponseDto.class);
+        try {
+            ChatbotUploadResponseDto response = restClient.post()
+                    .uri("/api/upload")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .body(body)
+                    .retrieve()
+                    .onStatus(status -> status.value() == 422, (request, response1) -> {
+                        throw new ServiceUnavailableException("Validation error from RAG API");
+                    })
+                    .body(ChatbotUploadResponseDto.class);
+
+            if (response != null && !response.success()) {
+                log.warn("RAG upload reported failure: {}", response.message());
+            }
+        } catch (Exception e) {
+            log.error("Failed to upload to RAG: {}", e.getMessage());
+            throw new ServiceUnavailableException("Could not upload to RAG API " + e);
+        }
     }
 
     public String askAi(String userMessage) {
