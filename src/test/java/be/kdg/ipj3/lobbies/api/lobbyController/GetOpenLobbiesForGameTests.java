@@ -112,9 +112,9 @@ public class GetOpenLobbiesForGameTests {
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].currentPlayerCount").value(1))
-                .andExpect(jsonPath("$[0].isPrivate").value(true));
+                .andExpect(jsonPath("$.availableLobbies", hasSize(1)))
+                .andExpect(jsonPath("$.availableLobbies[0].currentPlayerCount").value(1))
+                .andExpect(jsonPath("$.availableLobbies[0].isPrivate").value(true));
     }
 
     @Test
@@ -131,7 +131,7 @@ public class GetOpenLobbiesForGameTests {
                         .with(validJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.availableLobbies", hasSize(0)));
     }
 
     @Test
