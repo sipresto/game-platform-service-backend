@@ -7,6 +7,7 @@ import be.kdg.ipj3.sessions.domain.SessionRepository;
 import be.kdg.ipj3.sessions.shared.SessionId;
 import be.kdg.ipj3.sessions.shared.SessionStatus;
 import be.kdg.ipj3.sessions.shared.SessionsApi;
+import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,8 @@ public class SessionService implements SessionsApi {
 
     @Transactional(readOnly = true)
     public List<Session> findFinishedSessionsByUserId(String keycloakId) {
-        var userId = usersApi.findIdByKeycloakId(keycloakId);
+        var userId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         return sessionRepository.findFinishedSessionsByUserId(userId);
     }

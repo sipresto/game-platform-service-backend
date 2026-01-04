@@ -4,6 +4,7 @@ import be.kdg.ipj3.notifications.application.NotificationService;
 import be.kdg.ipj3.notifications.infrastructure.rabbitmq.config.RabbitMQTopologyNotifications;
 import be.kdg.ipj3.notifications.infrastructure.rabbitmq.dto.TurnNotificationDto;
 import be.kdg.ipj3.notifications.shared.NotificationType;
+import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.users.shared.UserId;
 import be.kdg.ipj3.users.shared.UsersApi;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -24,7 +25,9 @@ public class NotificationMessageHandler {
 
     @RabbitListener(queues = RabbitMQTopologyNotifications.TURN_NOTIFICATIONS_QUEUE)
     void onNotificationMessageReceived(TurnNotificationDto dto) {
-        UserId userId = usersApi.findIdByKeycloakId(dto.userId());
+        UserId userId = usersApi.findIdByKeycloakId(dto.userId())
+                .orElseThrow(() -> new UserNotFoundException(dto.userId()));
+
         notificationService.addNotification(null, dto.description(), NotificationType.YOUR_TURN, Instant.now(),
                 userId, null);
     }

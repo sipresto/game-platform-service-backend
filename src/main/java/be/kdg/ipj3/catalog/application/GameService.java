@@ -106,7 +106,8 @@ public class GameService implements GamesApi {
 
     @Transactional(readOnly = true)
     public List<Game> findOwnedGamesByKeycloakId(String keycloakId) {
-        UserId userId = usersApi.findIdByKeycloakId(keycloakId);
+        UserId userId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id(), keycloakId);
         if(ownedGameIds == null || ownedGameIds.isEmpty()) {
             return List.of();
@@ -115,11 +116,11 @@ public class GameService implements GamesApi {
     }
 
     @Transactional(readOnly = true)
-    public List<Game> findOwnedGamesByUserId(UserId userId, String keycloakid) {
+    public List<Game> findOwnedGamesByUserId(UserId userId, String keycloakId) {
         if (!usersApi.existsById(userId.id())) {
             throw new UserNotFoundException(userId.id().toString());
         }
-        List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id(), keycloakid);
+        List<GameId> ownedGameIds = usersApi.findOwnedGamesById(userId.id(), keycloakId);
         if(ownedGameIds == null || ownedGameIds.isEmpty()) {
             return List.of();
         }
@@ -128,7 +129,8 @@ public class GameService implements GamesApi {
 
     @Transactional(readOnly = true)
     public List<Game> findFavoriteGamesByKeycloakId(String keycloakId) {
-        var userId = usersApi.findIdByKeycloakId(keycloakId);
+        var userId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
         var favoriteGamesIds = usersApi.findFavoriteGamesByUserId(userId.id());
         return gameRepository.findGamesByIds(favoriteGamesIds);
     }

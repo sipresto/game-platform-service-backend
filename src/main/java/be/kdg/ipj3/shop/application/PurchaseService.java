@@ -2,6 +2,7 @@ package be.kdg.ipj3.shop.application;
 
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.catalog.shared.GamesApi;
+import be.kdg.ipj3.shared.domain.exceptions.UserNotFoundException;
 import be.kdg.ipj3.shop.domain.IPurchaseRepository;
 import be.kdg.ipj3.shop.domain.Purchase;
 import be.kdg.ipj3.users.shared.UserId;
@@ -25,7 +26,8 @@ public class PurchaseService {
     public Purchase buy(String keycloakId, UUID gameIdParam, String chargeId) {
         GameId gameId = new GameId(gameIdParam);
 
-        UserId userId = usersApi.findIdByKeycloakId(keycloakId);
+        UserId userId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         if (!gamesApi.existsById(gameIdParam)) {
             throw GameId.notFound(gameIdParam);

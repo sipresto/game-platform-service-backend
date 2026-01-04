@@ -32,7 +32,9 @@ public class NotificationService {
     }
 
     public List<Notification> findAllNotifications(String keycloakId) {
-        var userId = usersApi.findIdByKeycloakId(keycloakId);
+        var userId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
+
         return notificationRepository.findByUserId(userId);
     }
 
@@ -77,11 +79,13 @@ public class NotificationService {
         }
     }
 
-    public void readNotification(UUID id, String keycloakid) {
+    public void readNotification(UUID id, String keycloakId) {
         NotificationId notificationId = new NotificationId(id);
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(notificationId::notFound);
-        var userId = usersApi.findIdByKeycloakId(keycloakid);
+        var userId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
+
         if (!notification.getUser().equals(userId)) {
             throw new UserNotFoundException("User not found with id: " + userId);
         }
@@ -91,14 +95,16 @@ public class NotificationService {
     }
 
     public UserNotificationPreferences getPreferencesByKeycloakId(String keycloakId) {
-        UserId userId = usersApi.findIdByKeycloakId(keycloakId);
+        UserId userId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         return preferencesRepository.findByUserId(userId)
                 .orElse(new UserNotificationPreferences(userId));
     }
 
     public void updatePreferences(String keycloakId, NotificationType type, NotificationChannel channel, boolean enabled) {
-        UserId userId = usersApi.findIdByKeycloakId(keycloakId);
+        UserId userId = usersApi.findIdByKeycloakId(keycloakId)
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         UserNotificationPreferences prefs = preferencesRepository.findByUserId(userId)
                 .orElse(new UserNotificationPreferences(userId));
