@@ -13,7 +13,8 @@ public record GameDto(
         String description,
         BigDecimal price,
         String rules,
-        List<Category> categories
+        List<Category> categories,
+        int maxPlayers
 ) {
     public static GameDto fromDomain(Game game) {
         return new GameDto(
@@ -22,7 +23,8 @@ public record GameDto(
                 game.getDescription(),
                 game.getPrice().amount(),
                 game.getRules(),
-                game.getCategories()
+                game.getCategories(),
+                game.getMaxPlayers()
         );
     }
 }

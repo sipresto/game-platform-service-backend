@@ -6,7 +6,7 @@ import be.kdg.ipj3.catalog.domain.GameRepository;
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.api.dto.GameStartDto;
 import be.kdg.ipj3.lobbies.domain.Lobby;
-import be.kdg.ipj3.lobbies.domain.LobbyId;
+import be.kdg.ipj3.lobbies.shared.LobbyId;
 import be.kdg.ipj3.lobbies.domain.LobbyRepository;
 import be.kdg.ipj3.lobbies.infrastructure.rest.GameClient;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
