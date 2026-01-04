@@ -1,4 +1,4 @@
-package be.kdg.ipj3.lobbies.domain;
+package be.kdg.ipj3.lobbies.shared;
 
 import be.kdg.ipj3.shared.domain.exceptions.NotFoundException;
 import org.jmolecules.ddd.annotation.ValueObject;

@@ -2,7 +2,7 @@ package be.kdg.ipj3.lobbies.infrastructure.jpa;
 
 import be.kdg.ipj3.catalog.shared.GameId;
 import be.kdg.ipj3.lobbies.domain.Lobby;
-import be.kdg.ipj3.lobbies.domain.LobbyId;
+import be.kdg.ipj3.lobbies.shared.LobbyId;
 import be.kdg.ipj3.lobbies.domain.LobbyStatus;
 import be.kdg.ipj3.lobbies.shared.Difficulty;
 import be.kdg.ipj3.users.shared.UserId;

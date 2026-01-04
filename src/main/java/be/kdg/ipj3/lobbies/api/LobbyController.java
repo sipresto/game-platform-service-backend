@@ -146,4 +146,16 @@ public class LobbyController {
 
         return ResponseEntity.ok(lobbyDetail);
     }
+
+    @PatchMapping("/{lobbyId}/invite")
+    public ResponseEntity<Void> inviteToLobby(
+            @PathVariable UUID lobbyId,
+            @RequestBody InvitePlayerDto dto,
+            @AuthenticationPrincipal Jwt token
+    ) {
+        String keycloakId = token.getSubject();
+
+        lobbyService.invite(lobbyId, keycloakId, dto.userId());
+        return ResponseEntity.ok().build();
+    }
 }
