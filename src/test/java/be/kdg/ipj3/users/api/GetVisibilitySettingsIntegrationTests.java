@@ -23,8 +23,8 @@ public class GetVisibilitySettingsIntegrationTests extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.fieldVisibilities.PROFILE").value("PUBLIC"))
                 .andExpect(jsonPath("$.fieldVisibilities.POINTS").value("PUBLIC"))
                 .andExpect(jsonPath("$.fieldVisibilities.FAVORITE_GAMES").value("PUBLIC"))
-                .andExpect(jsonPath("$.fieldVisibilities.OWNED_GAMES").value("FRIENDS_ONLY"))
-                .andExpect(jsonPath("$.fieldVisibilities.FRIENDS_LIST").value("FRIENDS_ONLY"));
+                .andExpect(jsonPath("$.fieldVisibilities.OWNED_GAMES").value("PUBLIC"))
+                .andExpect(jsonPath("$.fieldVisibilities.FRIENDS_LIST").value("PUBLIC"));
     }
 
     @Test
