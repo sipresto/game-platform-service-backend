@@ -1,13 +1,11 @@
 package be.kdg.ipj3.notifications.application;
 
-import be.kdg.ipj3.notifications.shared.NotificationType;
 import be.kdg.ipj3.notifications.shared.EmailSendException;
-import jakarta.mail.MessagingException;
+import be.kdg.ipj3.notifications.shared.NotificationType;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -26,7 +24,7 @@ public class EmailService {
     @Value("${notification.email.from:no-reply@gameplatform.com}")
     private String fromEmail;
 
-    @Value("${notification.email.sender-name:Game Platform}")
+    @Value("${notification.email.sender-name:VibeGames}")
     private String senderName;
 
     public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
@@ -35,29 +33,9 @@ public class EmailService {
     }
 
     /**
-     * Send a simple text email
-     */
-    public void sendSimpleEmail(String to, String subject, String text) {
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(to);
-            message.setSubject(subject);
-            message.setText(text);
-
-            mailSender.send(message);
-            logger.info("Simple email sent successfully to: {}", to);
-        } catch (Exception e) {
-            logger.error("Failed to send simple email to: {}", to, e);
-            throw new EmailSendException("Failed to send email to " + to, e);
-        }
-    }
-
-    /**
      * Send an HTML email using Thymeleaf template
      */
-    public void sendHtmlEmail(String to, String subject, String templateName,
-                              Context context) throws MessagingException {
+    public void sendHtmlEmail(String to, String subject, String templateName, Context context) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -79,9 +57,7 @@ public class EmailService {
     /**
      * Send a notification email
      */
-    public void sendNotificationEmail(String to, String username,
-                                      NotificationType type,
-                                      String notificationMessage) {
+    public void sendNotificationEmail(String to, String username, NotificationType type, String notificationMessage) {
         try {
             Context context = new Context(Locale.getDefault());
             context.setVariable("username", username);
@@ -105,7 +81,7 @@ public class EmailService {
             case FRIEND_REQUEST -> "New Friend Request on " + senderName;
             case ACHIEVEMENT -> "Achievement Unlocked on " + senderName;
             case YOUR_TURN -> "It's Your Turn! - " + senderName;
-            case CHAT_MESSAGE -> null;
+            case CHAT_MESSAGE -> "New Chat Message on " + senderName;
         };
     }
 
@@ -114,7 +90,7 @@ public class EmailService {
             case FRIEND_REQUEST -> "email/friend-request";
             case ACHIEVEMENT -> "email/achievement";
             case YOUR_TURN -> "email/your-turn";
-            case CHAT_MESSAGE -> null;
+            case CHAT_MESSAGE -> "email/chat-message";
         };
     }
 }

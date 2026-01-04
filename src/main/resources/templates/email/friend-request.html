@@ -9,8 +9,6 @@
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { background-color: #4CAF50; color: white; padding: 20px; text-align: center; }
         .content { padding: 30px; background-color: #f9f9f9; }
-        .button { display: inline-block; padding: 10px 20px; background-color: #4CAF50;
-            color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
         .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
     </style>
 </head>
@@ -24,7 +22,6 @@
         <p>You have received a new friend request!</p>
         <p th:text="${message}">[Friend request message]</p>
         <p>Login to your account to accept or decline the request.</p>
-        <a href="https://your-game-platform.com" class="button">Go to Platform</a>
     </div>
     <div class="footer">
         <p>This is an automated message from <span th:text="${appName}">Game Platform</span>.</p>
