@@ -53,7 +53,7 @@ public class UserService implements UsersApi {
         }
 
         User user = userRepository.findByKeycloakId(keycloakId)
-                .orElseThrow(() -> new NotFoundException("User with keycloak id [" + keycloakId + "] not found"));
+                .orElseThrow(() -> new UserNotFoundException(keycloakId));
 
         user.updateProfile(new Profile(displayName, newBio));
         userRepository.save(user);
