@@ -8,6 +8,7 @@ public class JpaProfile {
     @Column(nullable = false)
     private String displayName;
 
+    @Column(length = 500)
     private String bio;
 
     @Lob

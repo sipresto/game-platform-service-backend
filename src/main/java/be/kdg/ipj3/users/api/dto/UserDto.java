@@ -9,6 +9,7 @@ import be.kdg.ipj3.users.shared.UserId;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.Instant;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.UUID;
 public record UserDto(
         @NotNull UUID id,
         @NotBlank String keycloakId,
-        @NotBlank String username,
+        @Size(max = 100) @NotBlank String username,
         @Valid @NotNull ProfileDto profile,
         @NotNull VisibilitySettings visibilitySettings,
         @NotNull int points,
@@ -58,8 +59,8 @@ public record UserDto(
     }
 
     public record ProfileDto(
-            @NotBlank String displayName,
-            String bio
+            @Size(max = 100) @NotBlank String displayName,
+            @Size(max = 500) String bio
     ) {
         public static ProfileDto fromDomain(Profile profile) {
             return new ProfileDto(

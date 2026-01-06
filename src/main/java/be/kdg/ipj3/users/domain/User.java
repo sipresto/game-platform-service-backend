@@ -108,7 +108,15 @@ public class User {
                 ? profile.bio()
                 : newProfile.bio();
 
-        this.profile = new Profile(displayName, bio);
+        var profileImage = newProfile.profileImage() == null
+                ? profile.profileImage()
+                : newProfile.profileImage();
+
+        String imageMimeType = newProfile.imageMimeType() == null
+                ? profile.imageMimeType()
+                : newProfile.imageMimeType();
+
+        this.profile = new Profile(displayName, bio, profileImage, imageMimeType);
         this.username = displayName;
     }
 
